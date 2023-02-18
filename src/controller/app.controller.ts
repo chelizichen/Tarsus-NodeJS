@@ -6,9 +6,6 @@ import { TestService } from "../service/test.service";
 
 @Controller("/hello")
 class appController {
-  constructor() {
-    console.log(1);
-  }
 
   @Inject(AppService)
   AppService!: AppService;

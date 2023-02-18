@@ -7,32 +7,38 @@ const Controller = (interFace: string) => {
     let router = express();
     
     context.addInitializer(() => {
+      console.log(routers);
+      
       routers.forEach((value: any, key) => {
         // value 是每个方法
         const { method, url } = key;
 
         value = value.bind(new controller())
 
+        
         let method_path = interFace + url
         
         if (method == METHODS.GET) {
           router.get(method_path, async (req,res) => {
+            
             const data = await value(req)
-            res.json(data)
+            if(!res.destroyed){
+              res.json(data);
+            }
           });
         }
 
         if (method == METHODS.POST) {
           router.post(method_path, async (req, res) => {
             const data = await value(req);
-            res.json(data);
+            if(!res.destroyed){
+              res.json(data);
+            }
           });
         }
 
       });
-      
       routers.clear()
-
       controllers.add(router)
     });
   };

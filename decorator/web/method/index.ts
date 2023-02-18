@@ -7,12 +7,12 @@ export enum METHODS{
 
 const Get = (url: string) => {
   return (value: any, context: ClassMethodDecoratorContext) => {
-    routers.set({ url, method: METHODS.GET }, value)
+      routers.set({ url, method: METHODS.GET }, value)
   };
 };
 const Post = (url: string) => {
   return (value: any, context: ClassMethodDecoratorContext) => {
-    routers.set({ url, method: METHODS.GET }, value);
+      routers.set({ url, method: METHODS.POST }, value)
   };
 };
 
