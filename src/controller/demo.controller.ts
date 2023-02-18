@@ -16,8 +16,6 @@ class demoController {
   @Get("/test")
   public test(req: Request) {
     const data = req.query;
-    console.log(this.TestService);
-
     const ret = this.TestService.hello();
 
     return { data, ret };

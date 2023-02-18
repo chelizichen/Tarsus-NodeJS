@@ -1,23 +1,30 @@
 import express from "express";
 import { controllers } from "../controller/routers";
+import { Application, ApplicationEvents } from "./index";
 
-const ArcServer = (port:number) => {
+function loaderClass(args: Function[]) {
+  args.forEach(el=>{
+    console.log(el.name ," is  loader success", );
+  })
+  ApplicationEvents.emit(Application.LOAD_SERVER)
+}
+
+const ArcServer = (port: number) => {
   return function (value: any, context: ClassDecoratorContext) {
     context.addInitializer(() => {
-      let app = express();
+      ApplicationEvents.on(Application.LOAD_SERVER, () => {
+        let app = express();
 
-      controllers.forEach((value: any) => {
-        app.use(value);
-      });
+        controllers.forEach((value: any) => {
+          app.use(value);
+        });
 
-      app.listen(port, function () {
-        console.log("Server started at port: ", port);
+        app.listen(port, function () {
+          console.log("Server started at port: ", port);
+        });
       });
-    })
+    });
   };
-
 };
 
-export {
-  ArcServer
-}
+export { ArcServer, loaderClass };

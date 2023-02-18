@@ -8,8 +8,11 @@ const Controller = (interFace: string) => {
     
     context.addInitializer(() => {
       routers.forEach((value: any, key) => {
+        // value 是每个方法
         const { method, url } = key;
+
         value = value.bind(new controller())
+
         let method_path = interFace + url
         
         if (method == METHODS.GET) {
