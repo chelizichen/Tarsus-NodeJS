@@ -30,6 +30,7 @@ class appController {
 ## use express http server
 
 ````TS
+// controlelr
 @Controller("/demo")
 class demoController {
   @Inject(AppService)
@@ -49,7 +50,10 @@ class demoController {
   @Get("/say")
   public say() {}
 }
+````
 
+````TS
+// Service
 @Collect
 class TestService {
   hello() {
@@ -57,6 +61,19 @@ class TestService {
     return "hello world"
   }
 }
+````
+
+### run application
+
+````TS
+@ArcServer(9811)
+class TestApplication{
+  static main () :void {
+    loaderClass([demoController]);
+  }
+}
+
+TestApplication.main()
 ````
 
 use POSTMAN to test
