@@ -20,7 +20,6 @@ const Controller = (interFace: string) => {
         
         if (method == METHODS.GET) {
           router.get(method_path, async (req,res) => {
-            
             const data = await value(req)
             if(!res.destroyed){
               res.json(data);

@@ -1,14 +1,8 @@
-import { Request,Response,NextFunction } from "express"
-import { Application, ApplicationEvents } from "../application"
 
-interface ArcGlobalPipe{
-    next(req:Request,res:Response,next:NextFunction):void
-}
+import { ArcPipe,UsePipe } from "./common"
+import { ArcGlobalPipe, loadGlobalPipe } from "./global"
 
-function loadGlobalPipe(args:Array<new ()=>ArcGlobalPipe>){
-    ApplicationEvents.emit(Application.LOAD_PIPE,args);
-}
 
 export {
-    ArcGlobalPipe,loadGlobalPipe
+    ArcGlobalPipe,loadGlobalPipe,ArcPipe,UsePipe
 }

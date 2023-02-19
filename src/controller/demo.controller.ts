@@ -6,25 +6,23 @@ import { LogInterCeptor } from "../interceptor/log";
 import { AppService } from "../service/app.service";
 import { TestService } from "../service/test.service";
 import { Request, Response } from "express";
-
-
+import { query } from "../../decorator/web/params/type";
+import { Goods } from "../entity/goods.entity";
 
 @Controller("/demo")
 class demoController {
-  @Inject(AppService)
-  AppService!: AppService;
 
-  @Inject(TestService)
-  TestService!: TestService;
+  @Inject(AppService) AppService: AppService;
 
-  @Get("/test")
-  @UseInterCeptor(new LogInterCeptor())
-  public test(req: Request) {
-    const data = req.query;
-    const ret = this.TestService.hello()
+  @Inject(TestService) TestService: TestService;
+
+  @Get("/test") @UseInterCeptor(new LogInterCeptor())
+  public async test(req: query<Goods>) {
+    const {id,sort_type_id} = req.query;
+    const ret = await this.TestService.hello(id,sort_type_id)
     // console.log('this',this);
     
-    return { data, ret };
+    return { ret };
   }
 
   @Get("/say")

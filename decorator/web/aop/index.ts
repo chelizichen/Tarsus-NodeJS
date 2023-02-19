@@ -5,12 +5,10 @@ function UseInterCeptor(interceptor:ArcInterCeptor){
         let copy_value = value;
         value = async function (req:Request){
             // @ts-ignore
-            const data =  await interceptor.hijack.call(this,req)
+            const data =  await interceptor.handle.call(this,req)
             if(data){
-                console.log("执行拦截器");
                 return data;
             }else{
-                console.log("执行业务");
             // @ts-ignore
                 const data = await copy_value.call(this,req)
                 return data
@@ -21,7 +19,7 @@ function UseInterCeptor(interceptor:ArcInterCeptor){
 }
 
 interface ArcInterCeptor{
-    hijack(req:Request):any;
+    handle(req:Request):any;
 }
 
 export {

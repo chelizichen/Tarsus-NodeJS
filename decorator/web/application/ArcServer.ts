@@ -2,6 +2,9 @@ import express,{ Express } from "express";
 import { controllers } from "../controller/routers";
 import { Application, ApplicationEvents } from "./index";
 import { ArcGlobalPipe } from "../pipe";
+import { nextTick,cwd} from 'process';
+import path from 'path'
+import {ArcOrm} from '../orm/ArcOrm';
 
 function loadController(args: Function[]) {
   args.forEach(el=>{
@@ -11,12 +14,30 @@ function loadController(args: Function[]) {
   ApplicationEvents.emit(Application.LOAD_SERVER)
 }
 
+function loadServer(){
+  // 加载配置
+  ApplicationEvents.emit(Application.LOAD_CONFIG)
+
+  // 最后监听
+  ApplicationEvents.emit(Application.LOAD_LISTEN)
+}
+
 const ArcServer = (port: number) => {
   return function (value: any, context: ClassDecoratorContext) {
     context.addInitializer(() => {
       const app = express()
       
-      // 优先执行
+      // 加载配置文件
+      ApplicationEvents.on(Application.LOAD_CONFIG,function(){
+        const config_path = path.resolve(cwd(),'arc.config.js')
+        const _config = require(config_path);
+        ApplicationEvents.emit(Application.LOAD_DATABASE,_config);
+
+      })
+
+      // 加载数据库
+      ApplicationEvents.on(Application.LOAD_DATABASE,ArcOrm.CreatePool)
+      // 全局管道
       ApplicationEvents.on(Application.LOAD_PIPE,function(args:Array<new ()=>ArcGlobalPipe>){
         args.forEach( pipe =>{
           let _pipe = new pipe()
@@ -24,20 +45,23 @@ const ArcServer = (port: number) => {
         })
       })
 
+      // 加载路由
       ApplicationEvents.on(Application.LOAD_SERVER, () => {
-        // 下一次事件循环执行run server
-        setImmediate(()=>{
           controllers.forEach((value: any) => {
             app.use(value);
           });
-  
+      });
+
+      // 监听
+      ApplicationEvents.on(Application.LOAD_LISTEN,()=>{
+        nextTick(()=>{
           app.listen(port, function () {
             console.log("Server started at port: ", port);
           });
         })
-      });
+      })
     });
   };
 };
 
-export { ArcServer, loadController };
+export { ArcServer, loadController,loadServer };

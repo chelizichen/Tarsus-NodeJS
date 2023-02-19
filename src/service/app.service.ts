@@ -1,6 +1,6 @@
-import { Collect } from "../../decorator/ioc";
+import { Service } from "../../decorator/web/service";
 
-@Collect
+@Service
 class AppService {
 
   hello() {
