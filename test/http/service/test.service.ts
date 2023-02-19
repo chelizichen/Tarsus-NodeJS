@@ -1,5 +1,5 @@
-import { Service } from "../../decorator/web/service";
-import { Inject } from "../../decorator/ioc";
+import { Service } from "../../../decorator/web/service";
+import { Inject } from "../../../decorator/ioc";
 import { GoodsMapper } from "../mapper/goods.mapper";
 @Service
 class TestService {

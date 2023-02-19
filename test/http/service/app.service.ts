@@ -1,4 +1,4 @@
-import { Service } from "../../decorator/web/service";
+import { Service } from "../../../decorator/web/service";
 
 @Service
 class AppService {

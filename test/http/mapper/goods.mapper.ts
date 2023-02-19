@@ -1,6 +1,7 @@
-import { ArcOrm } from "../../decorator/web/orm";
-import { Mapper } from "../../decorator/web/orm/Mapper";
-import { Select } from "../../decorator/web/orm/sql";
+import { ArcOrm } from "../../../decorator/web/orm"
+import { Mapper } from "../../../decorator/web/orm/Mapper"
+import { Select } from "../../../decorator/web/orm/sql"
+
 
 @Mapper
 class GoodsMapper{

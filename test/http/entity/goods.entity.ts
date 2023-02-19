@@ -1,5 +1,5 @@
-import { ArcOrm } from "../../decorator/web/orm";
-import { Entity } from "../../decorator/web/orm/Entity";
+import { ArcOrm } from "../../../decorator/web/orm";
+import { Entity } from "../../../decorator/web/orm/Entity";
 
 @Entity("goods")
 class Goods extends ArcOrm{

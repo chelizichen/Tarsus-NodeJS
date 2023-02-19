@@ -1,9 +1,9 @@
 import { Request } from "express";
 import { ParamsDictionary } from "express-serve-static-core";
 import { ParsedQs } from "qs";
-import { ArcInterCeptor } from "../../decorator/web/aop";
-import { ArcInstance } from "../../decorator/web/application";
 import { Goods } from "../entity/goods.entity";
+import { ArcInterCeptor } from "../../../decorator/web/aop";
+import { ArcInstance } from "../../../decorator/web/application";
 
 class LogInterCeptor implements ArcInterCeptor{
     handle(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): any {
