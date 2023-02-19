@@ -1,22 +1,29 @@
 import { ArcOrm } from "../../../decorator/web/orm";
-import { Entity } from "../../../decorator/web/orm/Entity";
+import { Column, Entity } from "../../../decorator/web/orm/Entity";
 
 @Entity("goods")
 class Goods extends ArcOrm{
     
+    @Column
     id:string;
-    
-    sort_type_id:string;
 
-    goods_name:string;
+    @Column("sort_type_id")
+    SortTypeId:string;
 
-    goods_price:string;
+    @Column("goods_name")
+    GoodsName:string;
 
-    goods_rest_num:string;
+    @Column("goods_price")
+    GoodsPrice:string;
 
-    seller_id:string;
+    @Column("goods_rest_num")
+    GoodsRestNum:string;
 
-    sort_child_id:string;
+    @Column("seller_id")
+    SellerId:string;
+
+    @Column("sort_child_id")
+    SortChildId:string;
     
 
 }

@@ -1,4 +1,6 @@
 import * as mysql from "mysql";
+import { EntityMap } from "./Entity";
+import _ from "lodash";
 // ORM 基类
 class ArcOrm {
   static getConnection() {}
@@ -24,7 +26,7 @@ class ArcOrm {
     }
   }
 
-  static async query(prepareSqlAndArgs: any): Promise<any> {
+  static async query(prepareSqlAndArgs: any,Class:any): Promise<any> {
     return new Promise(async (resolve,reject)=>{
       const { sql, args } = prepareSqlAndArgs;
       console.log(prepareSqlAndArgs);
@@ -36,12 +38,31 @@ class ArcOrm {
           if(err){
             reject(err)
           }
-          resolve(resu)
+
+          if(resu && resu.length){
+            const fields = EntityMap.get(Class.name) as Map<string,string>
+            // mapper orm
+            const data = resu.map(item=>{
+              const toObjFields = [...fields.entries()].reduce((obj, [key, value]) => (obj[key] = value, obj), {})
+              for(let k in toObjFields){
+                toObjFields[k] = item[toObjFields[k]]
+              }
+              return toObjFields
+            })
+            resolve(data)
+          }else{
+            resolve(resu)
+          }
         })
       })
 
     })
 
+  }
+
+  getList(){
+    console.log('Get List Test');
+    
   }
   // static async queryTest(sql:string){
   //   const data = await ArcOrm.ConnectionPool.query(sql);

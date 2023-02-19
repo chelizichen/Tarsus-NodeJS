@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "strictPropertyInitialization": false,
-        "esModuleInterop":true
+        "esModuleInterop":true,
+        "downlevelIteration":true
     }
 }

@@ -16,8 +16,9 @@ class demoController {
 
   @Get("/test") @UseInterCeptor(new LogInterCeptor())
   public async test(req: query<Goods>) {
-    const {id,sort_type_id} = req.query;
-    const ret = await this.TestService.hello(id,sort_type_id)
+    const {id,SortTypeId} = req.query;
+    req.query.getList()
+    const ret = await this.TestService.hello(id,SortTypeId)
     return { ret };
   }
 

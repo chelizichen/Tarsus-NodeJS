@@ -13,14 +13,14 @@ enum Application{
     LOAD_DATABASE="loaddatabase"
 }
 
-function ArcInstance(BASE){
+function ArcInstance<T extends new ()=>void>(BASE:T):InstanceType<T>{
     const hasInst = IocMap.get(BASE.name)
     if(hasInst){
         return hasInst
     }else{
         const INST = new BASE()
         IocMap.set(BASE.name,INST)
-        return INST
+        return INST as InstanceType<T>
     }
 }
 
