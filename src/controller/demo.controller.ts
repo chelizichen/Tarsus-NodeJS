@@ -7,6 +7,8 @@ import { AppService } from "../service/app.service";
 import { TestService } from "../service/test.service";
 import { Request, Response } from "express";
 
+
+
 @Controller("/demo")
 class demoController {
   @Inject(AppService)
@@ -26,7 +28,11 @@ class demoController {
   }
 
   @Get("/say")
-  public say() {}
+  public say(req:Request) {
+    return {
+      
+    }
+  }
 }
 
 export { demoController };
