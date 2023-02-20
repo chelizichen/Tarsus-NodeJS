@@ -1,0 +1,16 @@
+RPC-TEST localhost:7099/proxy/interceptor
+
+{
+    "interFace": "DemoInterFace",
+    "method": "say",
+    "data": {
+        "name":"测试名称",
+        "age":"22",
+        "value":{
+            "song":"测试歌曲",
+            "time":"5:54"
+        }
+    },
+    "timeout": "60000",
+    "key": "-h 127.0.0.1 -p 10012"
+}
