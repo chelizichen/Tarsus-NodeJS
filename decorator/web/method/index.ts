@@ -2,7 +2,8 @@ import { routers } from "../controller/routers";
 
 export enum METHODS{
   GET = "get",
-  POST = "post"
+  POST = "post",
+  VIEW = "view"
 }
 
 const Get = (url: string) => {

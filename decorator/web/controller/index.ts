@@ -1,7 +1,10 @@
+import { readFileSync } from 'fs';
 import express, { Express } from "express";
 import { routers, controllers } from "./routers";
 import { METHODS } from "../method";
-
+import ArtTemplate from 'art-template'
+import {cwd} from 'process'
+import path from 'path'
 const Controller = (interFace: string) => {
   return function (controller: new () => void, context: ClassDecoratorContext) {
     let router = express();
@@ -34,6 +37,19 @@ const Controller = (interFace: string) => {
               res.json(data);
             }
           });
+        }
+
+        if(method == METHODS.VIEW){
+          router.get(method_path, async (req,res) => {
+            // const layout = path.join(cwd(),"public","views",interFace,url+".art")
+            const ret = await value(req)
+            // const read_file = readFileSync(layout,"utf-8")
+            let {data,template} = ret
+            const after_render = ArtTemplate.render(template,data)
+            if(!res.destroyed){
+              res.end(after_render)
+            }
+          })
         }
 
       });

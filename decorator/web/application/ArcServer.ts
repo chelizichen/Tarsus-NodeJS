@@ -22,11 +22,19 @@ function loadServer() {
   ApplicationEvents.emit(Application.LOAD_LISTEN);
 }
 
+function loadInit(callback:(app:Express)=>void){
+  ApplicationEvents.on(Application.LOAD_INIT,(app)=>{
+    callback(app)
+  })
+}
+
 const ArcHttpApplication = (port: number) => {
   return function (value: any, context: ClassDecoratorContext) {
     context.addInitializer(() => {
       const app = express();
       app.use(express.json())
+
+      // 执行初始化逻辑
 
       // 加载配置文件
       ApplicationEvents.on(Application.LOAD_CONFIG, function () {
@@ -58,6 +66,7 @@ const ArcHttpApplication = (port: number) => {
       // 监听
       ApplicationEvents.on(Application.LOAD_LISTEN, () => {
         nextTick(() => {
+          ApplicationEvents.emit(Application.LOAD_INIT,app)
           app.listen(port, function () {
             console.log("Server started at port: ", port);
           });
@@ -67,4 +76,4 @@ const ArcHttpApplication = (port: number) => {
   };
 };
 
-export { ArcHttpApplication, loadController, loadServer };
+export { ArcHttpApplication, loadController, loadServer,loadInit };
