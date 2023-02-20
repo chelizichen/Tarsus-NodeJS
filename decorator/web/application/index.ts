@@ -1,5 +1,5 @@
 import { IocMap } from "../../ioc/collects";
-import { ArcServer } from "./ArcServer";
+import { ArcHttpApplication } from "./ArcServer";
 import {EventEmitter} from 'node:events'
 
 const ApplicationEvents = new EventEmitter();
@@ -24,4 +24,4 @@ function ArcInstance<T extends new ()=>void>(BASE:T):InstanceType<T>{
     }
 }
 
-export { ArcServer,ApplicationEvents,Application,ArcInstance };
+export { ArcHttpApplication, ApplicationEvents, Application, ArcInstance };

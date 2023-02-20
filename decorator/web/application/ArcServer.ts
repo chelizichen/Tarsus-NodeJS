@@ -1,67 +1,70 @@
-import express,{ Express } from "express";
+import express, { Express } from "express";
 import { controllers } from "../controller/routers";
 import { Application, ApplicationEvents } from "./index";
 import { ArcGlobalPipe } from "../pipe";
-import { nextTick,cwd} from 'process';
-import path from 'path'
-import {ArcOrm} from '../orm/ArcOrm';
+import { nextTick, cwd } from "process";
+import path from "path";
+import { ArcOrm } from "../orm/ArcOrm";
 
 function loadController(args: Function[]) {
-  args.forEach(el=>{
-    console.log(el.name ," is  loader success", );
-  })
+  args.forEach((el) => {
+    console.log(el.name, " is  loader success");
+  });
 
-  ApplicationEvents.emit(Application.LOAD_SERVER)
+  ApplicationEvents.emit(Application.LOAD_SERVER);
 }
 
-function loadServer(){
+function loadServer() {
   // 加载配置
-  ApplicationEvents.emit(Application.LOAD_CONFIG)
+  ApplicationEvents.emit(Application.LOAD_CONFIG);
 
   // 最后监听
-  ApplicationEvents.emit(Application.LOAD_LISTEN)
+  ApplicationEvents.emit(Application.LOAD_LISTEN);
 }
 
-const ArcServer = (port: number) => {
+const ArcHttpApplication = (port: number) => {
   return function (value: any, context: ClassDecoratorContext) {
     context.addInitializer(() => {
-      const app = express()
-      
-      // 加载配置文件
-      ApplicationEvents.on(Application.LOAD_CONFIG,function(){
-        const config_path = path.resolve(cwd(),'arc.config.js')
-        const _config = require(config_path);
-        ApplicationEvents.emit(Application.LOAD_DATABASE,_config);
+      const app = express();
+      app.use(express.json())
 
-      })
+      // 加载配置文件
+      ApplicationEvents.on(Application.LOAD_CONFIG, function () {
+        const config_path = path.resolve(cwd(), "arc.config.js");
+        const _config = require(config_path);
+        ApplicationEvents.emit(Application.LOAD_DATABASE, _config);
+      });
 
       // 加载数据库
-      ApplicationEvents.on(Application.LOAD_DATABASE,ArcOrm.CreatePool)
+      ApplicationEvents.on(Application.LOAD_DATABASE, ArcOrm.CreatePool);
       // 全局管道
-      ApplicationEvents.on(Application.LOAD_PIPE,function(args:Array<new ()=>ArcGlobalPipe>){
-        args.forEach( pipe =>{
-          let _pipe = new pipe()
-          app.use("*",(req,res,next)=>_pipe.next(req,res,next))
-        })
-      })
+      ApplicationEvents.on(
+        Application.LOAD_PIPE,
+        function (args: Array<new () => ArcGlobalPipe>) {
+          args.forEach((pipe) => {
+            let _pipe = new pipe();
+            app.use("*", (req, res, next) => _pipe.next(req, res, next));
+          });
+        }
+      );
 
       // 加载路由
       ApplicationEvents.on(Application.LOAD_SERVER, () => {
-          controllers.forEach((value: any) => {
-            app.use(value);
-          });
+        controllers.forEach((value: any) => {
+          app.use(value);
+        });
       });
 
       // 监听
-      ApplicationEvents.on(Application.LOAD_LISTEN,()=>{
-        nextTick(()=>{
+      ApplicationEvents.on(Application.LOAD_LISTEN, () => {
+        nextTick(() => {
           app.listen(port, function () {
             console.log("Server started at port: ", port);
           });
-        })
-      })
+        });
+      });
     });
   };
 };
 
-export { ArcServer, loadController,loadServer };
+export { ArcHttpApplication, loadController, loadServer };

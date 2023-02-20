@@ -8,10 +8,10 @@ class Demo{
     @Inject(DemoService) DemoService:DemoService
 
     @ArcMethod
-    say(){
-        console.log(this.DemoService.TestDemo());
-        console.log(this.hello);
-        return '112233'
+    say() {
+        // 将 arguments 转为对象的形式
+        console.log(arguments.length);
+        return arguments;
     }
 
     @ArcMethod

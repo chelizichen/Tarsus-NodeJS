@@ -37,7 +37,7 @@ class ArcServer {
     }
 
     async recieve(data: Buffer) {
-        console.log(data.toString());
+        console.log('接收到消息',data.toString());
         
         let head_end = data.indexOf("[##]");
         let timeout = Number(this.unpkgHead(2, data));
