@@ -28,7 +28,7 @@ class TestApplication {
       app.set('view engine', 'art');
       app.engine('art',template);
     })
-    proxyService.boost()
+    // proxyService.boost()
     loadServer();
   }
 }

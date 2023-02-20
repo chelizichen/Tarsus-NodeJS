@@ -4,7 +4,11 @@ import { Service } from "../../../decorator/web/service";
 class AppService {
 
   hello() {
-    console.log("hello world");
+    console.log("AppService！！！！！！！！！！！！！！！！！");
+  }
+
+  static test(){
+    
   }
 }
 
