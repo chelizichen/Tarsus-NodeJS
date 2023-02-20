@@ -3,7 +3,6 @@ import { ParamsDictionary } from "express-serve-static-core";
 import { ParsedQs } from "qs";
 import { Goods } from "../entity/goods.entity";
 import { ArcInterCeptor } from "../../../decorator/web/aop";
-import { ArcInstance } from "../../../decorator/web/application";
 import { class_transformer } from "../../../decorator/web/pipe";
 
 class LogInterCeptor implements ArcInterCeptor{
