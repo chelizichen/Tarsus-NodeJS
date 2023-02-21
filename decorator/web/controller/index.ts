@@ -1,8 +1,7 @@
-import { readFileSync } from 'fs';
 import express, { Express } from "express";
 import { routers, controllers } from "./routers";
-import { METHODS } from "../method";
-import ArtTemplate from 'art-template'
+import { METHODS } from "../method/index";
+import ReactDom from 'react-dom/server'
 const Controller = (interFace: string) => {
   return function (controller: new () => any, context: ClassDecoratorContext) {
     let router = express();
@@ -41,12 +40,15 @@ const Controller = (interFace: string) => {
         }
 
         if(method == METHODS.VIEW){
-          router.get(method_path, async (req,res) => {
+          router.get(method_path, async (req, res) => {
+            res.writeHead(200, { "Content-Type": "text/html;charset=utf-8" });
             const ret = await value(req)
-            let {data,template} = ret
-            const after_render = ArtTemplate.render(template,data)
-            if(!res.destroyed){
-              res.end(after_render)
+            const str = ReactDom.renderToString(ret);
+            console.log(str);
+            
+            if (!res.destroyed) {
+              res.write(str);
+              res.end()
             }
           })
         }

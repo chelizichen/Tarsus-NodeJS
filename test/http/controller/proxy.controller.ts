@@ -1,7 +1,7 @@
-import { Inject } from "../../../decorator/ioc";
+import { Inject } from "../../../decorator/ioc/index";
 import { proxyService } from "../../../decorator/microservice/service/proxyService";
-import { Controller } from "../../../decorator/web/controller";
-import { Post } from "../../../decorator/web/method";
+import { Controller } from "../../../decorator/web/controller/index";
+import { Post } from "../../../decorator/web/method/index";
 import { body } from "../../../decorator/web/params/type";
 import { AppService } from "../service/app.service";
 

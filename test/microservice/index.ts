@@ -1,5 +1,5 @@
-import { ArcServerApplication } from "../../decorator/microservice/application"
-import { loadInterFace, loadMicroService } from "../../decorator/microservice/load"
+import { ArcServerApplication } from "../../decorator/microservice/application/index"
+import { loadInterFace, loadMicroService } from "../../decorator/microservice/load/index"
 import { Demo } from "./register/demo"
 import { Hello } from "./register/hello"
 
