@@ -3,18 +3,22 @@ import path from "path";
 import { nextTick } from "node:process";
 import { call } from "../utils/call";
 import { TarsusProxy } from "../../web/proxy";
+import { Response } from "express";
 
 export class proxyService {
-  static async transmit(body: any) {
-    console.log(body);
+  static transmit(body: any,res:Response) {
     const { key } = body;
-
-    let Arc_ProxyInstance = proxyService.MicroServices.get(key);
-
-    if (Arc_ProxyInstance) {
-      const buf = call(body);
-      const data = await Arc_ProxyInstance.write(buf);
-      return data;
+    let ProxyInstance = proxyService.MicroServices.get(key);
+    if (ProxyInstance) {
+      const { head, buffer } = call(body);
+      ProxyInstance.write(buffer);
+      // 为 EventEmitter 注册事件
+      ProxyInstance.TarsusEvents.on("1", function (args) {
+        const _to_json_ = JSON.stringify(args);
+        if (!res.destroyed) {
+          res.json(_to_json_);
+        }
+      });
     } else {
       return 0;
     }
@@ -45,8 +49,4 @@ export class proxyService {
     });
   }
 
-  static async log() {
-    // @ts-ignore
-    let proxy_instance = new ArcProxy("127.0.0.1", parseInt("10012"));
-  }
 }

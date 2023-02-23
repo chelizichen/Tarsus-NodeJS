@@ -1,6 +1,6 @@
-import { Socket } from 'net'
-
-
+import { Socket } from "net";
+import { EventEmitter } from "node:events";
+import { Response } from "express";
 /**
  * @description 微服务接口代理层
  */
@@ -9,23 +9,21 @@ class TarsusProxy {
     return `-h ${host} -p ${port}`;
   }
 
-  java = false;
+  public java = false;
+  public socket: Socket;
+  public host: string;
+  public port: number;
+  public key: string;
+  public intervalConnect: any = false;
+  public _config_info_: any;
 
-  socket: Socket;
-  host: string;
-  port: number;
-  key: string;
-  intervalConnect: any = false;
-  _config_info_: any;
+  public TarsusEvents = new EventEmitter();
 
   constructor(host: string, port: number) {
     this.host = host;
     this.port = port;
-
     this.socket = new Socket();
-
     this.register_events();
-
     this.connect();
     this.key = TarsusProxy.createkey(host, port);
   }
@@ -48,6 +46,7 @@ class TarsusProxy {
     this.socket.on("end", () => {
       this.launchIntervalConnect();
     });
+    this.recieve_from_microService()
   }
 
   connect() {
@@ -62,22 +61,28 @@ class TarsusProxy {
       const { concat, from } = Buffer;
       buf = concat([buf, from("[#ENDL#]\n")]);
     }
-    return new Promise((resolve, reject) => {
-      this.socket.write(buf, async (err) => {
-        if (err) {
-          reject(err);
-        }
-        const data = await this.recieve_from_microService();
-        resolve(data);
-      });
+    this.socket.write(buf, async (err) => {
+      console.log("写入成功");
+      if (err) {
+        console.log(err);
+      }
     });
+    // return new Promise((resolve, reject) => {
+    //   this.socket.write(buf, async (err) => {
+    //     if (err) {
+    //       reject(err);
+    //     }
+    //     const data = await this.recieve_from_microService();
+    //     resolve(data);
+    //   });
+    // });
   }
 
   recieve_from_microService() {
-    return new Promise((resolve) => {
-      this.socket.on("data", function (chunk: Buffer) {
-        resolve(chunk);
-      });
+    this.socket.on("data", (chunk: Buffer) => {
+      console.log("接收到消息",chunk.toString());
+      
+      this.TarsusEvents.emit("1", chunk.toString());
     });
   }
 

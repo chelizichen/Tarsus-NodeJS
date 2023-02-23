@@ -39,15 +39,9 @@ const Controller = (interFace: string) => {
           });
         }
 
-        if(method == METHODS.VIEW){
-          router.get(method_path, async (req, res) => {
-            res.writeHead(200, { "Content-Type": "text/html;charset=utf-8" });
-            const ret = await value(req)
-            
-            if (!res.destroyed) {
-              res.write(ret);
-              res.end()
-            }
+        if(method == METHODS.Proxy){
+          router.post(method_path, async (req, res) => {
+            value(req,res)
           })
         }
 

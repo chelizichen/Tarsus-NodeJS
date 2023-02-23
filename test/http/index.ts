@@ -19,6 +19,7 @@ class TestApplication {
     loadInit((app) => {
       const public_path = path.resolve(cwd(), "public");
       app.use(express.static(public_path));
+      proxyService.boost()
     });
     loadServer();
   }

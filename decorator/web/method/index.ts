@@ -3,7 +3,7 @@ import { routers } from "../controller/routers";
 export enum METHODS{
   GET = "get",
   POST = "post",
-  VIEW = "view"
+  Proxy = "proxy"
 }
 
 const Get = (url: string) => {
@@ -17,4 +17,10 @@ const Post = (url: string) => {
   };
 };
 
-export { Get, Post };
+const Proxy = (url: string) => {
+  return (value: any, context: ClassMethodDecoratorContext) => {
+      routers.set({ url, method: METHODS.Proxy }, value)
+  };
+};
+
+export { Get, Post, Proxy };

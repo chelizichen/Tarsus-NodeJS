@@ -18,7 +18,7 @@ export function call(pkg: any) {
 
   let call_buf = Buffer.concat([head, body]);
 
-  return call_buf;
+  return { buffer: call_buf, head: head_str };
 }
 
 export function getRequestHead(...args: string[]): string {
