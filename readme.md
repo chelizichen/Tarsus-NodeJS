@@ -2,10 +2,9 @@
 
 ---
 
-Tarsus 由 [Ado-Node](https://github.com/chelizichen/ado-node)项目升级而来， 在 **Ado系列项目** 的设计中学到了很多的知识，比如一些常用的设计模式、数据库API的封装、ORM的设计、命令行与脚手架的设计、Redis的使用、微服务相关的概念，也明白了过度的封装只会让代码变得棘手和难以处理，大量的注解和装饰器也会让代码难以调试和阅读，Tarsus将会汲取这些失败的经验和设计，构建出更快更简便的**NodeJS FrameWork**。
+Tarsus FrameWork 由 [Ado](https://github.com/chelizichen/ado-node)项目升级改造而来，借助ECMAScript装饰器和Java8注解，可以快速创建并启动HTTP服务或微服务。 ECMAScript中的装饰器特性已经正式进入ES2018版本官方发布，这使得开发者无需担心兼容性问题。装饰器是一种特殊的语法抽象手段，可以装饰类，方法以及对象，使开发者更容易书写和管理程序逻辑，增加了程序的可读性，使其逻辑连贯可懂。此外，使用TypeScript和Java开发，可以提供更生动的语义，帮助Devs更迅速地工作，有效地防止程序错误和 bug 的发生。
 
 ---
-
 ## 整合的仓库
 
 - [@Tarsus/Node](https://github.com/chelizichen/Tarsus) 包含 Http服务  微服务模块 依赖注入 ORM 命令行 等多个开发包的库
@@ -74,6 +73,8 @@ class appController {
 
 ## use express http server
 
+### Controller
+
 ````TS
 // controlelr
 @Controller("/demo")
@@ -97,6 +98,8 @@ class demoController {
 }
 ````
 
+### Service
+
 ````TS
 // Service
 @Collect
@@ -108,20 +111,109 @@ class TestService {
 }
 ````
 
+### ORM
+
+````ts
+@Entity("goods")
+class Goods extends TarsusOrm {
+  @Column
+  id: string;
+
+  @Column("sort_type_id")
+  SortTypeId: string;
+
+  @Column("goods_name")
+  GoodsName: string;
+
+  @Column("goods_price")
+  GoodsPrice: string;
+
+  @Column("goods_rest_num")
+  GoodsRestNum: string;
+
+  @Column("seller_id")
+  SellerId: string;
+
+  @Column("sort_child_id")
+  SortChildId: string;
+}
+
+export {
+    Goods
+}
+````
+
+### Mapper
+
+````ts
+@Mapper
+class GoodsMapper{
+    
+    @Select("select * from goods where id = ? and sort_child_id = ?")
+    async TestSelect(args){
+        const data = await TarsusOrm.query(args, Goods);
+        return data
+    }
+}
+
+````
+
+### GlobalPipe
+
+````ts
+class LogGlobalPipe implements TarsusGlobalPipe {
+  next(
+    req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>,
+    res: Response<any, Record<string, any>>,
+    next: NextFunction
+  ): void {
+    console.log(req.query);
+    console.log(req.body);
+    next();
+  }
+}
+````
+
+### Interceptor
+
+````ts
+class LogInterCeptor implements TarsusInterCeptor {
+  handle(
+    req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>
+  ): any {
+    const { id } = req.query;
+    if (!id) {
+      return "NEED PARAMS ID";
+    }
+    req.query = class_transformer.plainToClass(req.query, Goods);
+  }
+}
+````
+
 ### run application
 
 ````TS
-@ArcServer(9811)
+@TarsusHttpApplication(9811)
 class TestApplication{
   static main () :void {
-    loaderClass([demoController]);
+    loadController([appController]);
+    loadGlobalPipe([LogGlobalPipe]);
+    
+    // init method
+    loadInit((app) => {
+      const public_path = path.resolve(cwd(), "public");
+      app.use(express.static(public_path));
+    });
+
+    // run application
+    loadServer();
   }
 }
 
 TestApplication.main()
 ````
 
-use POSTMAN to test
+## use POSTMAN to test
 
 ````txt
 Get Request ->
