@@ -10,15 +10,18 @@ export class proxyService {
     const { key } = body;
     let ProxyInstance = proxyService.MicroServices.get(key);
     if (ProxyInstance) {
-      const { head, buffer } = call(body);
-      ProxyInstance.write(buffer);
-      // 为 EventEmitter 注册事件
-      ProxyInstance.TarsusEvents.on("1", function (args) {
+      const str = call(body);
+
+      let curr  = String(ProxyInstance.uid);
+      ProxyInstance.TarsusEvents.on(curr, function (args) {
         const _to_json_ = JSON.stringify(args);
         if (!res.destroyed) {
           res.json(_to_json_);
         }
       });
+
+      ProxyInstance.write(str);
+      // 为 EventEmitter 注册事件
     } else {
       return 0;
     }

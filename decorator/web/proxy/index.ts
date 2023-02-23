@@ -9,6 +9,8 @@ class TarsusProxy {
     return `-h ${host} -p ${port}`;
   }
 
+  public uid = 1;
+
   public java = false;
   public socket: Socket;
   public host: string;
@@ -56,33 +58,31 @@ class TarsusProxy {
     });
   }
 
-  write(buf: Buffer) {
+  write(buf: string) {
     if (this.java) {
-      const { concat, from } = Buffer;
-      buf = concat([buf, from("[#ENDL#]\n")]);
+      buf += "[#ENDL#]\n";
     }
-    this.socket.write(buf, async (err) => {
+    let len = Buffer.from(buf).byteLength
+    let new_buf = Buffer.allocUnsafe(len + 4);
+    
+    new_buf.writeUInt32BE(this.uid,0);
+
+    new_buf.write(buf,4,"utf8")
+    this.uid ++ ;
+    console.log("BBBBBB",new_buf.toString());
+    this.socket.write(new_buf, async (err) => {
       console.log("写入成功");
       if (err) {
         console.log(err);
       }
     });
-    // return new Promise((resolve, reject) => {
-    //   this.socket.write(buf, async (err) => {
-    //     if (err) {
-    //       reject(err);
-    //     }
-    //     const data = await this.recieve_from_microService();
-    //     resolve(data);
-    //   });
-    // });
   }
 
   recieve_from_microService() {
     this.socket.on("data", (chunk: Buffer) => {
-      console.log("接收到消息",chunk.toString());
-      
-      this.TarsusEvents.emit("1", chunk.toString());
+      const getId = chunk.readUInt32BE(0)
+      console.log("获取ID",getId);
+      this.TarsusEvents.emit(getId.toString(), chunk.toString());
     });
   }
 

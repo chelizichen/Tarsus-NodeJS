@@ -14,11 +14,10 @@ export function call(pkg: any) {
     String(timeout),
     String(body_len)
   );
-  let head = Buffer.from(head_str);
 
-  let call_buf = Buffer.concat([head, body]);
+  let call_buf = head_str+body;
 
-  return { buffer: call_buf, head: head_str };
+  return call_buf;
 }
 
 export function getRequestHead(...args: string[]): string {

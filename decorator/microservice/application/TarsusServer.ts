@@ -38,7 +38,8 @@ class TarsusServer {
 
   async recieve(data: Buffer) {
     console.log("接收到消息", data.toString());
-
+    let getId = data.readInt32BE(0)
+    data = data.subarray(4,data.length)
     let head_end = data.indexOf("[##]");
     let timeout = Number(this.unpkgHead(2, data));
     let body_len = Number(this.unpkgHead(3, data, true));
@@ -48,7 +49,12 @@ class TarsusServer {
     Promise.race([this.timeout(timeout), this.ArcEvent.emit(head, ..._body)])
       .then((res: any) => {
         let toJson = JSON.stringify(res);
-        this.socket.write(toJson, function (err) {
+        let len = Buffer.from(toJson).byteLength;
+        let buf = Buffer.alloc(len+4)
+        
+        buf.writeUInt32BE(getId,0)
+        buf.write(toJson,4)
+        this.socket.write(buf, function (err) {
           if (err) {
             console.log("服务端写入错误", err);
           }
