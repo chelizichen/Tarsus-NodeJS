@@ -1,6 +1,6 @@
 {
   "name": "tarsus",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "new ts-decorator for express server",
   "repository": {
     "url": "https://github.com/chelizichen/awesome-typescript-decorator",
