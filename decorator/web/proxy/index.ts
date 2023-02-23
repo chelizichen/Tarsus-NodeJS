@@ -80,9 +80,16 @@ class TarsusProxy {
 
   recieve_from_microService() {
     this.socket.on("data", (chunk: Buffer) => {
-      const getId = chunk.readUInt32BE(0)
-      console.log("获取ID",getId);
-      const body = chunk.subarray(4,chunk.length)
+      let getId
+      let body;
+      if(this.java){
+        getId = Number.parseInt(chunk.subarray(0,4).toString())
+      }else{
+        getId = chunk.readUInt32BE(0)
+      }
+      body = chunk.subarray(4,chunk.length)
+      console.log(body.toString());
+      
       this.TarsusEvents.emit(getId.toString(), body.toString());
     });
   }
