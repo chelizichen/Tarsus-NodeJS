@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ArcInstance = exports.Application = exports.ApplicationEvents = exports.ArcHttpApplication = void 0;
+exports.ArcInstance = exports.Application = exports.ApplicationEvents = exports.TarsusHttpApplication = void 0;
 var collects_1 = require("../../ioc/collects");
-var ArcServer_1 = require("./ArcServer");
-Object.defineProperty(exports, "ArcHttpApplication", { enumerable: true, get: function () { return ArcServer_1.ArcHttpApplication; } });
+var TarsusServer_1 = require("./TarsusServer");
+Object.defineProperty(exports, "TarsusHttpApplication", { enumerable: true, get: function () { return TarsusServer_1.TarsusHttpApplication; } });
 var node_events_1 = require("node:events");
 var ApplicationEvents = new node_events_1.EventEmitter();
 exports.ApplicationEvents = ApplicationEvents;

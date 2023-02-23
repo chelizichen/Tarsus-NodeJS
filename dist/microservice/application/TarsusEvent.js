@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * @author chelizichen
+ * @description @Ado/Rpc/Event 提供注册和调用方法
+ *
+ */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,69 +40,46 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.proxyService = void 0;
-var fs_1 = require("fs");
-var path_1 = __importDefault(require("path"));
-var node_process_1 = require("node:process");
-var call_1 = require("../utils/call");
-var proxy_1 = require("../../web/proxy");
-var proxyService = /** @class */ (function () {
-    function proxyService() {
+exports.TarsusEvent = void 0;
+var TarsusEvent = /** @class */ (function () {
+    function TarsusEvent() {
+        this.events = {};
     }
-    proxyService.transmit = function (body) {
+    TarsusEvent.get_fn_name = function (interFace, method) {
+        var fn_name = "[#1]" + interFace + "[#2]" + method;
+        return fn_name;
+    };
+    /**
+     * @description 注册远程方法
+     * @param Head -> Buffer
+     * @param CallBack -> Function
+     */
+    TarsusEvent.prototype.register = function (Head, CallBack) {
+        this.events[Head] = CallBack;
+    };
+    /**
+     * @method emit
+     * @description 调用远程方法
+     */
+    TarsusEvent.prototype.emit = function (Head) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
         return __awaiter(this, void 0, void 0, function () {
-            var key, Arc_ProxyInstance, buf, data;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var head;
+            var _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0:
-                        console.log(body);
-                        key = body.key;
-                        Arc_ProxyInstance = proxyService.MicroServices.get(key);
-                        if (!Arc_ProxyInstance) return [3 /*break*/, 2];
-                        buf = (0, call_1.call)(body);
-                        return [4 /*yield*/, Arc_ProxyInstance.write(buf)];
-                    case 1:
-                        data = _a.sent();
-                        return [2 /*return*/, data];
-                    case 2: return [2 /*return*/, 0];
+                        head = Head.toString();
+                        return [4 /*yield*/, (_a = this.events)[head].apply(_a, args)];
+                    case 1: return [2 /*return*/, _b.sent()];
                 }
             });
         });
     };
-    proxyService.boost = function () {
-        proxyService.link_service();
-    };
-    proxyService.link_service = function () {
-        var cwd = process.cwd();
-        var config_path = path_1.default.resolve(cwd, "server.json");
-        var config = JSON.parse((0, fs_1.readFileSync)(config_path, "utf-8"));
-        (0, node_process_1.nextTick)(function () {
-            proxyService.MicroServices = new Map();
-            config.servant.forEach(function (net) {
-                var proxy_instance = new proxy_1.TarsusProxy(net.host, parseInt(net.port));
-                var isJava = net.type == "java";
-                if (isJava) {
-                    proxy_instance.java = true;
-                }
-                var key = proxy_instance.key;
-                console.log("key", key);
-                proxyService.MicroServices.set(key, proxy_instance);
-            });
-        });
-    };
-    proxyService.log = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var proxy_instance;
-            return __generator(this, function (_a) {
-                proxy_instance = new ArcProxy("127.0.0.1", parseInt("10012"));
-                return [2 /*return*/];
-            });
-        });
-    };
-    return proxyService;
+    return TarsusEvent;
 }());
-exports.proxyService = proxyService;
+exports.TarsusEvent = TarsusEvent;

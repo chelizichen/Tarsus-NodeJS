@@ -1,5 +1,5 @@
-import { ArcServer } from "./ArcServer";
-import { ArcEvent } from "./ArcEvent";
+import { TarsusServer } from "./TarsusServer";
+import { TarsusEvent } from "./TarsusEvent";
 import { Application,ApplicationEvents } from "../load";
 
 const interFaceMap = new Map<string, Function>();
@@ -21,7 +21,7 @@ const ArcInterFace = (interFace: string) => {
     interFaceSet.forEach((method) => {
       let { func, method_name } = method;
       func = func.bind(new classValue());
-      const _method_name = ArcEvent.get_fn_name(interFace, method_name);
+      const _method_name = TarsusEvent.get_fn_name(interFace, method_name);
       interFaceMap.set(_method_name, func);
     });
     interFaceSet.clear();
@@ -38,7 +38,7 @@ const ArcServerApplication = (port: number, host: string) => {
           });
 
         ApplicationEvents.on(Application.LOAD_MICROSERVICE, function () {
-            let arc_server = new ArcServer({ port, host });
+            let arc_server = new TarsusServer({ port, host });
             arc_server.registEvents(interFaceMap);
             console.log(arc_server.ArcEvent.events);
 
@@ -56,4 +56,4 @@ const ArcServerApplication = (port: number, host: string) => {
   };
 };
 
-export { ArcInterFace, ArcServerApplication, ArcMethod };
+export { ArcInterFace, ArcServerApplication, ArcMethod, TarsusServer };

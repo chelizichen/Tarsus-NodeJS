@@ -2,12 +2,11 @@ import { readFileSync } from "fs";
 import path from "path";
 import { nextTick } from "node:process";
 import { call } from "../utils/call";
-import { ArcProxy } from "../../web/proxy";
+import { TarsusProxy } from "../../web/proxy";
 
 export class proxyService {
-
   static async transmit(body: any) {
-    console.log(body)
+    console.log(body);
     const { key } = body;
 
     let Arc_ProxyInstance = proxyService.MicroServices.get(key);
@@ -21,22 +20,20 @@ export class proxyService {
     }
   }
 
-  static MicroServices: Map<string, ArcProxy>;
+  static MicroServices: Map<string, TarsusProxy>;
 
-  static  boost() {
+  static boost() {
     proxyService.link_service();
   }
-
-
 
   static link_service() {
     let cwd = process.cwd();
     let config_path = path.resolve(cwd, "server.json");
     const config = JSON.parse(readFileSync(config_path, "utf-8"));
     nextTick(() => {
-      proxyService.MicroServices = new Map<string, ArcProxy>();
+      proxyService.MicroServices = new Map<string, TarsusProxy>();
       config.servant.forEach((net: any) => {
-        let proxy_instance = new ArcProxy(net.host, parseInt(net.port));
+        let proxy_instance = new TarsusProxy(net.host, parseInt(net.port));
         let isJava = net.type == "java";
         if (isJava) {
           proxy_instance.java = true;

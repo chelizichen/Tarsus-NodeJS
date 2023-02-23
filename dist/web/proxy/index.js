@@ -36,13 +36,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ArcProxy = void 0;
+exports.TarsusProxy = void 0;
 var net_1 = require("net");
 /**
  * @description 微服务接口代理层
  */
-var ArcProxy = /** @class */ (function () {
-    function ArcProxy(host, port) {
+var TarsusProxy = /** @class */ (function () {
+    function TarsusProxy(host, port) {
         this.java = false;
         this.intervalConnect = false;
         this.host = host;
@@ -50,12 +50,12 @@ var ArcProxy = /** @class */ (function () {
         this.socket = new net_1.Socket();
         this.register_events();
         this.connect();
-        this.key = ArcProxy.createkey(host, port);
+        this.key = TarsusProxy.createkey(host, port);
     }
-    ArcProxy.createkey = function (host, port) {
+    TarsusProxy.createkey = function (host, port) {
         return "-h ".concat(host, " -p ").concat(port);
     };
-    ArcProxy.prototype.register_events = function () {
+    TarsusProxy.prototype.register_events = function () {
         var _this = this;
         this.socket.on("connect", function () { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
@@ -75,13 +75,13 @@ var ArcProxy = /** @class */ (function () {
             _this.launchIntervalConnect();
         });
     };
-    ArcProxy.prototype.connect = function () {
+    TarsusProxy.prototype.connect = function () {
         this.socket.connect({
             host: this.host,
             port: this.port,
         });
     };
-    ArcProxy.prototype.write = function (buf) {
+    TarsusProxy.prototype.write = function (buf) {
         var _this = this;
         if (this.java) {
             var concat = Buffer.concat, from = Buffer.from;
@@ -106,7 +106,7 @@ var ArcProxy = /** @class */ (function () {
             }); });
         });
     };
-    ArcProxy.prototype.recieve_from_microService = function () {
+    TarsusProxy.prototype.recieve_from_microService = function () {
         var _this = this;
         return new Promise(function (resolve) {
             _this.socket.on("data", function (chunk) {
@@ -114,21 +114,21 @@ var ArcProxy = /** @class */ (function () {
             });
         });
     };
-    ArcProxy.prototype.recieve_from_client = function () { };
-    ArcProxy.prototype.launchIntervalConnect = function () {
+    TarsusProxy.prototype.recieve_from_client = function () { };
+    TarsusProxy.prototype.launchIntervalConnect = function () {
         var _this = this;
         if (this.intervalConnect) {
             return;
         }
         this.intervalConnect = setInterval(function () { return _this.connect(); }, 5000);
     };
-    ArcProxy.prototype.clearIntervalConnect = function () {
+    TarsusProxy.prototype.clearIntervalConnect = function () {
         if (!this.intervalConnect) {
             return;
         }
         clearInterval(this.intervalConnect);
         this.intervalConnect = false;
     };
-    return ArcProxy;
+    return TarsusProxy;
 }());
-exports.ArcProxy = ArcProxy;
+exports.TarsusProxy = TarsusProxy;

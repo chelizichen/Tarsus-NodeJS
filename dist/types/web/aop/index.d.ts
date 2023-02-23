@@ -1,6 +1,6 @@
 import { Request } from "express";
-declare function UseInterCeptor(interceptor: ArcInterCeptor): (value: any, context: ClassMethodDecoratorContext) => any;
-interface ArcInterCeptor {
+declare function UseInterCeptor(interceptor: TarsusInterCeptor): (value: any, context: ClassMethodDecoratorContext) => any;
+interface TarsusInterCeptor {
     handle(req: Request): any;
 }
-export { UseInterCeptor, ArcInterCeptor };
+export { UseInterCeptor, TarsusInterCeptor };

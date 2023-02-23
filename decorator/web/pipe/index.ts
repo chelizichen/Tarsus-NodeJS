@@ -1,13 +1,13 @@
 
 import { class_transformer } from "./Transformer"
-import { ArcPipe,UsePipe } from "./common"
-import { ArcGlobalPipe, loadGlobalPipe } from "./global"
+import { TarsusPipe,UsePipe } from "./common"
+import { TarsusGlobalPipe, loadGlobalPipe } from "./global";
 
 
 export {
-    ArcGlobalPipe,
-    loadGlobalPipe,
-    ArcPipe,
-    UsePipe,
-    class_transformer
-}
+  TarsusGlobalPipe,
+  loadGlobalPipe,
+  TarsusPipe,
+  UsePipe,
+  class_transformer,
+};

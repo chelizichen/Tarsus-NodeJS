@@ -4,7 +4,7 @@
  * 
  */
 
-class ArcEvent {
+class TarsusEvent {
   events: Record<string, (...args: any[]) => Promise<any>>;
   
   static get_fn_name(interFace:string,method:string){
@@ -36,6 +36,4 @@ class ArcEvent {
 
 }
 
-export {
-  ArcEvent
-}
+export { TarsusEvent };

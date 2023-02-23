@@ -4,7 +4,7 @@ import { Socket } from 'net'
 /**
  * @description 微服务接口代理层
  */
-class ArcProxy {
+class TarsusProxy {
   static createkey(host: string, port: number) {
     return `-h ${host} -p ${port}`;
   }
@@ -27,14 +27,13 @@ class ArcProxy {
     this.register_events();
 
     this.connect();
-    this.key = ArcProxy.createkey(host, port);
+    this.key = TarsusProxy.createkey(host, port);
   }
 
   register_events() {
     this.socket.on("connect", async () => {
       this.clearIntervalConnect();
       console.log("connected to server", "TCP");
-                                                                                                                                                                                               
     });
 
     this.socket.on("error", (err) => {
@@ -100,6 +99,4 @@ class ArcProxy {
   }
 }
 
-export {
-  ArcProxy
-}
+export { TarsusProxy };

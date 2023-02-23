@@ -1,10 +1,10 @@
 import express, { Express } from "express";
 import { controllers } from "../controller/routers";
 import { Application, ApplicationEvents } from "./index";
-import { ArcGlobalPipe } from "../pipe";
+import { TarsusGlobalPipe } from "../pipe";
 import { nextTick, cwd } from "process";
 import path from "path";
-import { ArcOrm } from "../orm/ArcOrm";
+import { TarsusOrm } from "../orm/TarsusOrm";
 
 function loadController(args: Function[]) {
   args.forEach((el) => {
@@ -28,11 +28,11 @@ function loadInit(callback:(app:Express)=>void){
   })
 }
 
-const ArcHttpApplication = (port: number) => {
+const TarsusHttpApplication = (port: number) => {
   return function (value: any, context: ClassDecoratorContext) {
     context.addInitializer(() => {
       const app = express();
-      app.use(express.json())
+      app.use(express.json());
 
       // 执行初始化逻辑
 
@@ -44,11 +44,11 @@ const ArcHttpApplication = (port: number) => {
       });
 
       // 加载数据库
-      ApplicationEvents.on(Application.LOAD_DATABASE, ArcOrm.CreatePool);
+      ApplicationEvents.on(Application.LOAD_DATABASE, TarsusOrm.CreatePool);
       // 全局管道
       ApplicationEvents.on(
         Application.LOAD_PIPE,
-        function (args: Array<new () => ArcGlobalPipe>) {
+        function (args: Array<new () => TarsusGlobalPipe>) {
           args.forEach((pipe) => {
             let _pipe = new pipe();
             app.use("*", (req, res, next) => _pipe.next(req, res, next));
@@ -66,7 +66,7 @@ const ArcHttpApplication = (port: number) => {
       // 监听
       ApplicationEvents.on(Application.LOAD_LISTEN, () => {
         nextTick(() => {
-          ApplicationEvents.emit(Application.LOAD_INIT,app)
+          ApplicationEvents.emit(Application.LOAD_INIT, app);
           app.listen(port, function () {
             console.log("Server started at port: ", port);
           });
@@ -76,4 +76,4 @@ const ArcHttpApplication = (port: number) => {
   };
 };
 
-export { ArcHttpApplication, loadController, loadServer,loadInit };
+export { TarsusHttpApplication, loadController, loadServer, loadInit };

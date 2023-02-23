@@ -4,7 +4,7 @@ import { Socket } from 'net';
 /**
  * @description 微服务接口代理层
  */
-declare class ArcProxy {
+declare class TarsusProxy {
     static createkey(host: string, port: number): string;
     java: boolean;
     socket: Socket;
@@ -22,4 +22,4 @@ declare class ArcProxy {
     launchIntervalConnect(): void;
     clearIntervalConnect(): void;
 }
-export { ArcProxy };
+export { TarsusProxy };

@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { ArcHttpApplication } from "./ArcServer";
+import { TarsusHttpApplication } from "./TarsusServer";
 import { EventEmitter } from 'node:events';
 declare const ApplicationEvents: EventEmitter;
 declare enum Application {
@@ -11,4 +11,4 @@ declare enum Application {
     LOAD_INIT = "loadinit"
 }
 declare function ArcInstance<T extends new () => void>(BASE: T): InstanceType<T>;
-export { ArcHttpApplication, ApplicationEvents, Application, ArcInstance };
+export { TarsusHttpApplication, ApplicationEvents, Application, ArcInstance };

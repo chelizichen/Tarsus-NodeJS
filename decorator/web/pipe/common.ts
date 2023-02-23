@@ -1,6 +1,6 @@
 import { Request } from "express"
 
-interface ArcPipe{
+interface TarsusPipe{
     next(req:Request):void
 }
 
@@ -9,5 +9,5 @@ const UsePipe = () =>{
 }
 
 export{
-    ArcPipe,UsePipe
+    TarsusPipe,UsePipe
 }

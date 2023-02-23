@@ -1,7 +1,7 @@
-import { ArcOrm } from "./ArcOrm"
+import { TarsusOrm } from "./TarsusOrm"
 
 function getConenction(){
-    return ArcOrm.getConnection()
+    return TarsusOrm.getConnection();
 }
 
 export {

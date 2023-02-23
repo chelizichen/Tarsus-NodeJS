@@ -1,6 +1,6 @@
 import { Request } from "express";
-interface ArcPipe {
+interface TarsusPipe {
     next(req: Request): void;
 }
 declare const UsePipe: () => void;
-export { ArcPipe, UsePipe };
+export { TarsusPipe, UsePipe };

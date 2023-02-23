@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ArcMethod = exports.ArcServerApplication = exports.ArcInterFace = void 0;
-var ArcServer_1 = require("./ArcServer");
-var ArcEvent_1 = require("./ArcEvent");
+exports.TarsusServer = exports.ArcMethod = exports.ArcServerApplication = exports.ArcInterFace = void 0;
+var TarsusServer_1 = require("./TarsusServer");
+Object.defineProperty(exports, "TarsusServer", { enumerable: true, get: function () { return TarsusServer_1.TarsusServer; } });
+var TarsusEvent_1 = require("./TarsusEvent");
 var load_1 = require("../load");
 var interFaceMap = new Map();
 var interFaceSet = new Set();
@@ -19,7 +20,7 @@ var ArcInterFace = function (interFace) {
         interFaceSet.forEach(function (method) {
             var func = method.func, method_name = method.method_name;
             func = func.bind(new classValue());
-            var _method_name = ArcEvent_1.ArcEvent.get_fn_name(interFace, method_name);
+            var _method_name = TarsusEvent_1.TarsusEvent.get_fn_name(interFace, method_name);
             interFaceMap.set(_method_name, func);
         });
         interFaceSet.clear();
@@ -35,7 +36,7 @@ var ArcServerApplication = function (port, host) {
                 });
             });
             load_1.ApplicationEvents.on(load_1.Application.LOAD_MICROSERVICE, function () {
-                var arc_server = new ArcServer_1.ArcServer({ port: port, host: host });
+                var arc_server = new TarsusServer_1.TarsusServer({ port: port, host: host });
                 arc_server.registEvents(interFaceMap);
                 console.log(arc_server.ArcEvent.events);
                 // TEST FUNCTION

@@ -1,3 +1,3 @@
-import { ArcOrm } from "./ArcOrm";
+import { TarsusOrm } from "./TarsusOrm";
 import { getConenction } from "./getConnection";
-export { getConenction, ArcOrm };
+export { getConenction, TarsusOrm };

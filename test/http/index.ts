@@ -1,7 +1,7 @@
 import {cwd} from 'process';
 import { proxyService } from "../../decorator/microservice/service/proxyService";
-import { ArcHttpApplication } from "../../decorator/web/application/index";
-import { loadController, loadInit, loadServer } from "../../decorator/web/application/ArcServer";
+import { TarsusHttpApplication } from "../../decorator/web/application/index";
+import { loadController, loadInit, loadServer } from "../../decorator/web/application/TarsusServer";
 import { loadGlobalPipe } from "../../decorator/web/pipe/index";
 import { appController } from "./controller/app.controller";
 import { demoController } from "./controller/demo.controller";
@@ -11,16 +11,15 @@ import path from 'path'
 import express from 'express';
 
 
-@ArcHttpApplication(7099)
+@TarsusHttpApplication(7099)
 class TestApplication {
   static main(): void {
-
-    loadController([appController, demoController,proxyController]);
+    loadController([appController, demoController, proxyController]);
     loadGlobalPipe([LogGlobalPipe]);
-    loadInit((app)=>{
+    loadInit((app) => {
       const public_path = path.resolve(cwd(), "public");
       app.use(express.static(public_path));
-    })
+    });
     loadServer();
   }
 }

@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getConenction = void 0;
-var ArcOrm_1 = require("./ArcOrm");
+var TarsusOrm_1 = require("./TarsusOrm");
 function getConenction() {
-    return ArcOrm_1.ArcOrm.getConnection();
+    return TarsusOrm_1.TarsusOrm.getConnection();
 }
 exports.getConenction = getConenction;

@@ -1,5 +1,5 @@
 import { IocMap } from "../../ioc/collects";
-import { ArcHttpApplication } from "./ArcServer";
+import { TarsusHttpApplication } from "./TarsusServer";
 import {EventEmitter} from 'node:events'
 
 const ApplicationEvents = new EventEmitter();
@@ -25,4 +25,4 @@ function ArcInstance<T extends new ()=>void>(BASE:T):InstanceType<T>{
     }
 }
 
-export { ArcHttpApplication, ApplicationEvents, Application, ArcInstance };
+export { TarsusHttpApplication, ApplicationEvents, Application, ArcInstance };

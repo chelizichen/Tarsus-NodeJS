@@ -1,6 +1,6 @@
 import { Request,Response } from "express";
 
-function UseInterCeptor(interceptor:ArcInterCeptor){
+function UseInterCeptor(interceptor:TarsusInterCeptor){
     return function (value:any,context:ClassMethodDecoratorContext){
         let copy_value = value;
         value = async function (req:Request){
@@ -18,10 +18,10 @@ function UseInterCeptor(interceptor:ArcInterCeptor){
     }
 }
 
-interface ArcInterCeptor{
+interface TarsusInterCeptor{
     handle(req:Request):any;
 }
 
 export {
-    UseInterCeptor,ArcInterCeptor
+    UseInterCeptor,TarsusInterCeptor
 }
