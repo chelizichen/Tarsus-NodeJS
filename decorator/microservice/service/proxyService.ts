@@ -14,7 +14,7 @@ export class proxyService {
 
       let curr  = String(ProxyInstance.uid);
       ProxyInstance.TarsusEvents.on(curr, function (args) {
-        const _to_json_ = JSON.stringify(args);
+        const _to_json_ = JSON.parse(args);
         if (!res.destroyed) {
           res.json(_to_json_);
         }

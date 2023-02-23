@@ -82,7 +82,8 @@ class TarsusProxy {
     this.socket.on("data", (chunk: Buffer) => {
       const getId = chunk.readUInt32BE(0)
       console.log("获取ID",getId);
-      this.TarsusEvents.emit(getId.toString(), chunk.toString());
+      const body = chunk.subarray(4,chunk.length)
+      this.TarsusEvents.emit(getId.toString(), body.toString());
     });
   }
 
