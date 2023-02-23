@@ -12,8 +12,28 @@ Tarsus 由 [Ado-Node](https://github.com/chelizichen/ado-node)项目升级而来
 - [@Tarsus/Java-Proxy](https://github.com/chelizichen/Tarsus-Java-Proxy) SpringBoot，可以提供Http 服务，也可以调用微服务
 - [@Tarsus/Java](https://github.com/chelizichen/Tarsus-Java) Java 微服务模块 示例代码
 
+## 微服务架构模型
 
-### Use TypeScript version 5.0.0-beta
+```mermaid
+graph TD
+
+  A1[Web App] -->|请求| B1[TarsusNodeHttpServer]
+  A1[Web App] -->|请求| B2[TarsusJavaHttpServer]
+
+  B1 -->|响应| A1
+  B2 -->|响应| A1
+  
+  B1 ---|转发请求-响应| C(TarsusProxyServer)
+  B2 ---|转发请求-响应| C(TarsusProxyServer)
+  
+
+
+  C ---|请求-响应| D[TarsusNodeMicroServer]
+  C ---|请求-响应| E[TarsusJavaMicroServer]
+
+```
+
+### 使用新版TypeScript
 
 ````TS
 npm install typescript@beta
