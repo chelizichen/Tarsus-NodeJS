@@ -1,6 +1,5 @@
 import { Socket } from "net";
 import { EventEmitter } from "node:events";
-import { Response } from "express";
 /**
  * @description 微服务接口代理层
  */
@@ -48,7 +47,7 @@ class TarsusProxy {
     this.socket.on("end", () => {
       this.launchIntervalConnect();
     });
-    this.recieve_from_microService()
+    this.recieve_from_microService();
   }
 
   connect() {
@@ -59,37 +58,54 @@ class TarsusProxy {
   }
 
   write(buf: string) {
+    let len = Buffer.from(buf).byteLength;
+    let new_buf = Buffer.allocUnsafe(len + 4);
+
+    let new_str = "";
     if (this.java) {
       buf += "[#ENDL#]\n";
+      new_str = this.join_buf(buf);
+      this.socket.write(new_str, async (err) => {
+        if (err) {
+          console.log(err);
+        }
+      });
+    } else {
+      new_buf.writeUInt32BE(this.uid, 0);
+      new_buf.write(buf, 4, "utf8");
+      this.socket.write(new_buf, async (err) => {
+        if (err) {
+          console.log(err);
+        }
+      });
     }
-    let len = Buffer.from(buf).byteLength
-    let new_buf = Buffer.allocUnsafe(len + 4);
-    
-    new_buf.writeUInt32BE(this.uid,0);
-
-    new_buf.write(buf,4,"utf8")
-    this.uid ++ ;
-    console.log("BBBBBB",new_buf.toString());
-    this.socket.write(new_buf, async (err) => {
-      console.log("写入成功");
-      if (err) {
-        console.log(err);
-      }
-    });
+    this.uid++;
+  }
+  join_buf(buf: string): string {
+    let len = String(this.uid).length;
+    if (len == 1) {
+      return "000" + this.uid + buf;
+    } else if (len == 2) {
+      return "00" + this.uid + buf;
+    } else if (len == 3) {
+      return "0" + this.uid + buf;
+    } else if (len == 4) {
+      return "" + this.uid + buf;
+    }
   }
 
   recieve_from_microService() {
     this.socket.on("data", (chunk: Buffer) => {
-      let getId
+      let getId;
       let body;
-      if(this.java){
-        getId = Number.parseInt(chunk.subarray(0,4).toString())
-      }else{
-        getId = chunk.readUInt32BE(0)
+      if (this.java) {
+        getId = Number.parseInt(chunk.subarray(0, 4).toString());
+      } else {
+        getId = chunk.readUInt32BE(0);
       }
-      body = chunk.subarray(4,chunk.length)
+      body = chunk.subarray(4, chunk.length);
       console.log(body.toString());
-      
+
       this.TarsusEvents.emit(getId.toString(), body.toString());
     });
   }
