@@ -12,6 +12,10 @@ class proxyController {
 
   @Proxy("/interceptor")
   async interceptor(req: body<proxy>, res: Response) {
+    console.log('req.query',req.query);
+    console.log("req.body",req.body);
+    
+    
     const { body } = req as any;
     body.data["EndData"] = "End";
     proxyService.transmit(body, res)

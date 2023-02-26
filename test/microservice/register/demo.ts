@@ -27,7 +27,13 @@ class Demo{
 
     @ArcMethod
     hello(){
-
+        let name = arguments[0];
+        let age = arguments[1];
+        console.log(name);
+        console.log(age);
+        return {
+            name,age
+        };
     }
 }
 

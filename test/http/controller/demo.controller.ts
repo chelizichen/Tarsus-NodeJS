@@ -1,7 +1,7 @@
 import { Inject } from "../../../decorator/ioc";
 import { UseInterCeptor } from "../../../decorator/web/aop";
 import { Controller } from "../../../decorator/web/controller";
-import { Get } from "../../../decorator/web/method";
+import { Get, Post } from "../../../decorator/web/method";
 import { query } from "../../../decorator/web/params/type";
 import { Goods } from "../entity/goods.entity";
 import { LogInterCeptor } from "../interceptor/log";
@@ -23,12 +23,13 @@ class demoController {
     return { ret };
   }
 
-  @Get("/say")
+  @Post("/say")
   public say(req:Request) {
     return {
-      
+      body:req.body
     }
   }
+
 }
 
 export { demoController };
