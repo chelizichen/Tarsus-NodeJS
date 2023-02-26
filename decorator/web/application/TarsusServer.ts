@@ -5,6 +5,8 @@ import { TarsusGlobalPipe } from "../pipe";
 import { nextTick, cwd } from "process";
 import path from "path";
 import { TarsusOrm } from "../orm/TarsusOrm";
+import cluster from 'cluster';
+import {cpus}  from 'os'
 
 function loadController(args: Function[]) {
   args.forEach((el) => {
@@ -14,12 +16,14 @@ function loadController(args: Function[]) {
   ApplicationEvents.emit(Application.LOAD_SERVER);
 }
 
-function loadServer() {
+function loadServer(config?:{
+  cluster:boolean
+}) {
   // 加载配置
   ApplicationEvents.emit(Application.LOAD_CONFIG);
 
   // 最后监听
-  ApplicationEvents.emit(Application.LOAD_LISTEN);
+  ApplicationEvents.emit(Application.LOAD_LISTEN,config);
 }
 
 function loadInit(callback:(app:Express)=>void){
@@ -64,12 +68,44 @@ const TarsusHttpApplication = (port: number) => {
       });
 
       // 监听
-      ApplicationEvents.on(Application.LOAD_LISTEN, () => {
+      ApplicationEvents.on(Application.LOAD_LISTEN, (config?:{
+        cluster:boolean
+      }) => {
         nextTick(() => {
           ApplicationEvents.emit(Application.LOAD_INIT, app);
-          app.listen(port, function () {
-            console.log("Server started at port: ", port);
-          });
+
+          // 开启多进程程
+          if(config && config.cluster){
+
+            // 为主进程
+            if(cluster.isPrimary){
+              let workers: Record<any, any> = {};
+              console.log(`Master ${process.pid} is running`);
+              
+              for (let i = 0; i < cpus().length; i++) {
+                let worker = cluster.fork();
+    
+                workers[worker.process.pid] = worker;
+                console.log(`Child Process ${worker.process.pid} is running`);
+                
+              }
+
+              cluster.on("exit", (worker, _code, _signal) => {
+                console.log(`工作进程 ${worker.process.pid} 已退出`);
+                delete workers[worker.process.pid];
+                worker = cluster.fork();
+                workers[worker.process.pid] = worker;
+              });
+            }else{
+              app.listen(port, function () {
+                console.log("Server started at port: ", port);
+              });
+            }
+          }else{
+            app.listen(port, function () {
+              console.log("Server started at port: ", port);
+            });
+          }
         });
       });
     });
