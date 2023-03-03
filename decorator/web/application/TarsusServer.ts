@@ -22,58 +22,58 @@ function loadServer() {
   ApplicationEvents.emit(Application.LOAD_LISTEN);
 }
 
-function loadInit(callback:(app:Express)=>void){
-  ApplicationEvents.on(Application.LOAD_INIT,(app)=>{
-    callback(app)
-  })
+function loadInit(callback: (app: Express) => void) {
+  ApplicationEvents.on(Application.LOAD_INIT, (app) => {
+    callback(app);
+  });
 }
 
-const TarsusHttpApplication = (port: number) => {
-  return function (value: any, context: ClassDecoratorContext) {
-    context.addInitializer(() => {
-      const app = express();
-      app.use(express.json());
+const TarsusHttpApplication = (value: any, context: ClassDecoratorContext) => {
+  let port = 9811;
+  context.addInitializer(() => {
+    const app = express();
+    app.use(express.json());
 
-      // 执行初始化逻辑
+    // 执行初始化逻辑
 
-      // 加载配置文件
-      ApplicationEvents.on(Application.LOAD_CONFIG, function () {
-        const config_path = path.resolve(cwd(), "arc.config.js");
-        const _config = require(config_path);
-        ApplicationEvents.emit(Application.LOAD_DATABASE, _config);
-      });
+    // 加载配置文件
+    ApplicationEvents.on(Application.LOAD_CONFIG, function () {
+      const config_path = path.resolve(cwd(), "tarsus.config.js");
+      const _config = require(config_path);
+      port = _config.servant.port;
+      ApplicationEvents.emit(Application.LOAD_DATABASE, _config);
+    });
 
-      // 加载数据库
-      ApplicationEvents.on(Application.LOAD_DATABASE, TarsusOrm.CreatePool);
-      // 全局管道
-      ApplicationEvents.on(
-        Application.LOAD_PIPE,
-        function (args: Array<new () => TarsusGlobalPipe>) {
-          args.forEach((pipe) => {
-            let _pipe = new pipe();
-            app.use("*", (req, res, next) => _pipe.next(req, res, next));
-          });
-        }
-      );
-
-      // 加载路由
-      ApplicationEvents.on(Application.LOAD_SERVER, () => {
-        controllers.forEach((value: any) => {
-          app.use(value);
+    // 加载数据库
+    ApplicationEvents.on(Application.LOAD_DATABASE, TarsusOrm.CreatePool);
+    // 全局管道
+    ApplicationEvents.on(
+      Application.LOAD_PIPE,
+      function (args: Array<new () => TarsusGlobalPipe>) {
+        args.forEach((pipe) => {
+          let _pipe = new pipe();
+          app.use("*", (req, res, next) => _pipe.next(req, res, next));
         });
-      });
+      }
+    );
 
-      // 监听
-      ApplicationEvents.on(Application.LOAD_LISTEN, () => {
-        nextTick(() => {
-          ApplicationEvents.emit(Application.LOAD_INIT, app);
-          app.listen(port, function () {
-            console.log("Server started at port: ", port);
-          });
+    // 加载路由
+    ApplicationEvents.on(Application.LOAD_SERVER, () => {
+      controllers.forEach((value: any) => {
+        app.use(value);
+      });
+    });
+
+    // 监听
+    ApplicationEvents.on(Application.LOAD_LISTEN, () => {
+      nextTick(() => {
+        ApplicationEvents.emit(Application.LOAD_INIT, app);
+        app.listen(port, function () {
+          console.log("Server started at port: ", port);
         });
       });
     });
-  };
+  });
 };
 
 export { TarsusHttpApplication, loadController, loadServer, loadInit };

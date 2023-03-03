@@ -11,7 +11,7 @@ import path from 'path'
 import express from 'express';
 
 
-@TarsusHttpApplication(7099)
+@TarsusHttpApplication
 class TestApplication {
   static main(): void {
     loadController([appController, demoController, proxyController]);

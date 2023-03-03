@@ -10,5 +10,12 @@ module.exports = {
             port: 3306,
             connectionLimit: 10,
         }
-    ]
+    ],
+    servant: {
+        project: "TarsusHttpProject -l node -t @tarsus/http -h 127.0.0.1 -p 9811",
+        includes: [
+            "TarsusTestNodeService -l java -t @tarsus/ms -h 127.0.0.1 -p 10012",
+            "TarsusTestJavaService -l node -t @tarsus/ms -h 127.0.0.1 -p 7099",
+        ]
+    }
 }
