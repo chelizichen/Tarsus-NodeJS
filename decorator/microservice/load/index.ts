@@ -5,20 +5,24 @@ const ApplicationEvents = new EventEmitter();
 enum Application{
     LOAD_INTERFACE = "loadinterface",
     LOAD_MICROSERVICE = "loadmicroservice",
-    GET_INTERFACE = "getinterface"
+    GET_INTERFACE = "getinterface",
+    REQUIRE_INTERFACE = "require_interface"
 }
 
 function loadMicroService(){
     ApplicationEvents.emit(Application.LOAD_MICROSERVICE)
 }
 
-function loadInterFace(args:any[]){
-    ApplicationEvents.emit(Application.LOAD_INTERFACE,args)
-
+function loadInterFace(args?:any[]){
+    if(args){
+        ApplicationEvents.emit(Application.LOAD_INTERFACE,args)
+    }else{
+        ApplicationEvents.emit(Application.REQUIRE_INTERFACE)
+    }
 }
 export {
     Application,
     loadMicroService,
     loadInterFace,
-    ApplicationEvents
+    ApplicationEvents,
 }

@@ -1,9 +1,9 @@
-import { ArcInterFace, ArcMethod } from "../../../decorator/microservice/application"
+import { TarsusInterFace, TarsusMethod } from "../../../decorator/microservice/interface/TarsusInterFace";
 
-@ArcInterFace("HelloInterFace")
+@TarsusInterFace("HelloInterFace")
 class Hello{
 
-    @ArcMethod
+    @TarsusMethod
     say(){
 
     }

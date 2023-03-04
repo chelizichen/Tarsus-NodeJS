@@ -1,14 +1,14 @@
 import { Inject } from "../../../decorator/ioc"
-import { ArcInterFace, ArcMethod } from "../../../decorator/microservice/application"
+import { TarsusInterFace, TarsusMethod } from "../../../decorator/microservice/interface/TarsusInterFace";
 import { Song } from "../entity/song";
 import { DemoService } from "../service/demo.service"
 
-@ArcInterFace("DemoInterFace")
+@TarsusInterFace("DemoInterFace")
 class Demo{
 
     @Inject(DemoService) DemoService:DemoService
 
-    @ArcMethod
+    @TarsusMethod
     say() {
         // 将 arguments 转为对象的形式
         console.log(arguments.length);
@@ -25,7 +25,7 @@ class Demo{
         };
     }
 
-    @ArcMethod
+    @TarsusMethod
     hello(){
         let name = arguments[0];
         let age = arguments[1];

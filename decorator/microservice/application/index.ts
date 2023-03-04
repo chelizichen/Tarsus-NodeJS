@@ -1,34 +1,10 @@
-import { cwd } from 'process';
+import { readdirSync } from 'fs';
+import { cwd } from "process";
 import { TarsusServer } from "./TarsusServer";
-import { TarsusEvent } from "./TarsusEvent";
 import { Application, ApplicationEvents } from "../load";
-import path from 'path'
-import { ServantUtil } from '../../util/servant';
-const interFaceMap = new Map<string, Function>();
-const interFaceSet = new Set<{
-  func: any;
-  method_name: string;
-}>();
-
-const ArcMethod = (value: any, context: ClassMethodDecoratorContext) => {
-  interFaceSet.add({
-    func: value,
-    method_name: context.name as string,
-  });
-};
-
-const ArcInterFace = (interFace: string) => {
-  return function (classValue: any, context: ClassDecoratorContext) {
-    // 每次遍历完都清除
-    interFaceSet.forEach((method) => {
-      let { func, method_name } = method;
-      func = func.bind(new classValue());
-      const _method_name = TarsusEvent.get_fn_name(interFace, method_name);
-      interFaceMap.set(_method_name, func);
-    });
-    interFaceSet.clear();
-  };
-};
+import path from "path";
+import { ServantUtil } from "../../util/servant";
+import { interFaceMap } from "../interface/TarsusInterFace";
 
 const TarsusMsApplication = (value, context) => {
   context.addInitializer(() => {
@@ -37,17 +13,32 @@ const TarsusMsApplication = (value, context) => {
     const SERVER = _config.servant.project;
     const parsedServer = ServantUtil.parse(SERVER);
     const port = parsedServer.port || 8080;
-    const host = parsedServer.host
-    console.log('parsedServer',parsedServer);
-    
+    const host = parsedServer.host;
+
+    console.log("parsedServer", parsedServer);
+
     ApplicationEvents.on(Application.LOAD_INTERFACE, function (args: any[]) {
       args.forEach((el) => {
         console.log(el.name, "is load");
       });
     });
 
+    ApplicationEvents.on(Application.REQUIRE_INTERFACE, function () {
+      // 后续做处理
+      const register_path = _config.servant.src || "src/register";
+      const full_path = path.resolve(cwd(), register_path);
+      const dirs = readdirSync(full_path)
+      dirs.forEach(interFace=>{
+        let interFace_path = path.resolve(full_path,interFace)
+        require(interFace_path)
+      })
+      // console.log(full_path);
+      // console.log(dirs);
+    
+    });
+
     ApplicationEvents.on(Application.LOAD_MICROSERVICE, function () {
-      let arc_server = new TarsusServer({ port:Number(port), host });
+      let arc_server = new TarsusServer({ port: Number(port), host });
       arc_server.registEvents(interFaceMap);
       console.log(arc_server.ArcEvent.events);
 
@@ -62,4 +53,4 @@ const TarsusMsApplication = (value, context) => {
   });
 };
 
-export { ArcInterFace, TarsusMsApplication, ArcMethod, TarsusServer };
+export { TarsusMsApplication, TarsusServer };
