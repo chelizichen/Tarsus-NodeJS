@@ -1,6 +1,5 @@
 import { Inject } from "../../../decorator/ioc"
 import { TarsusInterFace, TarsusMethod } from "../../../decorator/microservice/interface/TarsusInterFace";
-import { Song } from "../entity/song";
 import { DemoService } from "../service/demo.service"
 
 @TarsusInterFace("DemoInterFace")

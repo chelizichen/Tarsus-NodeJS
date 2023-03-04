@@ -32,9 +32,6 @@ const TarsusMsApplication = (value, context) => {
         let interFace_path = path.resolve(full_path,interFace)
         require(interFace_path)
       })
-      // console.log(full_path);
-      // console.log(dirs);
-    
     });
 
     ApplicationEvents.on(Application.LOAD_MICROSERVICE, function () {
