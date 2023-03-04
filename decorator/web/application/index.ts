@@ -11,7 +11,8 @@ enum Application{
     LOAD_LISTEN="loadlisten",
     LOAD_CONFIG="loadconfig",
     LOAD_DATABASE="loaddatabase",
-    LOAD_INIT="loadinit"
+    LOAD_INIT="loadinit",
+    LOAD_MS="loadms"
 }
 
 function ArcInstance<T extends new ()=>void>(BASE:T):InstanceType<T>{

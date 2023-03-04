@@ -1,14 +1,14 @@
-const demo = [
+const demo = [ 
   "TarsusTestNodeService -l java -t @tarsus/ms -h 127.0.0.1 -p 10012",
   // "TarsusTestJavaService -l node -t @tarsus/ms -h 127.0.0.1 -p 7099",
   // "TarsusHttpProject -l node -t @tarsus/http -h 127.0.0.1 -p 9811",
 ];
 
-type parseToObj = {
+export type parseToObj = {
   language: "java" | "node",
   proto: "ms" | "http",
   host: string,
-  port: number,
+  port: string,
   serverName: string,
 }
 
@@ -27,19 +27,25 @@ class ServantUtil {
       if (end == -1) {
         end = servant.length;
       }
-      let substr = servant.substring(index+2,end)
-      obj[param.param] = substr.trim()
+      let substr = servant.substring(index+2,end).trim()
+      obj[param.param] = substr
+
+      if(substr.endsWith("ms") && param.key == "-t"){
+        obj[param.param] = "ms"
+      }
+      if(substr.endsWith("http") && param.key == "-t"){
+        obj[param.param] = "http"
+      }
     });
 
     let servant_end = servant.indexOf(" ")
     let servant_name = servant.substring(0,servant_end).trim()
     obj["serverName"] = servant_name;
-    console.log("tt",obj)
     return obj
   }
 }
 
-ServantUtil.parse(demo[0])
+// ServantUtil.parse(demo[0])
 
 
 

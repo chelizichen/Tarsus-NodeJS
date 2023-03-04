@@ -1,7 +1,9 @@
+import { cwd } from 'process';
 import { TarsusServer } from "./TarsusServer";
 import { TarsusEvent } from "./TarsusEvent";
-import { Application,ApplicationEvents } from "../load";
-
+import { Application, ApplicationEvents } from "../load";
+import path from 'path'
+import { ServantUtil } from '../../util/servant';
 const interFaceMap = new Map<string, Function>();
 const interFaceSet = new Set<{
   func: any;
@@ -28,32 +30,36 @@ const ArcInterFace = (interFace: string) => {
   };
 };
 
-const ArcServerApplication = (port: number, host: string) => {
-  return function (value: any, context: ClassDecoratorContext) {
-    context.addInitializer(() => {
-        ApplicationEvents.on(Application.LOAD_INTERFACE, function (args: any[]) {
-            args.forEach((el) => {
-              console.log(el.name, "is load");
-            });
-          });
-
-        ApplicationEvents.on(Application.LOAD_MICROSERVICE, function () {
-            let arc_server = new TarsusServer({ port, host });
-            arc_server.registEvents(interFaceMap);
-            console.log(arc_server.ArcEvent.events);
-
-
-            // TEST FUNCTION
-            
-            // setTimeout(async ()=>{
-            //     const {from} = Buffer
-            //     const data = await arc_server.ArcEvent.emit(from('[#1]DemoInterFace[#2]say'))
-            //     console.log(data);
-            // })
-        });
-
+const TarsusMsApplication = (value, context) => {
+  context.addInitializer(() => {
+    const config_path = path.resolve(cwd(), "tarsus.config.js");
+    const _config = require(config_path);
+    const SERVER = _config.servant.project;
+    const parsedServer = ServantUtil.parse(SERVER);
+    const port = parsedServer.port || 8080;
+    const host = parsedServer.host
+    console.log('parsedServer',parsedServer);
+    
+    ApplicationEvents.on(Application.LOAD_INTERFACE, function (args: any[]) {
+      args.forEach((el) => {
+        console.log(el.name, "is load");
+      });
     });
-  };
+
+    ApplicationEvents.on(Application.LOAD_MICROSERVICE, function () {
+      let arc_server = new TarsusServer({ port:Number(port), host });
+      arc_server.registEvents(interFaceMap);
+      console.log(arc_server.ArcEvent.events);
+
+      // TEST FUNCTION
+
+      // setTimeout(async ()=>{
+      //     const {from} = Buffer
+      //     const data = await arc_server.ArcEvent.emit(from('[#1]DemoInterFace[#2]say'))
+      //     console.log(data);
+      // })
+    });
+  });
 };
 
-export { ArcInterFace, ArcServerApplication, ArcMethod, TarsusServer };
+export { ArcInterFace, TarsusMsApplication, ArcMethod, TarsusServer };
