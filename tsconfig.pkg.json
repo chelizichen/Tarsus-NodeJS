@@ -9,9 +9,9 @@
     "declarationDir": "./dist/types"
   },
   "include": [
-    "./test",
+    "./decorator",
   ],
   "exclude": [
-    "./decorator"
+    "./test"
   ]
 }

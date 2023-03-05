@@ -10,8 +10,7 @@ function call(pkg) {
     var body = Buffer.from(args);
     var body_len = body.length;
     var head_str = getRequestHead(interFace, method, String(timeout), String(body_len));
-    var head = Buffer.from(head_str);
-    var call_buf = Buffer.concat([head, body]);
+    var call_buf = head_str + body;
     return call_buf;
 }
 exports.call = call;

@@ -79,11 +79,13 @@ var TarsusServer = /** @class */ (function () {
     };
     TarsusServer.prototype.recieve = function (data) {
         return __awaiter(this, void 0, void 0, function () {
-            var head_end, timeout, body_len, head, body, _body;
+            var getId, head_end, timeout, body_len, head, body, _body;
             var _a;
             var _this = this;
             return __generator(this, function (_b) {
                 console.log("接收到消息", data.toString());
+                getId = data.readInt32BE(0);
+                data = data.subarray(4, data.length);
                 head_end = data.indexOf("[##]");
                 timeout = Number(this.unpkgHead(2, data));
                 body_len = Number(this.unpkgHead(3, data, true));
@@ -93,7 +95,11 @@ var TarsusServer = /** @class */ (function () {
                 Promise.race([this.timeout(timeout), (_a = this.ArcEvent).emit.apply(_a, __spreadArray([head], _body, false))])
                     .then(function (res) {
                     var toJson = JSON.stringify(res);
-                    _this.socket.write(toJson, function (err) {
+                    var len = Buffer.from(toJson).byteLength;
+                    var buf = Buffer.alloc(len + 4);
+                    buf.writeUInt32BE(getId, 0);
+                    buf.write(toJson, 4);
+                    _this.socket.write(buf, function (err) {
                         if (err) {
                             console.log("服务端写入错误", err);
                         }

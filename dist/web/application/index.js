@@ -15,6 +15,7 @@ var Application;
     Application["LOAD_CONFIG"] = "loadconfig";
     Application["LOAD_DATABASE"] = "loaddatabase";
     Application["LOAD_INIT"] = "loadinit";
+    Application["LOAD_MS"] = "loadms";
 })(Application || (Application = {}));
 exports.Application = Application;
 function ArcInstance(BASE) {

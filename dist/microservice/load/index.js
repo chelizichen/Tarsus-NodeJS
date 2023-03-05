@@ -9,6 +9,7 @@ var Application;
     Application["LOAD_INTERFACE"] = "loadinterface";
     Application["LOAD_MICROSERVICE"] = "loadmicroservice";
     Application["GET_INTERFACE"] = "getinterface";
+    Application["REQUIRE_INTERFACE"] = "require_interface";
 })(Application || (Application = {}));
 exports.Application = Application;
 function loadMicroService() {
@@ -16,6 +17,11 @@ function loadMicroService() {
 }
 exports.loadMicroService = loadMicroService;
 function loadInterFace(args) {
-    ApplicationEvents.emit(Application.LOAD_INTERFACE, args);
+    if (args) {
+        ApplicationEvents.emit(Application.LOAD_INTERFACE, args);
+    }
+    else {
+        ApplicationEvents.emit(Application.REQUIRE_INTERFACE);
+    }
 }
 exports.loadInterFace = loadInterFace;

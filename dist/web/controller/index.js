@@ -90,22 +90,11 @@ var Controller = function (interFace) {
                         });
                     }); });
                 }
-                if (method == index_1.METHODS.VIEW) {
-                    router.get(method_path, function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-                        var ret;
+                if (method == index_1.METHODS.Proxy) {
+                    router.post(method_path, function (req, res) { return __awaiter(_this, void 0, void 0, function () {
                         return __generator(this, function (_a) {
-                            switch (_a.label) {
-                                case 0:
-                                    res.writeHead(200, { "Content-Type": "text/html;charset=utf-8" });
-                                    return [4 /*yield*/, value(req)];
-                                case 1:
-                                    ret = _a.sent();
-                                    if (!res.destroyed) {
-                                        res.write(ret);
-                                        res.end();
-                                    }
-                                    return [2 /*return*/];
-                            }
+                            value(req, res);
+                            return [2 /*return*/];
                         });
                     }); });
                 }

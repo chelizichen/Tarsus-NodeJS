@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Post = exports.Get = exports.METHODS = void 0;
+exports.Proxy = exports.Post = exports.Get = exports.METHODS = void 0;
 var routers_1 = require("../controller/routers");
 var METHODS;
 (function (METHODS) {
     METHODS["GET"] = "get";
     METHODS["POST"] = "post";
-    METHODS["VIEW"] = "view";
+    METHODS["Proxy"] = "proxy";
 })(METHODS = exports.METHODS || (exports.METHODS = {}));
 var Get = function (url) {
     return function (value, context) {
@@ -20,3 +20,9 @@ var Post = function (url) {
     };
 };
 exports.Post = Post;
+var Proxy = function (url) {
+    return function (value, context) {
+        routers_1.routers.set({ url: url, method: METHODS.Proxy }, value);
+    };
+};
+exports.Proxy = Proxy;

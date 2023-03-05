@@ -38,13 +38,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TarsusProxy = void 0;
 var net_1 = require("net");
+var node_events_1 = require("node:events");
 /**
  * @description 微服务接口代理层
  */
 var TarsusProxy = /** @class */ (function () {
     function TarsusProxy(host, port) {
+        this.uid = 1;
         this.java = false;
         this.intervalConnect = false;
+        this.TarsusEvents = new node_events_1.EventEmitter();
         this.host = host;
         this.port = port;
         this.socket = new net_1.Socket();
@@ -74,6 +77,7 @@ var TarsusProxy = /** @class */ (function () {
         this.socket.on("end", function () {
             _this.launchIntervalConnect();
         });
+        this.recieve_from_microService();
     };
     TarsusProxy.prototype.connect = function () {
         this.socket.connect({
@@ -83,35 +87,64 @@ var TarsusProxy = /** @class */ (function () {
     };
     TarsusProxy.prototype.write = function (buf) {
         var _this = this;
+        var len = Buffer.from(buf).byteLength;
+        var new_buf = Buffer.allocUnsafe(len + 4);
+        var new_str = "";
         if (this.java) {
-            var concat = Buffer.concat, from = Buffer.from;
-            buf = concat([buf, from("[#ENDL#]\n")]);
-        }
-        return new Promise(function (resolve, reject) {
-            _this.socket.write(buf, function (err) { return __awaiter(_this, void 0, void 0, function () {
-                var data;
+            buf += "[#ENDL#]\n";
+            new_str = this.join_buf(buf);
+            this.socket.write(new_str, function (err) { return __awaiter(_this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            if (err) {
-                                reject(err);
-                            }
-                            return [4 /*yield*/, this.recieve_from_microService()];
-                        case 1:
-                            data = _a.sent();
-                            resolve(data);
-                            return [2 /*return*/];
+                    if (err) {
+                        console.log(err);
                     }
+                    return [2 /*return*/];
                 });
             }); });
-        });
+        }
+        else {
+            new_buf.writeUInt32BE(this.uid, 0);
+            new_buf.write(buf, 4, "utf8");
+            this.socket.write(new_buf, function (err) { return __awaiter(_this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    if (err) {
+                        console.log(err);
+                    }
+                    return [2 /*return*/];
+                });
+            }); });
+        }
+        this.uid++;
+    };
+    TarsusProxy.prototype.join_buf = function (buf) {
+        var len = String(this.uid).length;
+        if (len == 1) {
+            return "000" + this.uid + buf;
+        }
+        else if (len == 2) {
+            return "00" + this.uid + buf;
+        }
+        else if (len == 3) {
+            return "0" + this.uid + buf;
+        }
+        else if (len == 4) {
+            return "" + this.uid + buf;
+        }
     };
     TarsusProxy.prototype.recieve_from_microService = function () {
         var _this = this;
-        return new Promise(function (resolve) {
-            _this.socket.on("data", function (chunk) {
-                resolve(chunk);
-            });
+        this.socket.on("data", function (chunk) {
+            var getId;
+            var body;
+            if (_this.java) {
+                getId = Number.parseInt(chunk.subarray(0, 4).toString());
+            }
+            else {
+                getId = chunk.readUInt32BE(0);
+            }
+            body = chunk.subarray(4, chunk.length);
+            console.log(body.toString());
+            _this.TarsusEvents.emit(getId.toString(), body.toString());
         });
     };
     TarsusProxy.prototype.recieve_from_client = function () { };
