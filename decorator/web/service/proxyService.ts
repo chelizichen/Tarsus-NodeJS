@@ -1,8 +1,8 @@
 import { readFileSync } from "fs";
 import path from "path";
 import { nextTick } from "node:process";
-import { call } from "../utils/call";
-import { TarsusProxy } from "../../web/proxy";
+import { call } from "../../microservice/utils/call";
+import { TarsusProxy } from "../proxy";
 import { Response } from "express";
 
 export class proxyService {

@@ -1,5 +1,5 @@
 import { Inject } from "../../../decorator/ioc/index";
-import { proxyService } from "../../../decorator/microservice/service/proxyService";
+import { proxyService } from "../../../decorator/web/service/proxyService";
 import { Controller } from "../../../decorator/web/controller/index";
 import { Proxy } from "../../../decorator/web/method/index";
 import { proxy } from "../../../decorator/web/method/types";

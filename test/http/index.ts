@@ -13,6 +13,7 @@ import { LogGlobalPipe } from "./pipe/Log";
 import path from "path";
 import express from "express";
 
+// Tarsus 微服务代理层
 @TarsusHttpApplication
 class TestApplication {
   static main(): void {

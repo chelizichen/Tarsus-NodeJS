@@ -7,7 +7,7 @@ import path from "path";
 import { TarsusOrm } from "../orm/TarsusOrm";
 import { ServantUtil, parseToObj } from "../../util/servant";
 import { TarsusProxy } from "../proxy";
-import { proxyService } from "../../microservice/service/proxyService";
+import { proxyService } from "../service/proxyService";
 // import cluster from "cluster";
 // import { cpus } from "os";
 
@@ -37,19 +37,17 @@ function loadInit(callback: (app: Express) => void) {
 function loadMs(config) {
   nextTick(() => {
     proxyService.MicroServices = new Map<string, TarsusProxy>();
-    config.servant.includes.forEach((servant: string) => {
-      let parsedServant: parseToObj = ServantUtil.parse(servant);
-      console.log(parsedServant);
-      let proxy_instance = new TarsusProxy(
-        parsedServant.host,
-        Number(parsedServant.port)
-      );
-
-      parsedServant.language == "java" ? (proxy_instance.java = true) : "";
-
-      const { key } = proxy_instance;
-      proxyService.MicroServices.set(key, proxy_instance);
-    });
+    // config.servant.includes.forEach((servant: string) => {
+    //   let parsedServant: parseToObj = ServantUtil.parse(servant);
+    //   console.log(parsedServant);
+    //   let proxy_instance = new TarsusProxy(
+    //     parsedServant.host,
+    //     Number(parsedServant.port)
+    //   );
+    //   parsedServant.language == "java" ? (proxy_instance.java = true) : "";
+    //   const { key } = proxy_instance;
+    //   proxyService.MicroServices.set(key, proxy_instance);
+    // });
   });
 }
 
