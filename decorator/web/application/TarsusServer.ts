@@ -8,6 +8,7 @@ import { TarsusOrm } from "../orm/TarsusOrm";
 import { ServantUtil, parseToObj } from "../../util/servant";
 import { TarsusProxy } from "../proxy";
 import { proxyService } from "../service/proxyService";
+import { TarsusCache } from "../cache/TarsusCache";
 // import cluster from "cluster";
 // import { cpus } from "os";
 
@@ -19,9 +20,11 @@ function loadController(args: Function[]) {
   ApplicationEvents.emit(Application.LOAD_SERVER);
 }
 
-function loadServer() {
+function loadServer(config?:{
+  ms:boolean // 是否启用微服务
+}) {
   // 加载配置
-  ApplicationEvents.emit(Application.LOAD_CONFIG);
+  ApplicationEvents.emit(Application.LOAD_CONFIG,config);
 
   // 最后监听
   ApplicationEvents.emit(Application.LOAD_LISTEN);
@@ -34,20 +37,10 @@ function loadInit(callback: (app: Express) => void) {
   });
 }
 
-function loadMs(config) {
+function loadMs() {
   nextTick(() => {
     proxyService.MicroServices = new Map<string, TarsusProxy>();
-    // config.servant.includes.forEach((servant: string) => {
-    //   let parsedServant: parseToObj = ServantUtil.parse(servant);
-    //   console.log(parsedServant);
-    //   let proxy_instance = new TarsusProxy(
-    //     parsedServant.host,
-    //     Number(parsedServant.port)
-    //   );
-    //   parsedServant.language == "java" ? (proxy_instance.java = true) : "";
-    //   const { key } = proxy_instance;
-    //   proxyService.MicroServices.set(key, proxy_instance);
-    // });
+    new TarsusCache()
   });
 }
 
@@ -64,11 +57,13 @@ const TarsusHttpApplication = (value: any, context: ClassDecoratorContext) => {
     const port = parsedServer.port || 8080;
 
     // 加载配置文件
-    ApplicationEvents.on(Application.LOAD_CONFIG, function () {
+    ApplicationEvents.on(Application.LOAD_CONFIG, function (props) {
       // 加载数据库
       ApplicationEvents.emit(Application.LOAD_DATABASE, _config);
       // 加载微服务
-      // ApplicationEvents.emit(Application.LOAD_MS, _config);
+      if(props && props.ms){
+        ApplicationEvents.emit(Application.LOAD_MS, _config);
+      }
     });
 
     // 加载数据库
@@ -96,7 +91,9 @@ const TarsusHttpApplication = (value: any, context: ClassDecoratorContext) => {
     // 监听
     ApplicationEvents.on(Application.LOAD_LISTEN, () => {
       nextTick(() => {
+        // 加载初始化方法
         ApplicationEvents.emit(Application.LOAD_INIT, app);
+        
         app.listen(port, function () {
           console.log("Server started at port: ", port);
           // 监听
