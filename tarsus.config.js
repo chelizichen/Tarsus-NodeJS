@@ -12,9 +12,10 @@ module.exports = {
         }
     ],
     servant: {
-        // project: "TarsusHttpProject -l node -t @tarsus/http -h 127.0.0.1 -p 9811",
-        project:"TarsusProxyServant -l node -t @tarsus/ms -h 127.0.0.1 -p 10012",
-        src:"test/microservice/register",
+        project: "TarsusProxyServant -l node -t @tarsus/http -h 127.0.0.1 -p 9811",
+        // project:"TarsusMsServant -l node -t @tarsus/ms -h 127.0.0.1 -p 10012",
+        // src:"test/microservice/register",
+        proxy:"TarsusProxyServant"
         // includes: [
         //     "TarsusTestNodeService -l node -t @tarsus/ms -h 127.0.0.1 -p 10012",
         //     "TarsusTestJavaService -l java -t @tarsus/ms -h 127.0.0.1 -p 7099",

@@ -23,7 +23,9 @@ class TestApplication {
       const public_path = path.resolve(cwd(), "public");
       app.use(express.static(public_path));
     });
-    loadServer();
+    loadServer({
+      ms:true
+    });
   }
 }
 

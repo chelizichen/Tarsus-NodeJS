@@ -5,6 +5,7 @@ import { Application, ApplicationEvents } from "../load";
 import path from "path";
 import { ServantUtil } from "../../util/servant";
 import { interFaceMap } from "../interface/TarsusInterFace";
+import { TarsusCache } from '../../cache/TarsusCache';
 
 const TarsusMsApplication = (value, context) => {
   context.addInitializer(() => {
@@ -30,15 +31,18 @@ const TarsusMsApplication = (value, context) => {
       const dirs = readdirSync(full_path)
       dirs.forEach(interFace=>{
         let interFace_path = path.resolve(full_path,interFace)
+        // 动态加载每一个注册的接口
         require(interFace_path)
       })
     });
 
     ApplicationEvents.on(Application.LOAD_MICROSERVICE, function () {
+      const cache = new TarsusCache()
+      cache.setServant()
+
       let arc_server = new TarsusServer({ port: Number(port), host });
       arc_server.registEvents(interFaceMap);
       console.log(arc_server.ArcEvent.events);
-
       // TEST FUNCTION
 
       // setTimeout(async ()=>{

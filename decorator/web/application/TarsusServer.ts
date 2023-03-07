@@ -8,7 +8,7 @@ import { TarsusOrm } from "../orm/TarsusOrm";
 import { ServantUtil, parseToObj } from "../../util/servant";
 import { TarsusProxy } from "../proxy";
 import { proxyService } from "../service/proxyService";
-import { TarsusCache } from "../cache/TarsusCache";
+import { TarsusCache } from "../../cache/TarsusCache";
 // import cluster from "cluster";
 // import { cpus } from "os";
 
@@ -38,9 +38,10 @@ function loadInit(callback: (app: Express) => void) {
 }
 
 function loadMs() {
-  nextTick(() => {
+  nextTick(async () => {
     proxyService.MicroServices = new Map<string, TarsusProxy>();
-    new TarsusCache()
+    let cache = new TarsusCache()
+    await cache.getMsServer()
   });
 }
 
