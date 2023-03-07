@@ -5,7 +5,7 @@ import { call } from "../../microservice/utils/call";
 import { TarsusProxy } from "../proxy";
 import { Response } from "express";
 
-export class proxyService {
+class proxyService {
   static transmit(body: any,res:Response) {
     const { key } = body;
     let ProxyInstance = proxyService.MicroServices.get(key);
@@ -52,4 +52,8 @@ export class proxyService {
     });
   }
 
+}
+
+export{
+  proxyService
 }
