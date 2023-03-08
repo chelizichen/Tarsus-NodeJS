@@ -1,6 +1,6 @@
 {
   "name": "tarsus",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "new ts-decorator for express server",
   "repository": {
     "url": "https://github.com/chelizichen/tarsus",
@@ -15,22 +15,22 @@
   "exports": {
     ".": {
       "require": "./dist/web.js",
-      "import": "./dist/web.js",
+      "import": "./dist/web.mjs",
       "types": "./dist/types/web.d.ts"
     },
     "./ms": {
       "require": "./dist/ms.js",
-      "import": "./dist/ms.js",
+      "import": "./dist/ms.mjs",
       "types": "./dist/types/ms.d.ts"
     },
     "./util": {
       "require": "./dist/util.js",
-      "import": "./dist/util.js",
+      "import": "./dist/util.mjs",
       "types": "./dist/types/util.d.ts"
     },
     "./cache": {
       "require": "./dist/cache.js",
-      "import": "./dist/cache.js",
+      "import": "./dist/cache.mjs",
       "types": "./dist/types/cache.d.ts"
     }
   },
