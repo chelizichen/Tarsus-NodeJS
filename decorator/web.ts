@@ -11,7 +11,7 @@ import { getConenction, TarsusOrm } from "./web/orm";
 import { Entity, Column, EntityMap } from "./web/orm/Entity";
 import { Mapper } from "./web/orm/Mapper";
 import { Select } from "./web/orm/sql";
-import { body, query } from "./web/params/type";
+// import { body, query } from "./web/params/type";
 import { TarsusPipe, UsePipe, TarsusGlobalPipe, loadGlobalPipe, class_transformer } from "./web/pipe";
 import { TarsusProxy } from "./web/proxy";
 import { RequestFactory } from "./web/proxy/http";
@@ -55,9 +55,9 @@ export {
 }
 
 
-export {
-  query,body
-}
+// export {
+//   query,body
+// }
 
 // ******************PIPE******************
 export{

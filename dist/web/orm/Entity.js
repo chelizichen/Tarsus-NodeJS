@@ -1,39 +1,62 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.EntityMap = exports.Column = exports.Entity = void 0;
-var collects_1 = require("../../ioc/collects");
-// let EntitySet = new Set()
-var EntityMap = new Map();
-exports.EntityMap = EntityMap;
-var ColumnMap = new Map();
-var Entity = function (table) {
-    return function (value, context) {
-        collects_1.IocMap.set(value.name, new value());
-        context.addInitializer(function () {
-            EntityMap.set(value.name, ColumnMap);
-            ColumnMap.clear();
-            console.log('EntityMap', EntityMap);
-        });
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// decorator/web/orm/Entity.ts
+var Entity_exports = {};
+__export(Entity_exports, {
+  Column: () => Column,
+  Entity: () => Entity,
+  EntityMap: () => EntityMap
+});
+module.exports = __toCommonJS(Entity_exports);
+
+// decorator/ioc/collects.ts
+var IocMap = /* @__PURE__ */ new Map();
+
+// decorator/web/orm/Entity.ts
+var EntityMap = /* @__PURE__ */ new Map();
+var ColumnMap = /* @__PURE__ */ new Map();
+var Entity = (table) => {
+  return function(value, context) {
+    IocMap.set(value.name, new value());
+    context.addInitializer(() => {
+      EntityMap.set(value.name, ColumnMap);
+      ColumnMap.clear();
+      console.log("EntityMap", EntityMap);
+    });
+  };
+};
+var Column = (field, context) => {
+  if (field && !context) {
+    return function(value, ctx) {
+      ctx.addInitializer(() => {
+        ColumnMap.set(ctx.name, field);
+      });
     };
+  } else {
+    context.addInitializer(() => {
+      ColumnMap.set(context.name, context.name);
+    });
+  }
 };
-exports.Entity = Entity;
-var Column = function (field, context) {
-    // 有参数
-    if (field && !context) {
-        return function (value, ctx) {
-            ctx.addInitializer(function () {
-                ColumnMap.set(ctx.name, field);
-            });
-        };
-    }
-    else {
-        // 无参数
-        context.addInitializer(function () {
-            ColumnMap.set(context.name, context.name);
-        });
-    }
-};
-exports.Column = Column;
-// f
-var Key = function (value, context) {
-};
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  Column,
+  Entity,
+  EntityMap
+});

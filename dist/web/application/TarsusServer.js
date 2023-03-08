@@ -1,140 +1,497 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
 };
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// decorator/web/application/TarsusServer.ts
+var TarsusServer_exports = {};
+__export(TarsusServer_exports, {
+  TarsusHttpApplication: () => TarsusHttpApplication,
+  loadController: () => loadController,
+  loadInit: () => loadInit,
+  loadServer: () => loadServer
+});
+module.exports = __toCommonJS(TarsusServer_exports);
+var import_express = __toESM(require("express"));
+
+// decorator/web/controller/routers.ts
+var controllers = /* @__PURE__ */ new Set();
+
+// decorator/web/application/index.ts
+var import_node_events = require("events");
+var ApplicationEvents = new import_node_events.EventEmitter();
+
+// decorator/web/application/TarsusServer.ts
+var import_process3 = require("process");
+var import_path3 = __toESM(require("path"));
+
+// decorator/web/orm/TarsusOrm.ts
+var mysql = __toESM(require("mysql"));
+
+// decorator/web/orm/Entity.ts
+var EntityMap = /* @__PURE__ */ new Map();
+
+// decorator/web/orm/TarsusOrm.ts
+var TarsusOrm = class {
+  static getConnection() {
+  }
+  static CreatePool(config) {
+    if (config && config.database) {
+      if (config.database instanceof Array) {
+        config.database.forEach(async (item) => {
+          if (item.default) {
+            const pool = await mysql.createPool({
+              host: item.host,
+              user: item.username,
+              password: item.password,
+              database: item.database,
+              port: item.port,
+              connectionLimit: item.connectionLimit
+            });
+            TarsusOrm.ConnectionPool = pool;
+          }
+        });
+      }
     }
+  }
+  static async query(prepareSqlAndArgs, Class) {
+    return new Promise(async (resolve, reject) => {
+      const { sql, args } = prepareSqlAndArgs;
+      console.log(prepareSqlAndArgs);
+      TarsusOrm.ConnectionPool.getConnection((err, conn) => {
+        if (err) {
+          reject(err);
+        }
+        conn.query(sql, args, function(err2, resu) {
+          if (err2) {
+            reject(err2);
+          }
+          if (resu && resu.length) {
+            const fields = EntityMap.get(Class.name);
+            const data = resu.map((item) => {
+              const toObjFields = [...fields.entries()].reduce(
+                (obj, [key, value]) => (obj[key] = value, obj),
+                {}
+              );
+              for (let k in toObjFields) {
+                toObjFields[k] = item[toObjFields[k]];
+              }
+              return toObjFields;
+            });
+            resolve(data);
+          } else {
+            resolve(resu);
+          }
+        });
+      });
+    });
+  }
+  getList() {
+    console.log("Get List Test");
+  }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+
+// decorator/util/servant.ts
+var ServantUtil = class {
+  static parse(servant) {
+    let obj = {};
+    this.params.map((param) => {
+      const index = servant.indexOf(param.key);
+      let end = servant.indexOf(" ", index + 3);
+      if (end == -1) {
+        end = servant.length;
+      }
+      let substr = servant.substring(index + 2, end).trim();
+      obj[param.param] = substr;
+      if (substr.endsWith("ms") && param.key == "-t") {
+        obj[param.param] = "ms";
+      }
+      if (substr.endsWith("http") && param.key == "-t") {
+        obj[param.param] = "http";
+      }
+    });
+    let servant_end = servant.indexOf(" ");
+    let servant_name = servant.substring(0, servant_end).trim();
+    obj["serverName"] = servant_name;
+    return obj;
+  }
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.loadInit = exports.loadServer = exports.loadController = exports.TarsusHttpApplication = void 0;
-var express_1 = __importDefault(require("express"));
-var routers_1 = require("../controller/routers");
-var index_1 = require("./index");
-var process_1 = require("process");
-var path_1 = __importDefault(require("path"));
-var TarsusOrm_1 = require("../orm/TarsusOrm");
-var servant_1 = require("../../util/servant");
-var proxyService_1 = require("../service/proxyService");
-var TarsusCache_1 = require("../../cache/TarsusCache");
-// import cluster from "cluster";
-// import { cpus } from "os";
+ServantUtil.params = [
+  { key: "-l", param: "language" },
+  { key: "-t", param: "type" },
+  { key: "-h", param: "host" },
+  { key: "-p", param: "port" }
+];
+
+// decorator/web/service/proxyService.ts
+var import_fs = require("fs");
+var import_path = __toESM(require("path"));
+var import_node_process = require("process");
+
+// decorator/microservice/pkg/index.ts
+var size = [
+  "a",
+  "b",
+  "c",
+  "d",
+  "e",
+  "f",
+  "g",
+  "h",
+  "i",
+  "j",
+  "k",
+  "l",
+  "m",
+  "n",
+  "o",
+  "p",
+  "q",
+  "r",
+  "s",
+  "t",
+  "u",
+  "v",
+  "w",
+  "x",
+  "y",
+  "z",
+  "-",
+  "=",
+  "/",
+  ".",
+  ","
+].map((item) => {
+  return "#" + item + "#";
+});
+var proto = [
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "#"
+].map((item) => {
+  return "[#" + item + "]";
+});
+
+// decorator/microservice/utils/call.ts
+function call(pkg) {
+  const { method, data, interFace, timeout } = pkg;
+  let args = getRequestArgs(data);
+  let body = Buffer.from(args);
+  let body_len = body.length;
+  let head_str = getRequestHead(
+    interFace,
+    method,
+    String(timeout),
+    String(body_len)
+  );
+  let call_buf = head_str + body;
+  return call_buf;
+}
+function getRequestHead(...args) {
+  let head = "";
+  args.forEach((item, index) => {
+    head += proto[index] + item;
+  });
+  head += proto[proto.length - 1];
+  return head;
+}
+function getRequestArgs(args) {
+  if (typeof args == "string") {
+    return args;
+  }
+  if (args instanceof Array) {
+    return JSON.stringify(args);
+  }
+  if (typeof args == "object") {
+    let init = 0;
+    let _args = "";
+    for (let v in args) {
+      let _ret = getRequestArgs(args[v]);
+      _args += size[init++] + _ret;
+    }
+    _args += size[size.length - 1];
+    return _args;
+  }
+  return "";
+}
+
+// decorator/web/proxy/index.ts
+var import_net = require("net");
+var import_node_events2 = require("events");
+var TarsusProxy = class {
+  constructor(host, port) {
+    this.uid = 1;
+    this.java = false;
+    this.intervalConnect = false;
+    this.TarsusEvents = new import_node_events2.EventEmitter();
+    this.host = host;
+    this.port = port;
+    this.socket = new import_net.Socket();
+    this.register_events();
+    this.connect();
+    this.key = TarsusProxy.createkey(host, port);
+  }
+  static createkey(host, port) {
+    return `-h ${host} -p ${port}`;
+  }
+  register_events() {
+    this.socket.on("connect", async () => {
+      this.clearIntervalConnect();
+      console.log("connected to server", "TCP");
+    });
+    this.socket.on("error", (err) => {
+      console.log(err, "TCP ERROR");
+      this.launchIntervalConnect();
+    });
+    this.socket.on("close", () => {
+      this.launchIntervalConnect();
+    });
+    this.socket.on("end", () => {
+      this.launchIntervalConnect();
+    });
+    this.recieve_from_microService();
+  }
+  connect() {
+    this.socket.connect({
+      host: this.host,
+      port: this.port
+    });
+  }
+  write(buf) {
+    let len = Buffer.from(buf).byteLength;
+    let new_buf = Buffer.allocUnsafe(len + 4);
+    let new_str = "";
+    if (this.java) {
+      buf += "[#ENDL#]\n";
+      new_str = this.join_buf(buf);
+      this.socket.write(new_str, async (err) => {
+        if (err) {
+          console.log(err);
+        }
+      });
+    } else {
+      new_buf.writeUInt32BE(this.uid, 0);
+      new_buf.write(buf, 4, "utf8");
+      this.socket.write(new_buf, async (err) => {
+        if (err) {
+          console.log(err);
+        }
+      });
+    }
+    this.uid++;
+  }
+  join_buf(buf) {
+    let len = String(this.uid).length;
+    if (len == 1) {
+      return "000" + this.uid + buf;
+    } else if (len == 2) {
+      return "00" + this.uid + buf;
+    } else if (len == 3) {
+      return "0" + this.uid + buf;
+    } else if (len == 4) {
+      return "" + this.uid + buf;
+    }
+  }
+  recieve_from_microService() {
+    this.socket.on("data", (chunk) => {
+      let getId;
+      let body;
+      if (this.java) {
+        getId = Number.parseInt(chunk.subarray(0, 4).toString());
+      } else {
+        getId = chunk.readUInt32BE(0);
+      }
+      body = chunk.subarray(4, chunk.length);
+      console.log(body.toString());
+      this.TarsusEvents.emit(getId.toString(), body.toString());
+    });
+  }
+  recieve_from_client() {
+  }
+  launchIntervalConnect() {
+    if (this.intervalConnect) {
+      return;
+    }
+    this.intervalConnect = setInterval(() => this.connect(), 5e3);
+  }
+  clearIntervalConnect() {
+    if (!this.intervalConnect) {
+      return;
+    }
+    clearInterval(this.intervalConnect);
+    this.intervalConnect = false;
+  }
+};
+
+// decorator/web/service/proxyService.ts
+var proxyService = class {
+  static transmit(body, res) {
+    const { key } = body;
+    let ProxyInstance = proxyService.MicroServices.get(key);
+    if (ProxyInstance) {
+      const str = call(body);
+      let curr = String(ProxyInstance.uid);
+      ProxyInstance.TarsusEvents.on(curr, function(args) {
+        const _to_json_ = JSON.parse(args);
+        if (!res.destroyed) {
+          res.json(_to_json_);
+        }
+      });
+      ProxyInstance.write(str);
+    } else {
+      return 0;
+    }
+  }
+  static boost() {
+    proxyService.link_service();
+  }
+  static link_service() {
+    let cwd3 = process.cwd();
+    let config_path = import_path.default.resolve(cwd3, "server.json");
+    const config = JSON.parse((0, import_fs.readFileSync)(config_path, "utf-8"));
+    (0, import_node_process.nextTick)(() => {
+      proxyService.MicroServices = /* @__PURE__ */ new Map();
+      config.servant.forEach((net) => {
+        let proxy_instance = new TarsusProxy(net.host, parseInt(net.port));
+        let isJava = net.type == "java";
+        if (isJava) {
+          proxy_instance.java = true;
+        }
+        const { key } = proxy_instance;
+        console.log("key", key);
+        proxyService.MicroServices.set(key, proxy_instance);
+      });
+    });
+  }
+};
+
+// decorator/cache/TarsusCache.ts
+var import_process = require("process");
+var import_redis = require("redis");
+var import_path2 = __toESM(require("path"));
+var import_process2 = require("process");
+var TarsusCache = class {
+  constructor() {
+    this.RedisTemplate = (0, import_redis.createClient)();
+    this.RedisTemplate.connect();
+    const config_path = import_path2.default.resolve((0, import_process2.cwd)(), "tarsus.config.js");
+    this.config = require(config_path);
+    this.servantName = ServantUtil.parse(this.config.servant.project).serverName;
+    this.servant = this.config.servant.project;
+    this.proxyName = this.config.servant.proxy;
+  }
+  async getMsServer() {
+    (0, import_process.nextTick)(async () => {
+      const data = await this.RedisTemplate.SMEMBERS(this.servantName);
+      console.log("\u52A0\u8F7D\u6240\u6709\u7684\u5FAE\u670D\u52A1\u6A21\u5757", data);
+      data.forEach((item) => {
+        const toObj = ServantUtil.parse(item);
+        let proxy_instance = new TarsusProxy(toObj.host, Number(toObj.port));
+        toObj.language == "java" ? proxy_instance.java = true : "";
+        const { key } = proxy_instance;
+        proxyService.MicroServices.set(key, proxy_instance);
+      });
+    });
+  }
+  async setServant() {
+    this.RedisTemplate.sAdd(this.proxyName, this.servant);
+  }
+};
+
+// decorator/web/application/TarsusServer.ts
 function loadController(args) {
-    args.forEach(function (el) {
-        console.log(el.name, " is  loader success");
-    });
-    index_1.ApplicationEvents.emit(index_1.Application.LOAD_SERVER);
+  args.forEach((el) => {
+    console.log(el.name, " is  loader success");
+  });
+  ApplicationEvents.emit("loadserver" /* LOAD_SERVER */);
 }
-exports.loadController = loadController;
 function loadServer(config) {
-    // 加载配置
-    index_1.ApplicationEvents.emit(index_1.Application.LOAD_CONFIG, config);
-    // 最后监听
-    index_1.ApplicationEvents.emit(index_1.Application.LOAD_LISTEN);
+  ApplicationEvents.emit("loadconfig" /* LOAD_CONFIG */, config);
+  ApplicationEvents.emit("loadlisten" /* LOAD_LISTEN */);
 }
-exports.loadServer = loadServer;
-// 初始化
 function loadInit(callback) {
-    index_1.ApplicationEvents.on(index_1.Application.LOAD_INIT, function (app) {
-        callback(app);
-    });
+  ApplicationEvents.on("loadinit" /* LOAD_INIT */, (app) => {
+    callback(app);
+  });
 }
-exports.loadInit = loadInit;
 function loadMs() {
-    var _this = this;
-    (0, process_1.nextTick)(function () { return __awaiter(_this, void 0, void 0, function () {
-        var cache;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    proxyService_1.proxyService.MicroServices = new Map();
-                    cache = new TarsusCache_1.TarsusCache();
-                    return [4 /*yield*/, cache.getMsServer()];
-                case 1:
-                    _a.sent();
-                    return [2 /*return*/];
-            }
-        });
-    }); });
+  (0, import_process3.nextTick)(async () => {
+    proxyService.MicroServices = /* @__PURE__ */ new Map();
+    let cache = new TarsusCache();
+    await cache.getMsServer();
+  });
 }
-var TarsusHttpApplication = function (value, context) {
-    context.addInitializer(function () {
-        var app = (0, express_1.default)();
-        app.use(express_1.default.json());
-        // 加载配置文件
-        var config_path = path_1.default.resolve((0, process_1.cwd)(), "tarsus.config.js");
-        var _config = require(config_path);
-        var SERVER = _config.servant.project;
-        var parsedServer = servant_1.ServantUtil.parse(SERVER);
-        var port = parsedServer.port || 8080;
-        // 加载配置文件
-        index_1.ApplicationEvents.on(index_1.Application.LOAD_CONFIG, function (props) {
-            // 加载数据库
-            index_1.ApplicationEvents.emit(index_1.Application.LOAD_DATABASE, _config);
-            // 加载微服务
-            if (props && props.ms) {
-                index_1.ApplicationEvents.emit(index_1.Application.LOAD_MS, _config);
-            }
-        });
-        // 加载数据库
-        index_1.ApplicationEvents.on(index_1.Application.LOAD_DATABASE, TarsusOrm_1.TarsusOrm.CreatePool);
-        index_1.ApplicationEvents.on(index_1.Application.LOAD_MS, loadMs);
-        // 全局管道
-        index_1.ApplicationEvents.on(index_1.Application.LOAD_PIPE, function (args) {
-            args.forEach(function (pipe) {
-                var _pipe = new pipe();
-                app.use("*", function (req, res, next) { return _pipe.next(req, res, next); });
-            });
-        });
-        // 加载路由
-        index_1.ApplicationEvents.on(index_1.Application.LOAD_SERVER, function () {
-            routers_1.controllers.forEach(function (value) {
-                app.use(value);
-            });
-        });
-        // 监听
-        index_1.ApplicationEvents.on(index_1.Application.LOAD_LISTEN, function () {
-            (0, process_1.nextTick)(function () {
-                // 加载初始化方法
-                index_1.ApplicationEvents.emit(index_1.Application.LOAD_INIT, app);
-                app.listen(port, function () {
-                    console.log("Server started at port: ", port);
-                    // 监听
-                });
-            });
-        });
+var TarsusHttpApplication = (value, context) => {
+  context.addInitializer(() => {
+    const app = (0, import_express.default)();
+    app.use(import_express.default.json());
+    const config_path = import_path3.default.resolve((0, import_process3.cwd)(), "tarsus.config.js");
+    const _config = require(config_path);
+    const SERVER = _config.servant.project;
+    const parsedServer = ServantUtil.parse(SERVER);
+    const port = parsedServer.port || 8080;
+    ApplicationEvents.on("loadconfig" /* LOAD_CONFIG */, function(props) {
+      ApplicationEvents.emit("loaddatabase" /* LOAD_DATABASE */, _config);
+      if (props && props.ms) {
+        ApplicationEvents.emit("loadms" /* LOAD_MS */, _config);
+      }
     });
+    ApplicationEvents.on("loaddatabase" /* LOAD_DATABASE */, TarsusOrm.CreatePool);
+    ApplicationEvents.on("loadms" /* LOAD_MS */, loadMs);
+    ApplicationEvents.on(
+      "loadpipe" /* LOAD_PIPE */,
+      function(args) {
+        args.forEach((pipe) => {
+          let _pipe = new pipe();
+          app.use("*", (req, res, next) => _pipe.next(req, res, next));
+        });
+      }
+    );
+    ApplicationEvents.on("loadserver" /* LOAD_SERVER */, () => {
+      controllers.forEach((value2) => {
+        app.use(value2);
+      });
+    });
+    ApplicationEvents.on("loadlisten" /* LOAD_LISTEN */, () => {
+      (0, import_process3.nextTick)(() => {
+        ApplicationEvents.emit("loadinit" /* LOAD_INIT */, app);
+        app.listen(port, function() {
+          console.log("Server started at port: ", port);
+        });
+      });
+    });
+  });
 };
-exports.TarsusHttpApplication = TarsusHttpApplication;
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  TarsusHttpApplication,
+  loadController,
+  loadInit,
+  loadServer
+});

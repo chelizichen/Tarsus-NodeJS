@@ -1,6 +1,6 @@
 {
   "name": "tarsus",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "new ts-decorator for express server",
   "repository": {
     "url": "https://github.com/chelizichen/tarsus",
@@ -38,8 +38,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "http": "ts-node-dev test/http/index.ts",
     "server": "ts-node-dev test/microservice/index.ts",
-    "build": " tsc --project tsconfig.build.json && tsup decorator/web.ts --format cjs,esm",
-    "pkg": "tsc --project tsconfig.pkg.json && tsup decorator/web.ts --format cjs,esm"
+    "build": " tsc --project tsconfig.build.json --format cjs,esm",
+    "pkg": "tsc --project tsconfig.pkg.json && tsup decorator --format cjs,esm"
   },
   "author": "",
   "license": "ISC",

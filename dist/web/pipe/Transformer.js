@@ -1,54 +1,56 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.class_transformer = void 0;
-var _ = __importStar(require("lodash"));
-var class_transformer = /** @class */ (function () {
-    function class_transformer() {
-    }
-    class_transformer.plainToClass = function (plain, Class) {
-        var inst = new Class();
-        var ret_plain = _.assignIn(inst, plain);
-        return ret_plain;
-    };
-    class_transformer.classToPlain = function (ClassInstance, filterKey) {
-        var keys = Object.getOwnPropertyNames(ClassInstance);
-        var get = keys
-            .map(function (el) {
-            return filterKey.indexOf(el) == -1 ? el : undefined;
-        })
-            .filter(function (el) { return el; });
-        return this.__classToPlain__(get, ClassInstance);
-    };
-    class_transformer.__classToPlain__ = function (get, inst) {
-        var plain = {};
-        get.forEach(function (el) {
-            plain[el] = inst[el];
-        });
-        return plain;
-    };
-    return class_transformer;
-}());
-exports.class_transformer = class_transformer;
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// decorator/web/pipe/Transformer.ts
+var Transformer_exports = {};
+__export(Transformer_exports, {
+  class_transformer: () => class_transformer
+});
+module.exports = __toCommonJS(Transformer_exports);
+var _ = __toESM(require("lodash"));
+var class_transformer = class {
+  static plainToClass(plain, Class) {
+    const inst = new Class();
+    const ret_plain = _.assignIn(inst, plain);
+    return ret_plain;
+  }
+  static classToPlain(ClassInstance, filterKey) {
+    const keys = Object.getOwnPropertyNames(ClassInstance);
+    const get = keys.map((el) => {
+      return filterKey.indexOf(el) == -1 ? el : void 0;
+    }).filter((el) => el);
+    return this.__classToPlain__(get, ClassInstance);
+  }
+  static __classToPlain__(get, inst) {
+    const plain = {};
+    get.forEach((el) => {
+      plain[el] = inst[el];
+    });
+    return plain;
+  }
+};
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  class_transformer
+});

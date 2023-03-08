@@ -1,202 +1,222 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// decorator/microservice/application/TarsusServer.ts
+var TarsusServer_exports = {};
+__export(TarsusServer_exports, {
+  TarsusServer: () => TarsusServer
+});
+module.exports = __toCommonJS(TarsusServer_exports);
+var import_net = require("net");
+
+// decorator/microservice/application/TarsusEvent.ts
+var TarsusEvent = class {
+  static get_fn_name(interFace, method) {
+    let fn_name = "[#1]" + interFace + "[#2]" + method;
+    return fn_name;
+  }
+  constructor() {
+    this.events = {};
+  }
+  register(Head, CallBack) {
+    this.events[Head] = CallBack;
+  }
+  async emit(Head, ...args) {
+    let head = Head.toString();
+    return await this.events[head](...args);
+  }
+};
+
+// decorator/microservice/pkg/index.ts
+var size = [
+  "a",
+  "b",
+  "c",
+  "d",
+  "e",
+  "f",
+  "g",
+  "h",
+  "i",
+  "j",
+  "k",
+  "l",
+  "m",
+  "n",
+  "o",
+  "p",
+  "q",
+  "r",
+  "s",
+  "t",
+  "u",
+  "v",
+  "w",
+  "x",
+  "y",
+  "z",
+  "-",
+  "=",
+  "/",
+  ".",
+  ","
+].map((item) => {
+  return "#" + item + "#";
+});
+var proto = [
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "#"
+].map((item) => {
+  return "[#" + item + "]";
+});
+
+// decorator/microservice/application/TarsusServer.ts
+var TarsusServer = class {
+  constructor(opts) {
+    const { port, host } = opts;
+    this.createServer({ port, host });
+    this.ArcEvent = new TarsusEvent();
+    console.log("server start at " + host + ":" + port);
+  }
+  registEvents(events) {
+    events.forEach((func, key) => {
+      this.ArcEvent.register(key, func);
     });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+  }
+  createServer({ port, host }) {
+    let bind_recieve = this.recieve.bind(this);
+    let bind_connection = this.connection.bind(this);
+    let bind_err = this.error.bind(this);
+    this.Net = (0, import_net.createServer)((socket) => {
+      this.socket = socket;
+      this.socket.on("data", bind_recieve);
+      this.socket.on("error", bind_err);
+      this.Net.on("connection", bind_connection);
+    });
+    this.Net.listen(port, host);
+  }
+  async recieve(data) {
+    console.log("\u63A5\u6536\u5230\u6D88\u606F", data.toString());
+    let getId = data.readInt32BE(0);
+    data = data.subarray(4, data.length);
+    let head_end = data.indexOf("[##]");
+    let timeout = Number(this.unpkgHead(2, data));
+    let body_len = Number(this.unpkgHead(3, data, true));
+    let head = data.subarray(0, data.indexOf(proto[2]));
+    let body = data.subarray(head_end + 4, body_len + head_end + 4);
+    let _body = this.unpacking(body);
+    Promise.race([this.timeout(timeout), this.ArcEvent.emit(head, ..._body)]).then((res) => {
+      let toJson = JSON.stringify(res);
+      let len = Buffer.from(toJson).byteLength;
+      let buf = Buffer.alloc(len + 4);
+      buf.writeUInt32BE(getId, 0);
+      buf.write(toJson, 4);
+      this.socket.write(buf, function(err) {
+        if (err) {
+          console.log("\u670D\u52A1\u7AEF\u5199\u5165\u9519\u8BEF", err);
+        }
+        console.log("\u670D\u52A1\u7AEF\u5199\u5165\u6210\u529F");
+      });
+    }).catch((err) => {
+      this.socket.write(err, function(err2) {
+        if (err2) {
+          console.log("\u670D\u52A1\u7AEF\u5199\u5165\u9519\u8BEF", err2);
+        }
+        console.log("\u670D\u52A1\u7AEF\u5199\u5165\u6210\u529F");
+      });
+    });
+  }
+  error(err) {
+    console.log("ado-rpc-err", err);
+  }
+  connection() {
+    console.log("\u6709\u65B0\u7528\u6237\u94FE\u63A5");
+  }
+  unpacking(buf) {
+    let args = [];
+    let init = 0;
+    let start = buf.indexOf(size[init]);
+    while (true) {
+      let end_str = buf.subarray(start, start + 3).toString();
+      let isEnd = end_str == size[size.length - 1];
+      if (isEnd) {
+        break;
+      }
+      let next = buf.indexOf(size[init + 1], start);
+      if (next == -1) {
+        let sub_pkg = buf.subarray(start, start + 6).toString();
+        let is_un_pkg = sub_pkg == size[init] + size[0];
+        if (is_un_pkg) {
+          let un_pkg = buf.subarray(start + 3, buf.length - 3);
+          let getargs = this.unpacking(un_pkg);
+          args[init] = getargs;
+        } else {
+          let un_pkg = buf.subarray(start + 3, buf.length - 3).toString();
+          args[init] = un_pkg;
+        }
+        break;
+      } else {
+        let isObject = buf.subarray(start, start + 6).toString() == size[init] + size[0];
+        if (isObject) {
+          let end = buf.indexOf(size[size.length - 1] + size[init + 1]);
+          let un_pkg = buf.subarray(start + 3, end + 3);
+          let getargs = this.unpacking(un_pkg);
+          args[init] = getargs;
+          start = end + 3;
+        } else {
+          let getargs = buf.subarray(start + 3, next).toString();
+          args[init] = getargs;
+          start = next;
+        }
+      }
+      init++;
     }
-};
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
+    return args;
+  }
+  unpkgHead(start, data, end) {
+    let start_index = data.indexOf(proto[start]);
+    let start_next = 0;
+    if (end) {
+      start_next = data.indexOf(proto[proto.length - 1]);
+    } else {
+      start_next = data.indexOf(proto[start + 1]);
     }
-    return to.concat(ar || Array.prototype.slice.call(from));
+    let timeout = data.subarray(start_index + proto[start].length, start_next).toString("utf-8");
+    return timeout;
+  }
+  timeout(time) {
+    return new Promise((_, rej) => {
+      let _time = setTimeout(() => {
+        rej("\u8BF7\u6C42\u8D85\u65F6");
+        clearTimeout(_time);
+      }, time);
+    });
+  }
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.TarsusServer = void 0;
-var net_1 = require("net");
-var TarsusEvent_1 = require("./TarsusEvent");
-var pkg_1 = require("../pkg");
-var TarsusServer = /** @class */ (function () {
-    function TarsusServer(opts) {
-        var port = opts.port, host = opts.host;
-        this.createServer({ port: port, host: host });
-        this.ArcEvent = new TarsusEvent_1.TarsusEvent();
-        console.log("server start at " + host + ":" + port);
-    }
-    TarsusServer.prototype.registEvents = function (events) {
-        var _this = this;
-        events.forEach(function (func, key) {
-            _this.ArcEvent.register(key, func);
-        });
-    };
-    TarsusServer.prototype.createServer = function (_a) {
-        var _this = this;
-        var port = _a.port, host = _a.host;
-        // 绑定this
-        var bind_recieve = this.recieve.bind(this);
-        var bind_connection = this.connection.bind(this);
-        var bind_err = this.error.bind(this);
-        this.Net = (0, net_1.createServer)(function (socket) {
-            _this.socket = socket;
-            _this.socket.on("data", bind_recieve);
-            _this.socket.on("error", bind_err);
-            _this.Net.on("connection", bind_connection);
-        });
-        this.Net.listen(port, host);
-    };
-    TarsusServer.prototype.recieve = function (data) {
-        return __awaiter(this, void 0, void 0, function () {
-            var getId, head_end, timeout, body_len, head, body, _body;
-            var _a;
-            var _this = this;
-            return __generator(this, function (_b) {
-                console.log("接收到消息", data.toString());
-                getId = data.readInt32BE(0);
-                data = data.subarray(4, data.length);
-                head_end = data.indexOf("[##]");
-                timeout = Number(this.unpkgHead(2, data));
-                body_len = Number(this.unpkgHead(3, data, true));
-                head = data.subarray(0, data.indexOf(pkg_1.proto[2]));
-                body = data.subarray(head_end + 4, body_len + head_end + 4);
-                _body = this.unpacking(body);
-                Promise.race([this.timeout(timeout), (_a = this.ArcEvent).emit.apply(_a, __spreadArray([head], _body, false))])
-                    .then(function (res) {
-                    var toJson = JSON.stringify(res);
-                    var len = Buffer.from(toJson).byteLength;
-                    var buf = Buffer.alloc(len + 4);
-                    buf.writeUInt32BE(getId, 0);
-                    buf.write(toJson, 4);
-                    _this.socket.write(buf, function (err) {
-                        if (err) {
-                            console.log("服务端写入错误", err);
-                        }
-                        console.log("服务端写入成功");
-                    });
-                })
-                    .catch(function (err) {
-                    _this.socket.write(err, function (err) {
-                        if (err) {
-                            console.log("服务端写入错误", err);
-                        }
-                        console.log("服务端写入成功");
-                    });
-                });
-                return [2 /*return*/];
-            });
-        });
-    };
-    TarsusServer.prototype.error = function (err) {
-        console.log("ado-rpc-err", err);
-    };
-    TarsusServer.prototype.connection = function () {
-        console.log("有新用户链接");
-    };
-    /**
-     *
-     * @param pkg Buffer
-     * @returns value:any[]
-     * @description 拆包 根据 start 和 end 拆包
-     */
-    TarsusServer.prototype.unpacking = function (buf) {
-        var args = [];
-        var init = 0;
-        var start = buf.indexOf(pkg_1.size[init]);
-        while (true) {
-            var end_str = buf.subarray(start, start + 3).toString();
-            var isEnd = end_str == pkg_1.size[pkg_1.size.length - 1];
-            if (isEnd) {
-                break;
-            }
-            var next = buf.indexOf(pkg_1.size[init + 1], start);
-            if (next == -1) {
-                var sub_pkg = buf.subarray(start, start + 6).toString();
-                var is_un_pkg = sub_pkg == pkg_1.size[init] + pkg_1.size[0];
-                // 判断是否为未分割的参数
-                if (is_un_pkg) {
-                    var un_pkg = buf.subarray(start + 3, buf.length - 3);
-                    var getargs = this.unpacking(un_pkg);
-                    args[init] = getargs;
-                }
-                else {
-                    var un_pkg = buf.subarray(start + 3, buf.length - 3).toString();
-                    args[init] = un_pkg;
-                }
-                break;
-            }
-            else {
-                var isObject = buf.subarray(start, start + 6).toString() == pkg_1.size[init] + pkg_1.size[0];
-                if (isObject) {
-                    var end = buf.indexOf(pkg_1.size[pkg_1.size.length - 1] + pkg_1.size[init + 1]);
-                    var un_pkg = buf.subarray(start + 3, end + 3);
-                    var getargs = this.unpacking(un_pkg);
-                    args[init] = getargs;
-                    start = end + 3;
-                }
-                else {
-                    var getargs = buf.subarray(start + 3, next).toString();
-                    args[init] = getargs;
-                    start = next;
-                }
-            }
-            init++;
-        }
-        return args;
-    };
-    TarsusServer.prototype.unpkgHead = function (start, data, end) {
-        var start_index = data.indexOf(pkg_1.proto[start]);
-        var start_next = 0;
-        if (end) {
-            start_next = data.indexOf(pkg_1.proto[pkg_1.proto.length - 1]);
-        }
-        else {
-            start_next = data.indexOf(pkg_1.proto[start + 1]);
-        }
-        var timeout = data
-            .subarray(start_index + pkg_1.proto[start].length, start_next)
-            .toString("utf-8");
-        return timeout;
-    };
-    TarsusServer.prototype.timeout = function (time) {
-        return new Promise(function (_, rej) {
-            var _time = setTimeout(function () {
-                rej("请求超时");
-                clearTimeout(_time);
-            }, time);
-        });
-    };
-    return TarsusServer;
-}());
-exports.TarsusServer = TarsusServer;
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  TarsusServer
+});
