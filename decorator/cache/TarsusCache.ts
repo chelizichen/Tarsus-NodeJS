@@ -3,7 +3,7 @@ import { RedisClientType, createClient } from "redis";
 import path from "path";
 import { cwd } from "process";
 import { ServantUtil } from "../util/servant";
-import { proxyService } from "../web/service/proxyService";
+import { TarsusProxyService } from "../web/service/TarsusProxyService";
 import { TarsusProxy } from "../web/proxy";
 
 class TarsusCache {
@@ -36,10 +36,19 @@ class TarsusCache {
       
       data.forEach((item) => {
         const toObj = ServantUtil.parse(item);
-        let proxy_instance = new TarsusProxy(toObj.host, Number(toObj.port));
-        toObj.language == "java" ? (proxy_instance.java = true) : "";
-        const { key } = proxy_instance;
-        proxyService.MicroServices.set(key, proxy_instance);
+        
+        if(toObj.proto == "ms"){
+          let proxy_instance = new TarsusProxy(toObj.host, Number(toObj.port));
+          toObj.language == "java" ? (proxy_instance.java = true) : "";
+          const { key } = proxy_instance;
+          TarsusProxyService.MicroServices.set(key, proxy_instance);
+        }
+
+        if(toObj.proto == "http"){
+          TarsusProxyService.HttpServices.set(toObj.serverName,toObj);
+        }
+
+
       });
     });
   }

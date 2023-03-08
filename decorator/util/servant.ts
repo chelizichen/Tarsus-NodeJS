@@ -1,9 +1,9 @@
-const demo = [ 
-  "@DemoProxy/GateWay -l node -t @tarsus/http -h 127.0.0.1 -p 9811"
-  // "TarsusTestNodeService -l java -t @tarsus/ms -h 127.0.0.1 -p 10012",
-  // "TarsusTestJavaService -l node -t @tarsus/ms -h 127.0.0.1 -p 7099",
-  // "TarsusHttpProject -l node -t @tarsus/http -h 127.0.0.1 -p 9811",
-];
+// const demo = [ 
+//   "@DemoProxy/GateWay -l node -t @tarsus/http -h 127.0.0.1 -p 9811"
+//   // "TarsusTestNodeService -l java -t @tarsus/ms -h 127.0.0.1 -p 10012",
+//   // "TarsusTestJavaService -l node -t @tarsus/ms -h 127.0.0.1 -p 7099",
+//   // "TarsusHttpProject -l node -t @tarsus/http -h 127.0.0.1 -p 9811",
+// ];
 
 export type parseToObj = {
   language: "java" | "node",
@@ -50,8 +50,8 @@ class ServantUtil {
   }
 }
 
-const data = ServantUtil.parse(demo[0])
-console.log(data);
+// const data = ServantUtil.parse(demo[0])
+// console.log(data);
 
 
 

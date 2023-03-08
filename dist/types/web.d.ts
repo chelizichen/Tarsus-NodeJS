@@ -14,7 +14,7 @@ import { TarsusPipe, UsePipe, TarsusGlobalPipe, loadGlobalPipe, class_transforme
 import { TarsusProxy } from "./web/proxy";
 import { RequestFactory } from "./web/proxy/http";
 import { Service } from "./web/service";
-import { proxyService } from "./web/service/proxyService";
+import { TarsusProxyService } from "./web/service/TarsusProxyService";
 export { UseInterCeptor, TarsusInterCeptor };
 export { TarsusHttpApplication, loadController, loadServer, loadInit };
 export { Controller };
@@ -29,6 +29,6 @@ export { class_transformer, };
 export { RequestFactory };
 export { TarsusProxy };
 export { Service };
-export { proxyService };
+export { TarsusProxyService };
 export { Collect, LazyCollect };
 export { Inject, LazyInject };

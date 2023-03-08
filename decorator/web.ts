@@ -16,7 +16,7 @@ import { TarsusPipe, UsePipe, TarsusGlobalPipe, loadGlobalPipe, class_transforme
 import { TarsusProxy } from "./web/proxy";
 import { RequestFactory } from "./web/proxy/http";
 import { Service } from "./web/service";
-import { proxyService } from "./web/service/proxyService";
+import { TarsusProxyService } from "./web/service/TarsusProxyService";
 
 // ******************AOP*****************
 export {
@@ -86,7 +86,7 @@ export {
   Service
 }
 export {
-  proxyService
+  TarsusProxyService
 }
 
 

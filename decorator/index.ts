@@ -27,7 +27,7 @@ import {
   RequestFactory,
   TarsusProxy,
   Service,
-  proxyService,
+  TarsusProxyService,
   LazyCollect,
   LazyInject,
   UsePipe,
@@ -93,7 +93,7 @@ export { TarsusProxy };
 
 // *****************SERVICE****************
 export { Service };
-export { proxyService };
+export { TarsusProxyService };
 
 // ***************IOC*****************
 

@@ -4,6 +4,8 @@ export type parseToObj = {
     host: string;
     port: string;
     serverName: string;
+    serverProject: string;
+    serverGroup: string;
 };
 declare class ServantUtil {
     static params: {

@@ -43,6 +43,8 @@ var ServantUtil = class {
     let servant_end = servant.indexOf(" ");
     let servant_name = servant.substring(0, servant_end).trim();
     obj["serverName"] = servant_name;
+    obj["serverGroup"] = servant_name.slice(1, servant_name.indexOf("/"));
+    obj["serverProject"] = servant_name.slice(servant_name.indexOf("/") + 1);
     return obj;
   }
 };

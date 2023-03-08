@@ -69,7 +69,7 @@ var Controller = (interFace) => {
           });
         }
         if (method == "proxy" /* Proxy */) {
-          router.post(method_path, async (req, res) => {
+          router.all(method_path, async (req, res) => {
             value(req, res);
           });
         }

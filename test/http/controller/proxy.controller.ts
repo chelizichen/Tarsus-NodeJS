@@ -1,5 +1,5 @@
 import { Inject } from "../../../decorator/ioc/index";
-import { proxyService } from "../../../decorator/web/service/proxyService";
+import { TarsusProxyService } from "../../../decorator/web/service/TarsusProxyService";
 import { Controller } from "../../../decorator/web/controller/index";
 import { Proxy } from "../../../decorator/web/method/index";
 import { proxy } from "../../../decorator/web/method/types";
@@ -17,7 +17,7 @@ class proxyController {
     
     
     const { body } = req as any;
-    proxyService.transmit(body, res)
+    TarsusProxyService.transmit(body, res)
     
     // then((data) => {
     //   let Arc_ProxyInstance = proxyService.MicroServices.get(req.body.key);

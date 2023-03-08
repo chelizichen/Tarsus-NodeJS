@@ -47,6 +47,7 @@ __export(web_exports, {
   TarsusHttpApplication: () => TarsusHttpApplication,
   TarsusOrm: () => TarsusOrm,
   TarsusProxy: () => TarsusProxy,
+  TarsusProxyService: () => TarsusProxyService,
   UseInterCeptor: () => UseInterCeptor,
   UsePipe: () => UsePipe,
   class_transformer: () => class_transformer,
@@ -54,8 +55,7 @@ __export(web_exports, {
   loadController: () => loadController,
   loadGlobalPipe: () => loadGlobalPipe,
   loadInit: () => loadInit,
-  loadServer: () => loadServer,
-  proxyService: () => proxyService
+  loadServer: () => loadServer
 });
 module.exports = __toCommonJS(web_exports);
 
@@ -243,6 +243,8 @@ var ServantUtil = class {
     let servant_end = servant.indexOf(" ");
     let servant_name = servant.substring(0, servant_end).trim();
     obj["serverName"] = servant_name;
+    obj["serverGroup"] = servant_name.slice(1, servant_name.indexOf("/"));
+    obj["serverProject"] = servant_name.slice(servant_name.indexOf("/") + 1);
     return obj;
   }
 };
@@ -253,7 +255,7 @@ ServantUtil.params = [
   { key: "-p", param: "port" }
 ];
 
-// decorator/web/service/proxyService.ts
+// decorator/web/service/TarsusProxyService.ts
 var import_fs = require("fs");
 var import_path = __toESM(require("path"));
 var import_node_process = require("process");
@@ -460,12 +462,15 @@ var TarsusProxy = class {
   }
 };
 
-// decorator/web/service/proxyService.ts
-var proxyService = class {
-  static transmit(body, res) {
-    body.data["EndData"] = "End";
+// decorator/web/service/TarsusProxyService.ts
+var import_axios = __toESM(require("axios"));
+var _TarsusProxyService = class {
+  static transmit(req, res) {
+    let { body, query } = req;
+    let merge = Object.assign({}, body, query);
+    merge.data["EndData"] = "End";
     const { key } = body;
-    let ProxyInstance = proxyService.MicroServices.get(key);
+    let ProxyInstance = _TarsusProxyService.MicroServices.get(key);
     if (ProxyInstance) {
       const str = call(body);
       let curr = String(ProxyInstance.uid);
@@ -481,14 +486,14 @@ var proxyService = class {
     }
   }
   static boost() {
-    proxyService.link_service();
+    _TarsusProxyService.link_service();
   }
   static link_service() {
     let cwd3 = process.cwd();
     let config_path = import_path.default.resolve(cwd3, "server.json");
     const config = JSON.parse((0, import_fs.readFileSync)(config_path, "utf-8"));
     (0, import_node_process.nextTick)(() => {
-      proxyService.MicroServices = /* @__PURE__ */ new Map();
+      _TarsusProxyService.MicroServices = /* @__PURE__ */ new Map();
       config.servant.forEach((net) => {
         let proxy_instance = new TarsusProxy(net.host, parseInt(net.port));
         let isJava = net.type == "java";
@@ -497,11 +502,31 @@ var proxyService = class {
         }
         const { key } = proxy_instance;
         console.log("key", key);
-        proxyService.MicroServices.set(key, proxy_instance);
+        _TarsusProxyService.MicroServices.set(key, proxy_instance);
       });
     });
   }
+  static async request(req, res) {
+    const toMerge = Object.assign({}, req.query, req.body);
+    const { proxy, data, url, method } = toMerge;
+    const target = _TarsusProxyService.HttpServices.get(proxy);
+    const targetUrl = "http://" + target.host + ":" + target.port;
+    _TarsusProxyService.proxy_request({
+      url: targetUrl + url,
+      method,
+      params: method == "get" ? data : void 0,
+      data: method == "post" ? data : void 0
+    }).then((ret) => {
+      res.json(ret);
+    });
+  }
 };
+var TarsusProxyService = _TarsusProxyService;
+TarsusProxyService.proxy_request = import_axios.default.create({
+  timeout: 6e3,
+  headers: { "Content-Type": "application/json;charset=utf-8" }
+  // 接口代理地址
+});
 
 // decorator/cache/TarsusCache.ts
 var import_process = require("process");
@@ -514,26 +539,30 @@ var TarsusCache = class {
     this.RedisTemplate.connect();
     const config_path = import_path2.default.resolve((0, import_process2.cwd)(), "tarsus.config.js");
     this.config = require(config_path);
-    this.servantName = ServantUtil.parse(this.config.servant.project).serverName;
+    this.servantGroup = ServantUtil.parse(this.config.servant.project).serverGroup;
     this.servant = this.config.servant.project;
-    this.proxyName = this.config.servant.proxy;
   }
   // 微服务网关所需要的代理层
   async getMsServer() {
     (0, import_process.nextTick)(async () => {
-      const data = await this.RedisTemplate.SMEMBERS(this.servantName);
+      const data = await this.RedisTemplate.SMEMBERS(this.servantGroup);
       console.log("\u52A0\u8F7D\u6240\u6709\u7684\u5FAE\u670D\u52A1\u6A21\u5757", data);
       data.forEach((item) => {
         const toObj = ServantUtil.parse(item);
-        let proxy_instance = new TarsusProxy(toObj.host, Number(toObj.port));
-        toObj.language == "java" ? proxy_instance.java = true : "";
-        const { key } = proxy_instance;
-        proxyService.MicroServices.set(key, proxy_instance);
+        if (toObj.proto == "ms") {
+          let proxy_instance = new TarsusProxy(toObj.host, Number(toObj.port));
+          toObj.language == "java" ? proxy_instance.java = true : "";
+          const { key } = proxy_instance;
+          TarsusProxyService.MicroServices.set(key, proxy_instance);
+        }
+        if (toObj.proto == "http") {
+          TarsusProxyService.HttpServices.set(toObj.serverName, toObj);
+        }
       });
     });
   }
   async setServant() {
-    this.RedisTemplate.sAdd(this.proxyName, this.servant);
+    this.RedisTemplate.sAdd(this.servantGroup, this.servant);
   }
 };
 
@@ -555,7 +584,7 @@ function loadInit(callback) {
 }
 function loadMs() {
   (0, import_process3.nextTick)(async () => {
-    proxyService.MicroServices = /* @__PURE__ */ new Map();
+    TarsusProxyService.MicroServices = /* @__PURE__ */ new Map();
     let cache = new TarsusCache();
     await cache.getMsServer();
   });
@@ -657,7 +686,7 @@ var Controller = (interFace) => {
           });
         }
         if (method == "proxy" /* Proxy */) {
-          router.post(method_path, async (req, res) => {
+          router.all(method_path, async (req, res) => {
             value(req, res);
           });
         }
@@ -727,12 +756,12 @@ function loadGlobalPipe(args) {
 }
 
 // decorator/web/proxy/http.ts
-var import_axios = __toESM(require("axios"));
+var import_axios2 = __toESM(require("axios"));
 function createkey(port, host) {
   return `-h ${host} -p ${port}`;
 }
 function RequestFactory(port, host) {
-  const proxy_request = import_axios.default.create({
+  const proxy_request = import_axios2.default.create({
     timeout: 6e3,
     headers: { "Content-Type": "application/json;charset=utf-8" },
     // 接口代理地址
@@ -781,6 +810,7 @@ var Service = Collect;
   TarsusHttpApplication,
   TarsusOrm,
   TarsusProxy,
+  TarsusProxyService,
   UseInterCeptor,
   UsePipe,
   class_transformer,
@@ -788,6 +818,5 @@ var Service = Collect;
   loadController,
   loadGlobalPipe,
   loadInit,
-  loadServer,
-  proxyService
+  loadServer
 });
