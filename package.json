@@ -1,6 +1,6 @@
 {
   "name": "tarsus",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "new ts-decorator for express server",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -46,7 +46,8 @@
     "http": "ts-node-dev test/http/index.ts",
     "server": "ts-node-dev test/microservice/index.ts",
     "build": " tsc --project tsconfig.build.json --format cjs,esm",
-    "pkg": "tsc --project tsconfig.pkg.json && tsup decorator --format cjs,esm"
+    "pkg": "tsc --project tsconfig.pkg.json && tsup decorator --format cjs,esm",
+    "util":"ts-node-dev decorator/util/servant.ts"
   },
   "author": "",
   "license": "ISC",

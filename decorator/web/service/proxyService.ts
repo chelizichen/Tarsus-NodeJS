@@ -7,6 +7,7 @@ import { Response } from "express";
 
 class proxyService {
   static transmit(body: any,res:Response) {
+    body.data["EndData"] = "End";
     const { key } = body;
     let ProxyInstance = proxyService.MicroServices.get(key);
     if (ProxyInstance) {

@@ -30,9 +30,18 @@ var TarsusEvent = class {
   constructor() {
     this.events = {};
   }
+  /**
+   * @description 注册远程方法
+   * @param Head -> Buffer
+   * @param CallBack -> Function
+   */
   register(Head, CallBack) {
     this.events[Head] = CallBack;
   }
+  /**
+   * @method emit
+   * @description 调用远程方法
+   */
   async emit(Head, ...args) {
     let head = Head.toString();
     return await this.events[head](...args);

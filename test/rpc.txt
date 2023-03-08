@@ -14,3 +14,6 @@ RPC-TEST localhost:7099/proxy/interceptor
     "timeout": "60000",
     "key": "-h 127.0.0.1 -p 10012"
 }
+{
+    "url":"localhost:7899",
+}

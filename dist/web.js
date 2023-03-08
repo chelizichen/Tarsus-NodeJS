@@ -17,6 +17,10 @@ var __copyProps = (to, from, except, desc) => {
   return to;
 };
 var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
   isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
   mod
 ));
@@ -211,6 +215,10 @@ var TarsusOrm = class {
   getList() {
     console.log("Get List Test");
   }
+  // static async queryTest(sql:string){
+  //   const data = await ArcOrm.ConnectionPool.query(sql);
+  //   return data;
+  // }
 };
 
 // decorator/util/servant.ts
@@ -455,6 +463,7 @@ var TarsusProxy = class {
 // decorator/web/service/proxyService.ts
 var proxyService = class {
   static transmit(body, res) {
+    body.data["EndData"] = "End";
     const { key } = body;
     let ProxyInstance = proxyService.MicroServices.get(key);
     if (ProxyInstance) {
@@ -509,6 +518,7 @@ var TarsusCache = class {
     this.servant = this.config.servant.project;
     this.proxyName = this.config.servant.proxy;
   }
+  // 微服务网关所需要的代理层
   async getMsServer() {
     (0, import_process.nextTick)(async () => {
       const data = await this.RedisTemplate.SMEMBERS(this.servantName);
@@ -725,6 +735,7 @@ function RequestFactory(port, host) {
   const proxy_request = import_axios.default.create({
     timeout: 6e3,
     headers: { "Content-Type": "application/json;charset=utf-8" },
+    // 接口代理地址
     baseURL: "http://localhost:5005/api/proxy/interceptor",
     method: "post"
   });

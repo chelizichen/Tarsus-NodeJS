@@ -33,9 +33,18 @@ var TarsusEvent = class {
   constructor() {
     this.events = {};
   }
+  /**
+   * @description 注册远程方法
+   * @param Head -> Buffer
+   * @param CallBack -> Function
+   */
   register(Head, CallBack) {
     this.events[Head] = CallBack;
   }
+  /**
+   * @method emit
+   * @description 调用远程方法
+   */
   async emit(Head, ...args) {
     let head = Head.toString();
     return await this.events[head](...args);
@@ -155,6 +164,12 @@ var TarsusServer = class {
   connection() {
     console.log("\u6709\u65B0\u7528\u6237\u94FE\u63A5");
   }
+  /**
+   *
+   * @param pkg Buffer
+   * @returns value:any[]
+   * @description 拆包 根据 start 和 end 拆包
+   */
   unpacking(buf) {
     let args = [];
     let init = 0;

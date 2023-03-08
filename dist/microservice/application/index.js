@@ -17,6 +17,10 @@ var __copyProps = (to, from, except, desc) => {
   return to;
 };
 var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
   isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
   mod
 ));
@@ -44,9 +48,18 @@ var TarsusEvent = class {
   constructor() {
     this.events = {};
   }
+  /**
+   * @description 注册远程方法
+   * @param Head -> Buffer
+   * @param CallBack -> Function
+   */
   register(Head, CallBack) {
     this.events[Head] = CallBack;
   }
+  /**
+   * @method emit
+   * @description 调用远程方法
+   */
   async emit(Head, ...args) {
     let head = Head.toString();
     return await this.events[head](...args);
@@ -166,6 +179,12 @@ var TarsusServer = class {
   connection() {
     console.log("\u6709\u65B0\u7528\u6237\u94FE\u63A5");
   }
+  /**
+   *
+   * @param pkg Buffer
+   * @returns value:any[]
+   * @description 拆包 根据 start 和 end 拆包
+   */
   unpacking(buf) {
     let args = [];
     let init = 0;
@@ -435,6 +454,7 @@ var TarsusProxy = class {
 // decorator/web/service/proxyService.ts
 var proxyService = class {
   static transmit(body, res) {
+    body.data["EndData"] = "End";
     const { key } = body;
     let ProxyInstance = proxyService.MicroServices.get(key);
     if (ProxyInstance) {
@@ -485,6 +505,7 @@ var TarsusCache = class {
     this.servant = this.config.servant.project;
     this.proxyName = this.config.servant.proxy;
   }
+  // 微服务网关所需要的代理层
   async getMsServer() {
     (0, import_process.nextTick)(async () => {
       const data = await this.RedisTemplate.SMEMBERS(this.servantName);

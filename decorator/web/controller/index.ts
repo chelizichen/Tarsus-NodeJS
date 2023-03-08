@@ -40,7 +40,7 @@ const Controller = (interFace: string) => {
         }
 
         if(method == METHODS.Proxy){
-          router.post(method_path, async (req, res) => {
+          router.all(method_path, async (req, res) => {
             value(req,res)
           })
         }

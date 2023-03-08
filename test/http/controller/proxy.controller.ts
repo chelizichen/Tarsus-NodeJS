@@ -17,7 +17,6 @@ class proxyController {
     
     
     const { body } = req as any;
-    body.data["EndData"] = "End";
     proxyService.transmit(body, res)
     
     // then((data) => {
