@@ -12,6 +12,7 @@ var load_1 = require("../load");
 var path_1 = __importDefault(require("path"));
 var servant_1 = require("../../util/servant");
 var TarsusInterFace_1 = require("../interface/TarsusInterFace");
+var TarsusCache_1 = require("../../cache/TarsusCache");
 var TarsusMsApplication = function (value, context) {
     context.addInitializer(function () {
         var config_path = path_1.default.resolve((0, process_1.cwd)(), "tarsus.config.js");
@@ -33,10 +34,13 @@ var TarsusMsApplication = function (value, context) {
             var dirs = (0, fs_1.readdirSync)(full_path);
             dirs.forEach(function (interFace) {
                 var interFace_path = path_1.default.resolve(full_path, interFace);
+                // 动态加载每一个注册的接口
                 require(interFace_path);
             });
         });
         load_1.ApplicationEvents.on(load_1.Application.LOAD_MICROSERVICE, function () {
+            var cache = new TarsusCache_1.TarsusCache();
+            cache.setServant();
             var arc_server = new TarsusServer_1.TarsusServer({ port: Number(port), host: host });
             arc_server.registEvents(TarsusInterFace_1.interFaceMap);
             console.log(arc_server.ArcEvent.events);

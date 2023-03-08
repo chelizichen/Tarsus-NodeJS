@@ -1,2 +1,3 @@
 declare const Collect: (value: new () => void, context: ClassDecoratorContext) => void;
-export { Collect };
+declare const LazyCollect: (value: new () => void, contenxt: ClassDecoratorContext) => void;
+export { Collect, LazyCollect };

@@ -1,2 +1,3 @@
 declare let IocMap: Map<any, any>;
-export { IocMap };
+declare let LazyIocMap: Map<any, any>;
+export { IocMap, LazyIocMap };

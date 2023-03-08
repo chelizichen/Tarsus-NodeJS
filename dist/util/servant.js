@@ -1,11 +1,11 @@
 "use strict";
+// const demo = [ 
+//   "TarsusTestNodeService -l java -t @tarsus/ms -h 127.0.0.1 -p 10012",
+//   // "TarsusTestJavaService -l node -t @tarsus/ms -h 127.0.0.1 -p 7099",
+//   // "TarsusHttpProject -l node -t @tarsus/http -h 127.0.0.1 -p 9811",
+// ];
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ServantUtil = void 0;
-var demo = [
-    "TarsusTestNodeService -l java -t @tarsus/ms -h 127.0.0.1 -p 10012",
-    // "TarsusTestJavaService -l node -t @tarsus/ms -h 127.0.0.1 -p 7099",
-    // "TarsusHttpProject -l node -t @tarsus/http -h 127.0.0.1 -p 9811",
-];
 var ServantUtil = /** @class */ (function () {
     function ServantUtil() {
     }

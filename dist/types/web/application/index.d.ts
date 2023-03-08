@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { TarsusHttpApplication } from "./TarsusServer";
-import { EventEmitter } from 'node:events';
+import { EventEmitter } from "node:events";
 declare const ApplicationEvents: EventEmitter;
 declare enum Application {
     LOAD_SERVER = "loadserver",

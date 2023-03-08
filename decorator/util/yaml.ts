@@ -4,7 +4,7 @@ import path from 'path';
 import { readFileSync } from 'fs';
 
 // parse yaml
-class YamlUtils{
+class YamlUtil{
   public ParseObj: Record<string, any> = {}
   constructor(file_path) {
     this.parseToObject(file_path)
@@ -21,6 +21,4 @@ class YamlUtils{
   }
 }
 
-export {
-  YamlUtils
-}
+export { YamlUtil };

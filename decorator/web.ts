@@ -89,9 +89,6 @@ export {
   proxyService
 }
 
-// ***************CACHE********************
-
-export { TarsusCache };
 
 
 // ***************IOC*****************
