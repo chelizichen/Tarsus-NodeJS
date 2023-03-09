@@ -18,7 +18,7 @@ export type parseToObj = {
 class ServantUtil {
   static params = [
     { key: "-l", param: "language" },
-    { key: "-t", param: "type" },
+    { key: "-t", param: "proto" },
     { key: "-h", param: "host" },
     { key: "-p", param: "port" },
   ];

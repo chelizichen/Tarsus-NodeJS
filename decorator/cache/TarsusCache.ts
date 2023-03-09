@@ -36,6 +36,8 @@ class TarsusCache {
       
       data.forEach((item) => {
         const toObj = ServantUtil.parse(item);
+        console.log(toObj.serverGroup," ", toObj.serverProject , " ", toObj.proto, " is load");
+        console.log(toObj);
         
         if(toObj.proto == "ms"){
           let proxy_instance = new TarsusProxy(toObj.host, Number(toObj.port));
