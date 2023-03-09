@@ -25,8 +25,8 @@ class TarsusProxyService {
     let merge = Object.assign({},body,query)
     merge.data["EndData"] = "End";
 
-    const { key } = body;
-    let ProxyInstance = TarsusProxyService.MicroServices.get(key);
+    const { proxy } = body;
+    let ProxyInstance = TarsusProxyService.MicroServices.get(proxy);
     if (ProxyInstance) {
       const str = call(body);
 
@@ -61,9 +61,9 @@ class TarsusProxyService {
         if (isJava) {
           proxy_instance.java = true;
         }
-        const { key } = proxy_instance;
-        console.log("key", key);
-        TarsusProxyService.MicroServices.set(key, proxy_instance);
+        const { proxy } = proxy_instance;
+        console.log("proxy", proxy);
+        TarsusProxyService.MicroServices.set(proxy, proxy_instance);
       });
     });
   }

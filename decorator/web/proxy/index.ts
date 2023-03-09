@@ -14,7 +14,9 @@ class TarsusProxy {
   public socket: Socket;
   public host: string;
   public port: number;
-  public key: string;
+
+  // 代表代理的哪个微服务
+  public proxy: string;
   public intervalConnect: any = false;
   public _config_info_: any;
 
@@ -26,7 +28,7 @@ class TarsusProxy {
     this.socket = new Socket();
     this.register_events();
     this.connect();
-    this.key = TarsusProxy.createkey(host, port);
+    this.proxy = TarsusProxy.createkey(host, port);
   }
 
   register_events() {
