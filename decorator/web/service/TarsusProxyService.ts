@@ -45,28 +45,6 @@ class TarsusProxyService {
     }
   }
 
-  static boost() {
-    TarsusProxyService.link_service();
-  }
-
-  static link_service() {
-    let cwd = process.cwd();
-    let config_path = path.resolve(cwd, "server.json");
-    const config = JSON.parse(readFileSync(config_path, "utf-8"));
-    nextTick(() => {
-      TarsusProxyService.MicroServices = new Map<string, TarsusProxy>();
-      config.servant.forEach((net: any) => {
-        let proxy_instance = new TarsusProxy(net.host, parseInt(net.port));
-        let isJava = net.type == "java";
-        if (isJava) {
-          proxy_instance.java = true;
-        }
-        const { proxy } = proxy_instance;
-        console.log("proxy", proxy);
-        TarsusProxyService.MicroServices.set(proxy, proxy_instance);
-      });
-    });
-  }
 
   static proxy_request = axios.create({
     timeout: 6000,

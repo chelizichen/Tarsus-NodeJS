@@ -40,8 +40,8 @@ class TarsusCache {
         if(toObj.proto == "ms"){
           let proxy_instance = new TarsusProxy(toObj.host, Number(toObj.port));
           toObj.language == "java" ? (proxy_instance.java = true) : "";
-          const { key } = proxy_instance;
-          TarsusProxyService.MicroServices.set(key, proxy_instance);
+          const { proxy } = proxy_instance;
+          TarsusProxyService.MicroServices.set(proxy, proxy_instance);
         }
 
         if(toObj.proto == "http"){
