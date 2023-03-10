@@ -1,27 +1,36 @@
-import { readFileSync } from "fs";
-import path from "path";
-import { nextTick } from "node:process";
 import { call } from "../../microservice/utils/call";
 import { TarsusProxy } from "../proxy";
 import { parseToObj } from "../../util/servant";
 import axios from "axios";
 import { Request, Response } from "express";
 
+
+// {
+//     "interFace":"DemoInterFace",
+//     "method":"say",
+//     "data":{
+//         "name":"一个大帅哥啊",
+//         "age":"22"
+//     },
+//     "proxy":"NodeDemo",
+//     "timeout":"6000"
+// }
+
 class TarsusProxyService {
   /**
    * @description 存储TarsusProxy实例的 Map
    * @type {Map<string,TarsusProxy>}
    */
-  static MicroServices: Map<string, TarsusProxy>;
+  static MicroServices: Map<string, TarsusProxy> = new Map();
 
   /**
    * @description 存储Http转发地址的 Map
    * @type {Map<string,TarsusProxy>}
    */
-  static HttpServices: Map<string, parseToObj>;
+  static HttpServices: Map<string, parseToObj> = new Map();
 
   static transmit(req: any, res: Response) {
-    let { body,query } = req;
+    let { body, query } = req;
     let merge = Object.assign({},body,query)
     merge.data["EndData"] = "End";
 

@@ -4,10 +4,6 @@ import { EventEmitter } from "node:events";
  * @description 微服务接口代理层
  */
 class TarsusProxy {
-  static createkey(host: string, port: number) {
-    return `-h ${host} -p ${port}`;
-  }
-
   public uid = 1;
 
   public java = false;
@@ -16,7 +12,6 @@ class TarsusProxy {
   public port: number;
 
   // 代表代理的哪个微服务
-  public proxy: string;
   public intervalConnect: any = false;
   public _config_info_: any;
 
@@ -28,7 +23,6 @@ class TarsusProxy {
     this.socket = new Socket();
     this.register_events();
     this.connect();
-    this.proxy = TarsusProxy.createkey(host, port);
   }
 
   register_events() {

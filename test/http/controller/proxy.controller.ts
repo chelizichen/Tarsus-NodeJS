@@ -11,13 +11,12 @@ class proxyController {
   @Inject(AppService) AppService: AppService;
 
   @Proxy("/interceptor")
-  async interceptor(req: body<proxy>, res: Response) {
+  async interceptor(req, res) {
     console.log('req.query',req.query);
     console.log("req.body",req.body);
     
     
-    const { body } = req as any;
-    TarsusProxyService.transmit(body, res)
+    TarsusProxyService.transmit(req, res);
     
     // then((data) => {
     //   let Arc_ProxyInstance = proxyService.MicroServices.get(req.body.key);

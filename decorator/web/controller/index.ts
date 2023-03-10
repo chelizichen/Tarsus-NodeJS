@@ -22,7 +22,9 @@ const Controller = (interFace: string) => {
         let method_path = interFace + url
         
         if (method == METHODS.GET) {
-          router.get(method_path, async (req,res) => {
+          console.log("Get ->>>>>> ",method_path );
+          
+          router.get(method_path, async (req, res) => {
             const data = await value(req)
             if(!res.destroyed){
               res.json(data);
@@ -31,6 +33,7 @@ const Controller = (interFace: string) => {
         }
 
         if (method == METHODS.POST) {
+          console.log("Post ->>>>>> ", method_path);
           router.post(method_path, async (req, res) => {
             const data = await value(req);
             if(!res.destroyed){
@@ -39,8 +42,9 @@ const Controller = (interFace: string) => {
           });
         }
 
-        if(method == METHODS.Proxy){
-          router.all(method_path, async (req, res) => {
+        if (method == METHODS.Proxy) {
+          console.log("Proxy ->>>>>> ", method_path);
+          router.post(method_path, async (req, res) => {
             value(req,res)
           })
         }

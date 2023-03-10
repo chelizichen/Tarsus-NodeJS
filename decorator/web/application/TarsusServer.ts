@@ -99,7 +99,7 @@ const TarsusHttpApplication = (value: any, context: ClassDecoratorContext) => {
         ApplicationEvents.emit(Application.LOAD_INIT, app);
         
         app.listen(port, function () {
-          console.log("Server started at port: ", port);
+          console.log("Server started at port:", port);
           // 监听
         });
       });

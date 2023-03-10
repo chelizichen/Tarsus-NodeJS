@@ -24,7 +24,7 @@ class TestApplication {
       app.use(express.static(public_path));
     });
     loadServer({
-      ms:true
+      ms:false
     });
   }
 }
