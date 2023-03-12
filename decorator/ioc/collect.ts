@@ -1,11 +1,11 @@
 import { IocMap, LazyIocMap } from "./collects";
 
 const Collect = (value: new () => void, context: ClassDecoratorContext) => {
-  IocMap.set(value.name, new value());
+  IocMap.set(value.prototype, new value());
 };
 
 const LazyCollect = (value:new()=>void,contenxt:ClassDecoratorContext)=>{
-  LazyIocMap.set(value.name,value)
+  LazyIocMap.set(value.prototype,value)
 }
 
 export {

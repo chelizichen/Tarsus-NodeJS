@@ -47,7 +47,8 @@
     "http": "ts-node-dev test/http/index.ts",
     "server": "ts-node-dev test/microservice/index.ts",
     "build": " tsc --project tsconfig.build.json --format cjs,esm",
-    "pkg": "tsc --project tsconfig.pkg.json && tsup decorator --format cjs,esm"
+    "pkg": "tsc --project tsconfig.pkg.json && tsup decorator --format cjs,esm",
+    "test:target": "ts-node-dev decorator/web/proxy/target.ts"
   },
   "author": "",
   "license": "ISC",

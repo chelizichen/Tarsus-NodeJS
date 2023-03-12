@@ -1,6 +1,7 @@
 import { Inject } from "../../../decorator/ioc"
 import { TarsusInterFace, TarsusMethod } from "../../../decorator/microservice/interface/TarsusInterFace";
 import { DemoService } from "../service/demo.service"
+import { ret } from "../utils/ret";
 
 @TarsusInterFace("DemoInterFace")
 class Demo{
@@ -19,9 +20,9 @@ class Demo{
         
         
         // let value = new Song(arguments[2]).logDetail();
-        return {
+        return ret.success({
             name,age
-        };
+        });
     }
 
     @TarsusMethod
@@ -30,9 +31,9 @@ class Demo{
         let age = arguments[1];
         console.log(name);
         console.log(age);
-        return {
+        return ret.success({
             name,age
-        };
+        });
     }
 }
 

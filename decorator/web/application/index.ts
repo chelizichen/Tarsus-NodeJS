@@ -20,7 +20,7 @@ function ArcInstance<T extends new () => void>(BASE: T): InstanceType<T> {
     return hasInst;
   } else {
     const INST = new BASE();
-    IocMap.set(BASE.name, INST);
+    IocMap.set(BASE.prototype, INST);
     return INST as InstanceType<T>;
   }
 }
