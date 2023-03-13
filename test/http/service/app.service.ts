@@ -5,6 +5,7 @@ class AppService {
 
   hello() {
     console.log("AppService！！！！！！！！！！！！！！！！！");
+    return "123123"
   }
 
   static test(){

@@ -1,9 +1,15 @@
 import axios, { AxiosRequestConfig } from "axios";
 
+/**
+ * @deprecated 弃用
+ */
 function createkey(port: number, host: string) {
     return `-h ${host} -p ${port}`;
-  }
-
+}
+  
+/**
+ * @deprecated 弃用
+ */
 function RequestFactory(port:number,host:string){
     const proxy_request = axios.create({
         timeout: 6000,

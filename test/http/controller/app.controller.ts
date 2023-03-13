@@ -2,35 +2,17 @@ import { Inject } from "../../../decorator/ioc/index";
 import { Controller } from "../../../decorator/web/controller/index";
 import { Get } from "../../../decorator/web/method/index";
 import { AppService } from "../service/app.service";
+import { ret } from '../../../../Tarsus-GateWay/src/utils/ret';
 
-@Controller("/hello")
+@Controller("hello")
 class appController {
   @Inject(AppService) AppService: AppService;
 
-  public age;
-  public name;
-
-  init() {
-    this.add = this.add.bind(this);
-    this.age = 21;
-    this.name = "LeeSeriousYun";
-  }
-
-  add() {
-    this.age++;
-  }
-
-  @Get("/say")
+  @Get("say")
   public say() {
-    this.age++;
-    return "say hello";
-  }
-  @Get("/say")
-  public Body() {
-    this.add();
-    return `
-        <div>hello world ${this.age}</div>
-      `;
+    console.log("app",this);
+    const data = this.AppService.hello()
+    return ret.success(data)
   }
 }
 

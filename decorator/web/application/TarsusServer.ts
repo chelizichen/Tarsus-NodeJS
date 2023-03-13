@@ -1,5 +1,4 @@
 import express, { Express } from "express";
-import { controllers } from "../controller/routers";
 import { Application, ApplicationEvents } from "./index";
 import { TarsusGlobalPipe } from "../pipe";
 import { nextTick, cwd } from "process";
@@ -9,6 +8,7 @@ import { ServantUtil, parseToObj } from "../../util/servant";
 import { TarsusProxy } from "../proxy";
 import { TarsusProxyService } from "../service/TarsusProxyService";
 import { TarsusCache } from "../../cache/TarsusCache";
+import { TarsusOberserver } from "../ober/TarsusOberserver";
 // import cluster from "cluster";
 // import { cpus } from "os";
 
@@ -50,7 +50,7 @@ function loadMs() {
 
 const TarsusHttpApplication = (value: any, context: ClassDecoratorContext) => {
   context.addInitializer(() => {
-    const app = express();
+    const app = TarsusOberserver.getApp();
     app.use(express.json());
 
     // 加载配置文件
@@ -86,11 +86,7 @@ const TarsusHttpApplication = (value: any, context: ClassDecoratorContext) => {
     );
 
     // 加载路由
-    ApplicationEvents.on(Application.LOAD_SERVER, () => {
-      controllers.forEach((value: any) => {
-        app.use(value);
-      });
-    });
+    app.use(TarsusOberserver.router)
 
     // 监听
     ApplicationEvents.on(Application.LOAD_LISTEN, () => {
