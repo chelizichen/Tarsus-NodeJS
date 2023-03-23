@@ -43,9 +43,10 @@ class TarsusServer {
     let head_end = data.indexOf("[##]");
     let timeout = Number(this.unpkgHead(2, data));
     let body_len = Number(this.unpkgHead(3, data, true));
+
     let head = data.subarray(0, data.indexOf(proto[2]));
     let body = data.subarray(head_end + 4, body_len + head_end + 4);
-    let _body = this.unpacking(body);
+    let _body = this.unpackage(body);
     Promise.race([this.timeout(timeout), this.ArcEvent.emit(head, ..._body)])
       .then((res: any) => {
         let toJson = JSON.stringify(res);
@@ -72,7 +73,7 @@ class TarsusServer {
   }
 
   error(err: Error) {
-    console.log("ado-rpc-err", err);
+    console.log("tarsus-ms-err", err);
   }
 
   connection() {
@@ -84,6 +85,9 @@ class TarsusServer {
    * @param pkg Buffer
    * @returns value:any[]
    * @description 拆包 根据 start 和 end 拆包
+   * @deprecated @since 2023.3.23
+   * 写的太垃圾了，改JSON了
+   *   
    */
   unpacking(buf: Buffer): any[] {
     let args = [];
@@ -128,6 +132,17 @@ class TarsusServer {
     }
     return args;
   }
+
+  /**
+   * @param buf 
+   * @description 新版的解析参数方法 
+   * 直接JSON拿到
+   * 效果和原来一样
+   */
+  unpackage(buf: Buffer) {
+    return JSON.parse(buf.toString() || "{}");
+  }
+  
 
   /**
    * @description 首部拆包得到字段
