@@ -49,7 +49,7 @@ class TarsusServer {
     
     let request = this.unpkgHead(4, data);
     let response = this.unpkgHead(5, data, true);
-    let getRequestClass = TarsusStreamProxy.StreamClass[request];
+    let getRequestClass = TarsusStreamProxy.TarsusStream.get_struct(request);
     let requestParams = []
 
     let head = data.subarray(0, data.indexOf(proto[2]));
@@ -68,6 +68,8 @@ class TarsusServer {
       this.TarsusEvent.emit(head, ...requestParams),
     ])
       .then((res: any) => {
+        console.log(res);
+        
         let toJson = JSON.stringify(res);
         let len = Buffer.from(toJson).byteLength;
         let buf = Buffer.alloc(len + 4);

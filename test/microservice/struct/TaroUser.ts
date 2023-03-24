@@ -1,9 +1,11 @@
+const { TarsusReadStream } = require("tarsus-cli");
 export class Basic {
   public token: string;
   constructor(...args: any[]) {
-    this.token = args[1];
+    const _TarsusReadStream = new TarsusReadStream("Basic", args);
+    this.token = _TarsusReadStream.read_string(1);
   }
-};
+}
 export class User {
   public id: string;
   public name: string;
@@ -11,46 +13,51 @@ export class User {
   public fullName: string;
   public address: string;
   constructor(...args: any[]) {
-    this.id = args[1];
-    this.name = args[2];
-    this.age = args[3];
-    this.fullName = args[4];
-    this.address = args[5];
+    const _TarsusReadStream = new TarsusReadStream("User", args);
+    this.id = _TarsusReadStream.read_string(1);
+    this.name = _TarsusReadStream.read_string(2);
+    this.age = _TarsusReadStream.read_string(3);
+    this.fullName = _TarsusReadStream.read_string(4);
+    this.address = _TarsusReadStream.read_string(5);
   }
-};
+}
 export class GetUserByIdReq {
   public id: number;
   public basic: Basic;
   constructor(...args: any[]) {
-    this.id = args[1];
-    this.basic = new Basic(...args[2])
+    const _TarsusReadStream = new TarsusReadStream("GetUserByIdReq", args);
+    this.id = _TarsusReadStream.read_int(1);
+    this.basic = _TarsusReadStream.read_struct(2, "Basic");
   }
-};
+}
 export class GetUserByIdRes {
   public code: number;
   public data: User;
   public message: string;
   constructor(...args: any[]) {
-    this.code = args[1];
-    this.data = new User(...args[2])
-    this.message = args[3];
+    const _TarsusReadStream = new TarsusReadStream("GetUserByIdRes", args);
+    this.code = _TarsusReadStream.read_int(1);
+    this.data = _TarsusReadStream.read_struct(2, "User");
+    this.message = _TarsusReadStream.read_string(3);
   }
-};
+}
 export class GetUserListReq {
   public basic: Basic;
   public ids: Array<number>;
   constructor(...args: any[]) {
-    this.basic = new Basic(...args[1])
-    this.ids = JSON.parse(args[2]);
+    const _TarsusReadStream = new TarsusReadStream("GetUserListReq", args);
+    this.basic = _TarsusReadStream.read_struct(1, "Basic");
+    this.ids = _TarsusReadStream.read_list(2, "List<int>");
   }
-};
+}
 export class GetUserListRes {
   public code: number;
   public data: Array<User>;
   public message: string;
   constructor(...args: any[]) {
-    this.code = args[1];
-    this.data = JSON.parse(args[2]).map(item => new User(...Object.values(item)));
-    this.message = args[3];
+    const _TarsusReadStream = new TarsusReadStream("GetUserListRes", args);
+    this.code = _TarsusReadStream.read_int(1);
+    this.data = _TarsusReadStream.read_list(2, "List<User>");
+    this.message = _TarsusReadStream.read_string(3);
   }
-};
+}

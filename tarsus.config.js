@@ -13,7 +13,7 @@ module.exports = {
   ],
   servant: {
     // project: "@TarsusDemoProject/NodeProxyDemo -l node -t @tarsus/http -h 127.0.0.1 -p 7091",
-    project: "@TarsusDemoProject/NodeDemo -l node -t @tarsus/ms -h 127.0.0.1 -p 10012",
+    project: "@TarsusDemoProject/NodeDemo -l node -t @tarsus/ms -h 127.0.0.1 -p 7098",
     taro:"test/microservice/taro",
     register: "test/microservice/register",
     struct:"test/microservice/struct",

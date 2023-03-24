@@ -32,13 +32,10 @@ class TarsusProxyService {
   static transmit(req: any, res: Response) {
     let { body, query } = req;
     let merge = Object.assign({},body,query)
-    merge.data["EndData"] = "End";
-
     const { proxy } = body;
     let ProxyInstance = TarsusProxyService.MicroServices.get(proxy);
     if (ProxyInstance) {
-      const str = call(body);
-
+      const str = call(merge);
       let curr = String(ProxyInstance.uid);
       ProxyInstance.TarsusEvents.on(curr, function (args) {
         const _to_json_ = JSON.parse(args);

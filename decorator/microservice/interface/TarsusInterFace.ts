@@ -4,7 +4,7 @@ import { TarsusEvent } from "../application/TarsusEvent";
 const interFaceMaps = new Map();
 const TarsusEvents = TarsusOberserver.getEvents()
 
-const TarsusMethod = (value: any, context: any) => {
+const TarsusMethod = (value: (...args:any[])=>Promise<any>, context: any) => {
   context.addInitializer(function () {
     const fn_name = TarsusEvent.get_fn_name(this.interFace, context.name);
     value = value.bind(this)

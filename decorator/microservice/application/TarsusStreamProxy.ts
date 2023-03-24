@@ -6,10 +6,7 @@ class TarsusStreamProxy{
     new TarsusStreamProxy.TarsusStream(url);
   }
 
-  static StreamClass = {}
-  static SetClass(clazz:Function) {
-    TarsusStreamProxy.StreamClass[clazz.name] = clazz;
-  }
+
 
   static Parse(...args:any[]) {
     return TarsusStreamProxy.TarsusStream.parse(...args);

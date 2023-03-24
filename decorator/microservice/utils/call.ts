@@ -1,10 +1,16 @@
+import { TarsusStreamProxy } from "../application/TarsusStreamProxy";
 import { proto, size } from "../pkg";
+
+
 
 // @parmas { filed method data interFace timeout } pkg
 export function call(pkg: any) {
   const { method, data, interFace, timeout,request,response } = pkg;
+
+  let _parse = TarsusStreamProxy.Parse({req:request,data})
   // 处理头部字段
-  let args = getArgs(data); 
+  let args = getArgs(_parse); 
+  
   let _tojson = JSON.stringify(args)
 
   let body: Buffer = Buffer.from(_tojson);

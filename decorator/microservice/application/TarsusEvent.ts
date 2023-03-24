@@ -31,6 +31,10 @@ class TarsusEvent {
 
   async emit(Head: Buffer, ...args: any[]) {
     let head = Head.toString();
+    console.log("111",args);
+    console.log("head",Head.toString());
+    
+    
     return await this.events[head](...args);
   }
 
