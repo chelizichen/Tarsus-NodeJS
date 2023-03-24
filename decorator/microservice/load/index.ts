@@ -6,7 +6,9 @@ enum Application{
     LOAD_INTERFACE = "loadinterface",
     LOAD_MICROSERVICE = "loadmicroservice",
     GET_INTERFACE = "getinterface",
-    REQUIRE_INTERFACE = "require_interface"
+    REQUIRE_INTERFACE = "requireinterface",
+    LOAD_TARO = "loadtaro",
+    LOAD_STRUCT = "loadstruct",
 }
 
 function loadMicroService(){

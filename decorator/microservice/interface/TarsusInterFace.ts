@@ -1,34 +1,21 @@
+import { TarsusOberserver } from "../../web/ober/TarsusOberserver";
 import { TarsusEvent } from "../application/TarsusEvent";
 
-const interFaceMap = new Map<string, Function>();
-const interFaceSet = new Set<{
-  func: any;
-  method_name: string;
-}>();
+const interFaceMaps = new Map();
+const TarsusEvents = TarsusOberserver.getEvents()
 
-const TarsusMethod = (value: any, context: ClassMethodDecoratorContext) => {
-  interFaceSet.add({
-    func: value,
-    method_name: context.name as string,
+const TarsusMethod = (value: any, context: any) => {
+  context.addInitializer(function () {
+    const fn_name = TarsusEvent.get_fn_name(this.interFace, context.name);
+    value = value.bind(this)
+    TarsusEvents.register(fn_name, value)
   });
 };
 
 const TarsusInterFace = (interFace: string) => {
   return function (classValue: any, context: ClassDecoratorContext) {
-    // 每次遍历完都清除
-    interFaceSet.forEach((method) => {
-      let { func, method_name } = method;
-      func = func.bind(new classValue());
-      const _method_name = TarsusEvent.get_fn_name(interFace, method_name);
-      interFaceMap.set(_method_name, func);
-    });
-    interFaceSet.clear();
+    classValue.prototype.interFace = interFace;
   };
 };
 
-export{
-    interFaceMap,
-    interFaceSet,
-    TarsusInterFace,
-    TarsusMethod
-}
+export { TarsusInterFace, TarsusMethod, interFaceMaps };

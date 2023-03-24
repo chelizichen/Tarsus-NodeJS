@@ -1,23 +1,25 @@
 import { createServer, Server, Socket } from "net";
 import { TarsusEvent } from "./TarsusEvent";
 import { proto, size } from "../pkg";
+import { TarsusOberserver } from "../../web/ober/TarsusOberserver";
+import { TarsusStreamProxy } from "./TarsusStreamProxy";
 
 type ConnOpt = { port: number; host: string };
 
 class TarsusServer {
   public Net!: Server;
   public socket!: Socket;
-  public ArcEvent!: TarsusEvent;
+  public TarsusEvent!: TarsusEvent;
   constructor(opts: ConnOpt) {
     const { port, host } = opts;
     this.createServer({ port, host });
-    this.ArcEvent = new TarsusEvent();
+    this.TarsusEvent = TarsusOberserver.getEvents();
     console.log("server start at " + host + ":" + port);
   }
 
   registEvents(events: Map<string, any>) {
     events.forEach((func, key) => {
-      this.ArcEvent.register(key, func);
+      this.TarsusEvent.register(key, func);
     });
   }
 
@@ -38,23 +40,40 @@ class TarsusServer {
 
   async recieve(data: Buffer) {
     console.log("接收到消息", data.toString());
+    
     let getId = data.readInt32BE(0)
     data = data.subarray(4,data.length)
     let head_end = data.indexOf("[##]");
     let timeout = Number(this.unpkgHead(2, data));
-    let body_len = Number(this.unpkgHead(3, data, true));
+    let body_len = Number(this.unpkgHead(3, data));
+    
+    let request = this.unpkgHead(4, data);
+    let response = this.unpkgHead(5, data, true);
+    let getRequestClass = TarsusStreamProxy.StreamClass[request];
+    let requestParams = []
 
     let head = data.subarray(0, data.indexOf(proto[2]));
     let body = data.subarray(head_end + 4, body_len + head_end + 4);
-    let _body = this.unpackage(body);
-    Promise.race([this.timeout(timeout), this.ArcEvent.emit(head, ..._body)])
+
+    let _body = JSON.parse(body.toString("utf-8"))
+
+    let requestArg = new getRequestClass(..._body);
+    let responseArg = TarsusStreamProxy.Parse({ req: response, data: {} })
+
+    requestParams.push(requestArg);
+    requestParams.push(responseArg);
+
+    Promise.race([
+      this.timeout(timeout),
+      this.TarsusEvent.emit(head, ...requestParams),
+    ])
       .then((res: any) => {
         let toJson = JSON.stringify(res);
         let len = Buffer.from(toJson).byteLength;
-        let buf = Buffer.alloc(len+4)
-        
-        buf.writeUInt32BE(getId,0)
-        buf.write(toJson,4)
+        let buf = Buffer.alloc(len + 4);
+
+        buf.writeUInt32BE(getId, 0);
+        buf.write(toJson, 4);
         this.socket.write(buf, function (err) {
           if (err) {
             console.log("服务端写入错误", err);

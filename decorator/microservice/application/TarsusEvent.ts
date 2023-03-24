@@ -8,7 +8,7 @@ class TarsusEvent {
   events: Record<string, (...args: any[]) => Promise<any>>;
   
   static get_fn_name(interFace:string,method:string){
-    let fn_name = "[#1]" + interFace + "[#2]" + method
+    let fn_name = "[#1]" + interFace + "[#2]" + method;
     return fn_name
   }
   constructor() {

@@ -4,8 +4,9 @@ import { TarsusServer } from "./TarsusServer";
 import { Application, ApplicationEvents } from "../load";
 import path from "path";
 import { ServantUtil } from "../../util/servant";
-import { interFaceMap } from "../interface/TarsusInterFace";
 import { TarsusCache } from '../../cache/TarsusCache';
+import { interFaceMaps } from '../interface/TarsusInterFace';
+import { TarsusStreamProxy } from './TarsusStreamProxy';
 
 const TarsusMsApplication = (value, context) => {
   context.addInitializer(() => {
@@ -26,23 +27,53 @@ const TarsusMsApplication = (value, context) => {
 
     ApplicationEvents.on(Application.REQUIRE_INTERFACE, function () {
       // 后续做处理
-      const register_path = _config.servant.src || "src/register";
+      const register_path = _config.servant.register || "src/register";
       const full_path = path.resolve(cwd(), register_path);
       const dirs = readdirSync(full_path)
-      dirs.forEach(interFace=>{
-        let interFace_path = path.resolve(full_path,interFace)
-        // 动态加载每一个注册的接口
-        require(interFace_path)
+      dirs.forEach(interFace => {
+        let interFace_path = path.resolve(full_path, interFace)
+        const singalClazz = require(interFace_path).default
+        new singalClazz()
       })
     });
 
+    ApplicationEvents.on(Application.LOAD_TARO, function () {
+      const taro_path = _config.servant.taro || "src/taro";
+      const full_path = path.resolve(cwd(), taro_path);
+      const dirs = readdirSync(full_path);
+      dirs.forEach((interFace) => {
+        let taro_path = path.resolve(full_path, interFace);
+        // 将会存储到 TarsusStream 的 Map 里
+        TarsusStreamProxy.SetStream(taro_path);
+      });
+    });
+
+    ApplicationEvents.on(Application.LOAD_STRUCT, function () {
+      // 后续做处理
+      const struct_path = _config.servant.struct || "src/struct";
+      const full_path = path.resolve(cwd(), struct_path);
+      const dirs = readdirSync(full_path);
+      dirs.forEach((interFace) => {
+        let interFace_path = path.resolve(full_path, interFace);
+        const singalClazz = require(interFace_path);
+        for (let v in singalClazz) {
+          TarsusStreamProxy.SetClass(singalClazz[v])
+        }
+      });
+    });
+
     ApplicationEvents.on(Application.LOAD_MICROSERVICE, function () {
+
+      ApplicationEvents.emit(Application.LOAD_TARO)
+      ApplicationEvents.emit(Application.LOAD_STRUCT);
+
+
       const cache = new TarsusCache()
       cache.setServant()
 
       let arc_server = new TarsusServer({ port: Number(port), host });
-      arc_server.registEvents(interFaceMap);
-      console.log(arc_server.ArcEvent.events);
+      arc_server.registEvents(interFaceMaps);
+      console.log(arc_server.TarsusEvent.events);
       // TEST FUNCTION
 
       // setTimeout(async ()=>{

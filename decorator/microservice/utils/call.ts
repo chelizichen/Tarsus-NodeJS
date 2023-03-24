@@ -2,7 +2,7 @@ import { proto, size } from "../pkg";
 
 // @parmas { filed method data interFace timeout } pkg
 export function call(pkg: any) {
-  const { method, data, interFace, timeout } = pkg;
+  const { method, data, interFace, timeout,request,response } = pkg;
   // 处理头部字段
   let args = getArgs(data); 
   let _tojson = JSON.stringify(args)
@@ -15,7 +15,9 @@ export function call(pkg: any) {
     interFace,
     method,
     String(timeout),
-    String(body_len)
+    String(body_len),
+    request,
+    response
   );
 
   let call_buf = head_str + body;
