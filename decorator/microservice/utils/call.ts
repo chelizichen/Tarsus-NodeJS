@@ -4,7 +4,7 @@ import { proto, size } from "../pkg";
 export function call(pkg: any) {
   const { method, data, interFace, timeout } = pkg;
   // 处理头部字段
-  let args = getRequestArgs(data); 
+  let args = getArgs(data); 
   let _tojson = JSON.stringify(args)
 
   let body: Buffer = Buffer.from(_tojson);
