@@ -1,3 +1,4 @@
+import { readdirSync } from 'fs';
 import express, { Express } from "express";
 import { Application, ApplicationEvents } from "./index";
 import { TarsusGlobalPipe } from "../pipe";
@@ -9,6 +10,7 @@ import { TarsusProxy } from "../proxy";
 import { TarsusProxyService } from "../service/TarsusProxyService";
 import { TarsusCache } from "../../cache/TarsusCache";
 import { TarsusOberserver } from "../ober/TarsusOberserver";
+import { TarsusStreamProxy } from "../../microservice/application/TarsusStreamProxy";
 // import cluster from "cluster";
 // import { cpus } from "os";
 
@@ -37,7 +39,9 @@ function loadInit(callback: (app: Express) => void) {
   });
 }
 
-function loadMs() {
+function loadMs(config) {
+  console.log("config--",config);
+  
   nextTick(async () => {
     // 创建后台微服务 Map
     TarsusProxyService.MicroServices = new Map<string, TarsusProxy>();
@@ -45,6 +49,16 @@ function loadMs() {
     let cache = new TarsusCache()
     // 得到 微服务
     await cache.getMsServer()
+
+
+    const taro_path = config.servant.taro || "src/taro";
+    const full_path = path.resolve(cwd(), taro_path);
+    const dirs = readdirSync(full_path);
+    dirs.forEach((interFace) => {
+      let taro_path = path.resolve(full_path, interFace);
+      // 将会存储到 TarsusStream 的 Map 里
+      TarsusStreamProxy.SetStream(taro_path);
+    });
   });
 }
 
