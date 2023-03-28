@@ -31,6 +31,8 @@ class TarsusOberserver {
     }
     return TarsusOberserver.TarsusStream;
   }
+
+  public static StreamMap: Record<string, { request: string, response: string }> = {}
 }
 
 export { TarsusOberserver };

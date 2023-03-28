@@ -46,13 +46,42 @@ class TarsusServer {
     let head_end = data.indexOf("[##]");
     let timeout = Number(this.unpkgHead(2, data));
     let body_len = Number(this.unpkgHead(3, data));
+
+    let _request = this.unpkgHead(4, data, true)
     
-    let request = this.unpkgHead(4, data);
-    let response = this.unpkgHead(5, data, true);
+    
+
+    let head = data.subarray(0, data.indexOf(proto[2]));
+    
+    let { request, response } = TarsusOberserver.StreamMap[head.toString()];
+
+    console.log(_request);
+    console.log(request);
+
+    
+    
+    if (request != _request.toString()) {
+      let data = {
+        code: "-500",
+        message: `Tarsus-Error :  请求参数不匹配 ${request} != ${_request.toString()}`
+      }
+      let toJson = JSON.stringify(data);
+      let len = Buffer.from(toJson).byteLength;
+      let buf = Buffer.alloc(len + 4);
+      buf.writeUInt32BE(getId, 0);
+      buf.write(toJson, 4);
+      this.socket.write(buf, function (err) {
+        if (err) {
+          console.log("服务端写入错误", err);
+        }
+        console.log("服务端写入成功");
+      });
+      return;
+    }
+
     let getRequestClass = TarsusStreamProxy.TarsusStream.get_struct(request);
     let requestParams = []
 
-    let head = data.subarray(0, data.indexOf(proto[2]));
     let body = data.subarray(head_end + 4, body_len + head_end + 4);
 
     let _body = JSON.parse(body.toString("utf-8"))

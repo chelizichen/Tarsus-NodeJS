@@ -22,8 +22,7 @@ export function call(pkg: any) {
     method,
     String(timeout),
     String(body_len),
-    request,
-    response
+    request
   );
 
   let call_buf = head_str + body;
