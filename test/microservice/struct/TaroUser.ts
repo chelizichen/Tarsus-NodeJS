@@ -45,6 +45,7 @@ export class GetUserListReq {
   public basic: Basic;
   public ids: Array<number>;
   constructor(...args: any[]) {
+    console.log(args);
     const _TarsusReadStream = new TarsusReadStream("GetUserListReq", args);
     this.basic = _TarsusReadStream.read_struct(1, "Basic");
     this.ids = _TarsusReadStream.read_list(2, "List<int>");

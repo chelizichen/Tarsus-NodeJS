@@ -35,16 +35,24 @@ class TarsusProxyService {
     const { proxy } = body;
     let ProxyInstance = TarsusProxyService.MicroServices.get(proxy);
     if (ProxyInstance) {
-      const str = call(merge);
-      let curr = String(ProxyInstance.uid);
-      ProxyInstance.TarsusEvents.on(curr, function (args) {
-        const _to_json_ = JSON.parse(args);
-        if (!res.destroyed) {
-          res.json(_to_json_);
+      try {
+        const str = call(merge);
+        let curr = String(ProxyInstance.uid);
+        ProxyInstance.TarsusEvents.on(curr, function (args) {
+          const _to_json_ = JSON.parse(args);
+          if (!res.destroyed) {
+            res.json(_to_json_);
+          }
+        });
+        ProxyInstance.write(str);
+      } catch (e) {
+        const error = {
+          code: "-91000",
+          message: e.message
         }
-      });
+        res.json(error);
+      }
 
-      ProxyInstance.write(str);
       // 为 EventEmitter 注册事件
     } else {
       return 0;

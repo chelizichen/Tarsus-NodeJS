@@ -7,7 +7,7 @@ import { proto, size } from "../pkg";
 export function call(pkg: any) {
   const { method, data, interFace, timeout,request,response } = pkg;
 
-  let _parse = TarsusStreamProxy.Parse({req:request,data})
+  let _parse = TarsusStreamProxy.Parse({ req: request, data })
   // 处理头部字段
   let args = getArgs(_parse); 
   

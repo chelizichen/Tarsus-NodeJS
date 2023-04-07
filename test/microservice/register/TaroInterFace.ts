@@ -5,6 +5,7 @@ import {
   GetUserByIdRes,
   GetUserListReq,
   GetUserListRes,
+  User,
 } from "../struct/TaroUser";
 
 interface TaroInterFace {
@@ -46,7 +47,20 @@ class TaroInterFaceImpl implements TaroInterFace {
     Request: GetUserListReq,
     Response: GetUserListRes
   ): Promise<GetUserListRes> {
-    throw new Error("Method not implemented.");
+    return new Promise((resolve, reject) => {
+      Response.code = 0;
+      Response.data = Request.ids.map(el => {
+        let user = new User()
+        user.address = el + "address";
+        user.id = el + "id";
+        user.fullName = el + "fullName";
+        user.name = el + "name";
+        user.age = el + "age";
+        return user;
+      })
+      Response.message = Request.basic.token;
+      resolve(Response);
+    });
   }
 }
 

@@ -54,11 +54,6 @@ class TarsusServer {
     let head = data.subarray(0, data.indexOf(proto[2]));
     
     let { request, response } = TarsusOberserver.StreamMap[head.toString()];
-
-    console.log(_request);
-    console.log(request);
-
-    
     
     if (request != _request.toString()) {
       let data = {
@@ -79,13 +74,13 @@ class TarsusServer {
       return;
     }
 
+    
     let getRequestClass = TarsusStreamProxy.TarsusStream.get_struct(request);
     let requestParams = []
 
     let body = data.subarray(head_end + 4, body_len + head_end + 4);
 
     let _body = JSON.parse(body.toString("utf-8"))
-
     let requestArg = new getRequestClass(..._body);
     let responseArg = TarsusStreamProxy.Parse({ req: response, data: {} })
 
