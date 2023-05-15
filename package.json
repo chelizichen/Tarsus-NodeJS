@@ -48,7 +48,8 @@
     "server": "ts-node-dev test/microservice/index.ts",
     "build": " tsc --project tsconfig.build.json --format cjs,esm",
     "pkg": "tsc --project tsconfig.pkg.json && tsup decorator --format cjs,esm",
-    "test:proxy": "ts-node-dev decorator/web/proxy/TarsusRequest.ts"
+    "test:proxy": "ts-node-dev decorator/web/proxy/TarsusRequest.ts",
+    "servant": "ts-node-dev decorator/util/servant.ts"
   },
   "author": "",
   "license": "ISC",

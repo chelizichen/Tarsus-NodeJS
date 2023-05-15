@@ -1,5 +1,5 @@
 // const demo = [ 
-//   "@DemoProxy/GateWay -l node -t @tarsus/http -h 127.0.0.1 -p 9811"
+//   "@DemoProxy/GateWay -l node -t @tarsus/http -h 127.0.0.1 -p 9811  -w 7"
 //   // "TarsusTestNodeService -l java -t @tarsus/ms -h 127.0.0.1 -p 10012",
 //   // "TarsusTestJavaService -l node -t @tarsus/ms -h 127.0.0.1 -p 7099",
 //   // "TarsusHttpProject -l node -t @tarsus/http -h 127.0.0.1 -p 9811",
@@ -13,6 +13,7 @@ export type parseToObj = {
   serverName: string,
   serverProject:string,
   serverGroup:string,
+  weight:string,
 }
 
 class ServantUtil {
@@ -21,6 +22,7 @@ class ServantUtil {
     { key: "-t", param: "proto" },
     { key: "-h", param: "host" },
     { key: "-p", param: "port" },
+    { key: "-w", param: "weight" },
   ];
   static parse(servant: string): parseToObj {
     let obj: parseToObj = {} as any;

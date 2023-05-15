@@ -43,8 +43,6 @@ function loadMs(config) {
   console.log("config--",config);
   
   nextTick(async () => {
-    // 创建后台微服务 Map
-    TarsusProxyService.MicroServices = new Map<string, TarsusProxy>();
     // 根据 tarsus.config 初始化信息 
     let cache = new TarsusCache()
     // 得到 微服务

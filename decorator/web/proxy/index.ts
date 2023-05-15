@@ -1,5 +1,7 @@
 import { Socket } from "net";
 import { EventEmitter } from "node:events";
+import { call } from "../../microservice/utils/call";
+import os from 'os'
 /**
  * @description 微服务接口代理层
  */
@@ -58,6 +60,7 @@ class TarsusProxy {
     let new_buf = Buffer.allocUnsafe(len + 4);
 
     let new_str = "";
+    // 如果为Java 则需要加尾判断
     if (this.java) {
       buf += "[#ENDL#]\n";
       new_str = this.join_buf(buf);
@@ -66,7 +69,10 @@ class TarsusProxy {
           console.log(err);
         }
       });
-    } else {
+      
+    } 
+    // Nodejs 则正常通信 参照 taf-nodejs
+    else {
       new_buf.writeUInt32BE(this.uid, 0);
       new_buf.write(buf, 4, "utf8");
       this.socket.write(new_buf, async (err) => {
@@ -77,6 +83,21 @@ class TarsusProxy {
     }
     this.uid++;
   }
+
+  // 拿到负载信息
+  getLoadInfoArgs(){
+    let data = call({
+      method:"getLoadInfo", 
+      interFace:"SystemInterFace",
+      timeout:"6000",
+      request:"GetSystemLoadInfoReq",
+      data:{
+        host:os.hostname(),
+      },
+    })
+    return data
+  }
+
   join_buf(buf: string): string {
     let len = String(this.uid).length;
     if (len == 1) {

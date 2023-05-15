@@ -5,7 +5,7 @@ import { proto, size } from "../pkg";
 
 // @parmas { filed method data interFace timeout } pkg
 export function call(pkg: any) {
-  const { method, data, interFace, timeout,request,response } = pkg;
+  const { method, data, interFace, timeout,request } = pkg;
 
   let _parse = TarsusStreamProxy.Parse({ req: request, data })
   // 处理头部字段

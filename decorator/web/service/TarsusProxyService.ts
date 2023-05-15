@@ -3,6 +3,7 @@ import { TarsusProxy } from "../proxy";
 import { parseToObj } from "../../util/servant";
 import axios from "axios";
 import { Request, Response } from "express";
+import { TarsusLoadBalance } from "../../gateway/LoadBalance";
 
 
 // {
@@ -17,11 +18,6 @@ import { Request, Response } from "express";
 // }
 
 class TarsusProxyService {
-  /**
-   * @description 存储TarsusProxy实例的 Map
-   * @type {Map<string,TarsusProxy>}
-   */
-  static MicroServices: Map<string, TarsusProxy> = new Map();
 
   /**
    * @description 存储Http转发地址的 Map
@@ -33,30 +29,7 @@ class TarsusProxyService {
     let { body, query } = req;
     let merge = Object.assign({},body,query)
     const { proxy } = body;
-    let ProxyInstance = TarsusProxyService.MicroServices.get(proxy);
-    if (ProxyInstance) {
-      try {
-        const str = call(merge);
-        let curr = String(ProxyInstance.uid);
-        ProxyInstance.TarsusEvents.on(curr, function (args) {
-          const _to_json_ = JSON.parse(args);
-          if (!res.destroyed) {
-            res.json(_to_json_);
-          }
-        });
-        ProxyInstance.write(str);
-      } catch (e) {
-        const error = {
-          code: "-91000",
-          message: e.message
-        }
-        res.json(error);
-      }
-
-      // 为 EventEmitter 注册事件
-    } else {
-      return 0;
-    }
+    TarsusLoadBalance.getServantToRequest(proxy,merge,res)
   }
 
 

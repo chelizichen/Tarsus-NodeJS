@@ -10,7 +10,7 @@ class TarsusCache {
   RedisTemplate: RedisClientType;
   private config: Record<string, any>;
   private servantGroup:string;
-  private servant:string;
+  private servant:string[];
 
   constructor() {
     this.RedisTemplate = createClient();
@@ -20,7 +20,7 @@ class TarsusCache {
     // 微服务网关层可以通过对应的服务名拿到相关的服务（redis）
     // 修改后 变为 @TarsusGroup/ProjectName
     // 从分组里面拿到所有微服务
-    this.servantGroup = ServantUtil.parse(this.config.servant.project).serverGroup;
+    this.servantGroup = ServantUtil.parse(this.config.servant.project[0]).serverGroup;
     // 可能也是微服务本身
     this.servant = this.config.servant.project;
     // 此时需要拿到对应的 微服务网网关层的服务名
@@ -29,27 +29,50 @@ class TarsusCache {
 
   // 微服务网关所需要的代理层
   public async getMsServer() {
+    // 1 加载所有微服务模块
+    // 2 对所有微服务模块进行分组
+
     nextTick(async () => {
       // 从redis 中读取 相关服务名，然后启动
       const data = await this.RedisTemplate.SMEMBERS(this.servantGroup);
       console.log("加载所有的微服务模块",data);
       
-      data.forEach((item) => {
-        const toObj = ServantUtil.parse(item);
-        console.log(toObj.serverGroup," ", toObj.serverProject , " ", toObj.proto, " is load");
-        console.log(toObj);
+      let _groupMs:Record<string,Array<any>> = data.reduce((groups,obj)=>{
+        let toObj = ServantUtil.parse(obj)
+        const project = toObj.serverProject;
+
+        if (!groups[project]) {
+          groups[project] = [];
+        }
+      
+        groups[project].push(toObj);
+        return groups;
+      },{})
+
+
+      // data.forEach((item) => {
+      //   const toObj = ServantUtil.parse(item);
+      //   console.log(toObj.serverGroup," ", toObj.serverProject , " ", toObj.proto, " is load");
+      //   console.log(toObj);
         
-        if(toObj.proto == "ms"){
-          let proxy_instance = new TarsusProxy(toObj.host, Number(toObj.port));
-          toObj.language == "java" ? (proxy_instance.java = true) : "";
-          TarsusProxyService.MicroServices.set(toObj.serverProject, proxy_instance);
-        }
+      //   if(toObj.proto == "ms"){
+      //     let proxy_instance = new TarsusProxy(toObj.host, Number(toObj.port));
+      //     toObj.language == "java" ? (proxy_instance.java = true) : "";
+          
+      //     let isMicroServiceExist = TarsusProxyService.MicroServices.get(toObj.serverProject)
 
-        if(toObj.proto == "http"){
-          TarsusProxyService.HttpServices.set(toObj.serverProject, toObj);
-        }
+      //     if(isMicroServiceExist){
+            
+      //     }else{
+      //       TarsusProxyService.MicroServices.set(toObj.serverProject, proxy_instance);
+      //     }
+      //   }
 
-      });
+      //   if(toObj.proto == "http"){
+      //     TarsusProxyService.HttpServices.set(toObj.serverProject, toObj);
+      //   }
+
+      // });
     });
   }
   public async setServant(){
