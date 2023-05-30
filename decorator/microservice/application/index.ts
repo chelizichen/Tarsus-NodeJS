@@ -9,18 +9,22 @@ import { interFaceMaps } from '../interface/TarsusInterFace';
 import { TarsusStreamProxy } from './TarsusStreamProxy';
 import cluster from 'cluster';
 
+/**
+ * @description 启动微服务
+ */
 const TarsusMsApplication = (value, context) => {
   context.addInitializer(() => {
+    // 拿到config 的配置文件
     const config_path = path.resolve(cwd(), "tarsus.config.js");
     const _config = require(config_path);
+    
+    // 拿到集群的数组对象
     const SERVER = _config.servant.project;
     const parsedServer = SERVER.map(item=>{
       return ServantUtil.parse(item)}
     ) as any[]
     // const port = parsedServer.port;
     // const host = parsedServer.host;
-
-    console.log("parsedServer", parsedServer);
 
     ApplicationEvents.on(Application.LOAD_INTERFACE, function (args: any[]) {
       args.forEach((el) => {
@@ -90,6 +94,7 @@ const TarsusMsApplication = (value, context) => {
           cluster.fork();
         });
       }else{
+        console.log("开启子进程 ————PID",process.pid);
         parsedServer.forEach(item=>{
           let arc_server = new TarsusServer({ port: Number(item.port), host:item.host });
           arc_server.registEvents(interFaceMaps);

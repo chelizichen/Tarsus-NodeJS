@@ -92,7 +92,8 @@ class TarsusProxy {
       timeout:"6000",
       request:"GetSystemLoadInfoReq",
       data:{
-        host:os.hostname(),
+        host: os.hostname(),
+        time: Date.now()
       },
     })
     return data
