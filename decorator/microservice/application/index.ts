@@ -7,15 +7,18 @@ import { ServantUtil } from "../../util/servant";
 import { TarsusCache } from '../../cache/TarsusCache';
 import { interFaceMaps } from '../interface/TarsusInterFace';
 import { TarsusStreamProxy } from './TarsusStreamProxy';
+import cluster from 'cluster';
 
 const TarsusMsApplication = (value, context) => {
   context.addInitializer(() => {
     const config_path = path.resolve(cwd(), "tarsus.config.js");
     const _config = require(config_path);
     const SERVER = _config.servant.project;
-    const parsedServer = ServantUtil.parse(SERVER);
-    const port = parsedServer.port || 8080;
-    const host = parsedServer.host;
+    const parsedServer = SERVER.map(item=>{
+      return ServantUtil.parse(item)}
+    ) as any[]
+    // const port = parsedServer.port;
+    // const host = parsedServer.host;
 
     console.log("parsedServer", parsedServer);
 
@@ -63,6 +66,8 @@ const TarsusMsApplication = (value, context) => {
       });
     });
 
+    // 加载方法
+    // 5.31 更新 添加多进程模型
     ApplicationEvents.on(Application.LOAD_MICROSERVICE, function () {
 
       ApplicationEvents.emit(Application.LOAD_TARO)
@@ -71,10 +76,26 @@ const TarsusMsApplication = (value, context) => {
 
       const cache = new TarsusCache()
       cache.setServant()
-
-      let arc_server = new TarsusServer({ port: Number(port), host });
-      arc_server.registEvents(interFaceMaps);
-      console.log(arc_server.TarsusEvent.events);
+      console.log("cluster is isWorker",cluster.isWorker);
+      
+      if(!cluster.isWorker){
+        console.log(`主进程已开启 ———— PID: ${process.pid}`);
+        for (let i = 0; i < parsedServer.length; i++) {
+          cluster.fork();
+        }
+         // 监听工作进程的退出事件
+        cluster.on('exit', (worker, code, signal) => {
+          console.log(`Worker process ${worker.process.pid} exited`);
+          console.log(`Starting a new worker...`);
+          cluster.fork();
+        });
+      }else{
+        parsedServer.forEach(item=>{
+          let arc_server = new TarsusServer({ port: Number(item.port), host:item.host });
+          arc_server.registEvents(interFaceMaps);
+          console.log(arc_server.TarsusEvent.events);
+        })
+      }
       // TEST FUNCTION
 
       // setTimeout(async ()=>{

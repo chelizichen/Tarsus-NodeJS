@@ -34,6 +34,9 @@ class TarsusLoadBalance {
         return os.loadavg()[0]
     }
 
+    /**
+     * @description 服务的Getter 和 Setter方法
+     */
     static ServantMaps = new Map<string, TarsusLoadBalance>();
 
     static getServant(key: string) {
