@@ -1,7 +1,10 @@
 import * as mysql from "mysql";
-import { EntityMap } from "./Entity";
 import _ from "lodash";
-// ORM 基类
+import { __column__ } from "./Entity";
+
+/**
+ * @description Tarsus ORM 对象与实体映射类
+ */
 class TarsusOrm {
   static getConnection() {}
   static ConnectionPool: mysql.Pool;
@@ -26,11 +29,13 @@ class TarsusOrm {
     }
   }
 
-  static async query(prepareSqlAndArgs: any, Class: any): Promise<any> {
+  static async query(prepareSqlAndArgs: { sql: string, args: any[] }, targetEntity: any): Promise<any> {
+    const vm = TarsusOrm;
+    const tgvm = targetEntity.prototype;
+
     return new Promise(async (resolve, reject) => {
-      const { sql, args } = prepareSqlAndArgs;
-      console.log(prepareSqlAndArgs);
-      TarsusOrm.ConnectionPool.getConnection((err, conn) => {
+      const { sql, args = [] } = prepareSqlAndArgs;
+      vm.ConnectionPool.getConnection((err, conn) => {
         if (err) {
           reject(err);
         }
@@ -40,17 +45,19 @@ class TarsusOrm {
           }
 
           if (resu && resu.length) {
-            const fields = EntityMap.get(Class.name) as Map<string, string>;
+            // const fields = EntityMap.get(targetEntity.name) as Map<string, string>;
+            const __columns__ = tgvm.__columns__;
+            console.log(__columns__);
+            
+            
             // mapper orm
             const data = resu.map((item) => {
-              const toObjFields = [...fields.entries()].reduce(
-                (obj, [key, value]) => ((obj[key] = value), obj),
-                {}
-              );
-              for (let k in toObjFields) {
-                toObjFields[k] = item[toObjFields[k]];
+              const __item__ = {}
+              for (let v in __columns__) {
+                let { column_name } = __columns__[v];
+                __item__[column_name] = item[v];
               }
-              return toObjFields;
+              return __item__;
             });
             resolve(data);
           } else {

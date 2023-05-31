@@ -49,7 +49,8 @@
     "build": " tsc --project tsconfig.build.json --format cjs,esm",
     "pkg": "tsc --project tsconfig.pkg.json && tsup decorator --format cjs,esm",
     "test:proxy": "ts-node-dev decorator/web/proxy/TarsusRequest.ts",
-    "servant": "ts-node-dev decorator/util/servant.ts"
+    "servant": "ts-node-dev decorator/util/servant.ts",
+    "orm":"ts-node-dev test/http/entity/goods.entity.ts"
   },
   "author": "",
   "license": "ISC",

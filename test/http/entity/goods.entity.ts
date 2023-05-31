@@ -1,30 +1,33 @@
 import { TarsusOrm } from "../../../decorator/web/orm";
 import { Column, Entity } from "../../../decorator/web/orm/Entity";
 
-@Entity("goods")
-class Goods extends TarsusOrm {
-  @Column
+@Entity("fund_list")
+class FundList extends TarsusOrm {
+  @Column({ filed: "id" })
   id: string;
 
-  @Column("sort_type_id")
-  SortTypeId: string;
+  @Column({ filed: "fund_code" })
+  fundCode: string;
 
-  @Column("goods_name")
-  GoodsName: string;
+  @Column({ filed: "fund_eng_name" })
+  fundEngName: string;
 
-  @Column("goods_price")
-  GoodsPrice: string;
+  @Column({ filed: "fund_name" })
+  fundName: string;
 
-  @Column("goods_rest_num")
-  GoodsRestNum: string;
-
-  @Column("seller_id")
-  SellerId: string;
-
-  @Column("sort_child_id")
-  SortChildId: string;
+  @Column({ filed: "fund_type" })
+  fundType: string;
 }
 
-export {
-    Goods
-}
+// new Goods();
+
+// Goods.query(
+//   {
+//     sql: "select * from goods",
+//     args: [],
+//   },
+//   Goods
+// ).then((res) => {
+//   console.log(res);
+// });
+export { FundList };

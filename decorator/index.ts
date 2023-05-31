@@ -15,7 +15,7 @@ import {
   loadServer,
   loadInit,
   Column,
-  EntityMap,
+  PrimaryGenerateColumn,
   getConenction,
   TarsusOrm,
   Mapper,
@@ -37,7 +37,7 @@ import {
   Get,
   Inject,
   Post,
-  Proxy
+  Proxy,
 } from "./web";
 
 // ***************CACHE********************
@@ -70,7 +70,7 @@ export { Controller };
 export { Get, Post, Proxy };
 
 // ******************ORM******************
-export { Entity, Column, EntityMap };
+export { Entity, Column, PrimaryGenerateColumn };
 
 export { getConenction, TarsusOrm };
 

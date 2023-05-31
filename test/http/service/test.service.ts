@@ -6,8 +6,8 @@ class TestService {
 
   @Inject(GoodsMapper) GoodsMapper:GoodsMapper;
   
-  async hello(id:string,sort_type_id:string) {
-    const data = await this.GoodsMapper.TestSelect([id,sort_type_id])
+  async hello(id:string) {
+    const data = await this.GoodsMapper.TestSelect([id])
     return data
   }
 }

@@ -9,11 +9,12 @@ class appController {
   @Inject(AppService) AppService: AppService;
 
   @Get("say")
-  public say() {
+  public async say() {
     console.log("app",this);
-    const data = this.AppService.hello()
+    const data = await this.AppService.hello()
     return ret.success(data)
   }
+
 }
 
 export {

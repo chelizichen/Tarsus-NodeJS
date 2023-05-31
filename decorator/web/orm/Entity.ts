@@ -1,47 +1,82 @@
-import { IocMap } from "../../ioc/collects";
+import { nextTick } from "process";
 
-// let EntitySet = new Set()
-
-let EntityMap = new Map<string,typeof ColumnMap>()
-
-let ColumnMap = new Map<string,string>()
-
-const Entity = (table:string)=>{
-    return function(value:new ()=>void,context:ClassDecoratorContext ){
-        IocMap.set(value.name, new value());
-        context.addInitializer(()=>{
-            EntityMap.set(value.name,ColumnMap)
-            ColumnMap.clear()
-            console.log('EntityMap',EntityMap);
-        })
-    }
+interface ColumnType {
+    filed?: string;
+    type?: string;
+    length?: number;
 }
 
-const Column = (field?:string|any,context?:ClassFieldDecoratorContext):any =>{
+interface column_type {
+    column_name: string;
+    filed_name: string;
+    filed_length: string | number;
+    filed_type: string;
+}
 
-    // 有参数
-    if(field && !context){
-        return function(value:any,ctx:ClassFieldDecoratorContext){
-            ctx.addInitializer(()=>{
-                ColumnMap.set(ctx.name as string,field)
+export interface __column__ {
+    [key: string]: column_type;
+}
+
+/**
+ * @description 存储每个实体的实例对象
+ */
+const TarsusEntitys = {}
+
+/**
+ * @param table 数据库中的表
+ */
+function Entity(table: string) {
+    return function (proto: new () => void, context: ClassDecoratorContext) {
+        const table_name = table || proto.name;
+        proto.prototype.__table__ = table_name;
+        proto.prototype.__columns__ = {}
+
+        const inst = new proto()
+        TarsusEntitys[table_name] = inst;
+
+        context.addInitializer(function () {
+            const vm = this
+            nextTick(() => {
+                console.log(vm.prototype);
             })
-        }
-    }else{
-        // 无参数
-        context.addInitializer(()=>{
-            ColumnMap.set(context.name as string,context.name as string)
         })
-    }
+    };
+};
+
+/**
+ * @description 一般用于普通行
+ */
+function Column(config: ColumnType) {
+    return function (value: any, context: ClassFieldDecoratorContext) {
+        const column_name = context.name;
+        const filed_name = config.filed || (context.name as string);
+        const filed_length = config.length || "255";
+        const filed_type = config.type || "varchar";
+        const _column = { column_name, filed_name, filed_length, filed_type };
+        context.addInitializer(function () {
+            this.constructor.prototype.__columns__[filed_name] = _column;
+        });
+    };
+};
+
+/**
+ * @description 一般用于主键
+ */
+function PrimaryGenerateColumn(config: ColumnType) {
+    return function (value: any, context: ClassFieldDecoratorContext) {
+        const column_name = context.name;
+        const filed_name = config.filed || (context.name as string);
+        const filed_length = config.length || "20";
+        const filed_type = config.type || "bigint";
+        const _column = { column_name, filed_name, filed_length, filed_type };
+
+        context.addInitializer(function () {
+            this.constructor.prototype.__columns__[filed_name] = _column;
+        });
+    };
 }
 
 // f
 
-const Key = (value:any,context:ClassFieldDecoratorContext) => {
 
-}
-
-export {
-    Entity,
-    Column,
-    EntityMap
-}
+export { Entity, Column, PrimaryGenerateColumn };
