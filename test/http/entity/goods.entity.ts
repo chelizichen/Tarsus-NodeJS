@@ -1,8 +1,8 @@
-import { TarsusOrm } from "../../../decorator/web/orm";
+import { TarsusOrm } from "../../../decorator";
 import { Column, Entity } from "../../../decorator/web/orm/Entity";
 
 @Entity("fund_list")
-class FundList extends TarsusOrm {
+class FundList  extends TarsusOrm{
   @Column({ filed: "id" })
   id: string;
 

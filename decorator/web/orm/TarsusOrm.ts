@@ -7,7 +7,7 @@ import { __column__ } from "./Entity";
  */
 class TarsusOrm {
   static getConnection() {}
-  static ConnectionPool: mysql.Pool;
+  static connectionPool: mysql.Pool;
 
   static CreatePool(config: any) {
     if (config && config.database) {
@@ -22,20 +22,19 @@ class TarsusOrm {
               port: item.port,
               connectionLimit: item.connectionLimit,
             });
-            TarsusOrm.ConnectionPool = pool;
+            TarsusOrm.connectionPool = pool;
           }
         });
       }
     }
   }
 
-  static async query(prepareSqlAndArgs: { sql: string, args: any[] }, targetEntity: any): Promise<any> {
+  static async query(sql: string, args: any[] , targetEntity: any): Promise<any> {
     const vm = TarsusOrm;
     const tgvm = targetEntity.prototype;
 
     return new Promise(async (resolve, reject) => {
-      const { sql, args = [] } = prepareSqlAndArgs;
-      vm.ConnectionPool.getConnection((err, conn) => {
+      vm.connectionPool.getConnection((err, conn) => {
         if (err) {
           reject(err);
         }

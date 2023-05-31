@@ -83,7 +83,7 @@ const TarsusHttpApplication = (value: any, context: ClassDecoratorContext) => {
     });
 
     // 加载数据库
-    ApplicationEvents.on(Application.LOAD_DATABASE, TarsusOrm.CreatePool);
+    ApplicationEvents.on(Application.LOAD_DATABASE, TarsusOrm.createPool);
 
     ApplicationEvents.on(Application.LOAD_MS, loadMs);
     // 全局管道

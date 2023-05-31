@@ -1,4 +1,5 @@
 import { nextTick } from "process";
+import { TarsusOrm } from "./TarsusOrm";
 
 interface ColumnType {
     filed?: string;
@@ -13,7 +14,7 @@ interface column_type {
     filed_type: string;
 }
 
-export interface __column__ {
+interface __column__ {
     [key: string]: column_type;
 }
 
@@ -22,24 +23,37 @@ export interface __column__ {
  */
 const TarsusEntitys = {}
 
+interface Pagination {
+    keyword: string;
+    page: string;
+    size: string;
+    offset: string;
+}
+
+// abstract class OrmMethods {
+//     abstract getList(pagination: Pagination);
+// }
+
+
 /**
  * @param table 数据库中的表
  */
-function Entity(table: string) {
-    return function (proto: new () => void, context: ClassDecoratorContext) {
+const Entity = (table: string) =>{
+    return function(
+        proto: new () => any,
+        context: ClassDecoratorContext
+    ) {
         const table_name = table || proto.name;
         proto.prototype.__table__ = table_name;
-        proto.prototype.__columns__ = {}
-
-        const inst = new proto()
+        proto.prototype.__columns__ = {};
+        const inst = new proto();
         TarsusEntitys[table_name] = inst;
-
         context.addInitializer(function () {
-            const vm = this
+            const vm = this;
             nextTick(() => {
                 console.log(vm.prototype);
-            })
-        })
+            });
+        });
     };
 };
 
@@ -79,4 +93,4 @@ function PrimaryGenerateColumn(config: ColumnType) {
 // f
 
 
-export { Entity, Column, PrimaryGenerateColumn };
+export { Entity, Column, PrimaryGenerateColumn, __column__ };

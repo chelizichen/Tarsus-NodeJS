@@ -5,18 +5,18 @@ import { Get, Post } from "../../../decorator/web/method";
 import { query } from "../../../decorator/web/params/type";
 import { FundList } from "../entity/goods.entity";
 import { LogInterCeptor } from "../interceptor/log";
-import { TestService } from "../service/test.service";
+import { AppService } from "../service/app.service";
 
 
 @Controller("/demo")
 class demoController {
-  @Inject(TestService) TestService: TestService;
+  @Inject(AppService) AppService: AppService;
 
   @Get("/test")
   @UseInterCeptor(new LogInterCeptor())
   public async test(req: query<FundList>) {
     const { id = "1" } = req.query;
-    const ret = await this.TestService.hello(id);
+    const ret = await this.AppService.hello();
     return { ret };
   }
 

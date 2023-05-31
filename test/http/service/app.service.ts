@@ -8,12 +8,11 @@ class AppService {
   async hello() {
     // console.log(this.GoodsMapper);
     const data = await FundList.query(
-      {
-        args: ["1"],
-        sql: "select * from fund_list where id = ?",
-      },
+      "select * from fund_list where id = ?", ["1"],
       FundList
     );
+
+    // FundList.getL
     // await this.GoodsMapper.TestSelect([1,1]);
     return data;
   }
