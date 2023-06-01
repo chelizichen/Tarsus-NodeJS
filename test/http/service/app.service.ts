@@ -1,14 +1,19 @@
+import { Repo, Repository } from "../../../decorator/web/orm/Repo";
 import { Service } from "../../../decorator/web/service/index";
 import { FundList } from "../entity/goods.entity";
 
 @Service
 class AppService {
-  // @Inject(GoodsMapper) GoodsMapper: GoodsMapper;
-  
+  // constructor() {}
+
+  @Repo(FundList)
+  private readonly FundList: Repository<FundList>;
+
   async hello() {
-    // console.log(this.GoodsMapper);
-    const data = await FundList.query(
-      "select * from fund_list where id = ?", ["1"],
+    console.log("fundList", this.FundList.getList());
+    const data = await this.FundList.query(
+      "select * from fund_list where id = ?",
+      ["1"],
       FundList
     );
 

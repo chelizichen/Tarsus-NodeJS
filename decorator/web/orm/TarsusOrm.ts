@@ -29,7 +29,7 @@ class TarsusOrm {
     }
   }
 
-  static async query(sql: string, args: any[] , targetEntity: any): Promise<any> {
+  async query(sql: string, args: any[] , targetEntity: any): Promise<any> {
     const vm = TarsusOrm;
     const tgvm = targetEntity.prototype;
 
@@ -46,8 +46,6 @@ class TarsusOrm {
           if (resu && resu.length) {
             // const fields = EntityMap.get(targetEntity.name) as Map<string, string>;
             const __columns__ = tgvm.__columns__;
-            console.log(__columns__);
-            
             
             // mapper orm
             const data = resu.map((item) => {

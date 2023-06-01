@@ -15,7 +15,7 @@ class demoController {
   @Get("/test")
   @UseInterCeptor(new LogInterCeptor())
   public async test(req: query<FundList>) {
-    const { id = "1" } = req.query;
+    // const { id = "1" } = req.query;
     const ret = await this.AppService.hello();
     return { ret };
   }

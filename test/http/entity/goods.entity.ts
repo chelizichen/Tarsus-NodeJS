@@ -1,9 +1,10 @@
 import { TarsusOrm } from "../../../decorator";
-import { Column, Entity } from "../../../decorator/web/orm/Entity";
+import { Column, Entity, PrimaryGenerateColumn } from "../../../decorator/web/orm/Entity";
 
 @Entity("fund_list")
-class FundList  extends TarsusOrm{
-  @Column({ filed: "id" })
+class FundList{
+  
+  @PrimaryGenerateColumn({ filed: "id" })
   id: string;
 
   @Column({ filed: "fund_code" })

@@ -21,14 +21,8 @@ interface __column__ {
 /**
  * @description 存储每个实体的实例对象
  */
-const TarsusEntitys = {}
+export const TarsusEntitys = {}
 
-interface Pagination {
-    keyword: string;
-    page: string;
-    size: string;
-    offset: string;
-}
 
 // abstract class OrmMethods {
 //     abstract getList(pagination: Pagination);
@@ -43,13 +37,22 @@ const Entity = (table: string) =>{
         proto: new () => any,
         context: ClassDecoratorContext
     ) {
+        // TarsusOrm.call(proto);
+
         const table_name = table || proto.name;
+
+        proto.prototype = TarsusOrm.prototype;
         proto.prototype.__table__ = table_name;
         proto.prototype.__columns__ = {};
-        const inst = new proto();
+    
+        const inst = new proto()
+        // const tarsusOrm = new TarsusOrm();
+    
         TarsusEntitys[table_name] = inst;
         context.addInitializer(function () {
             const vm = this;
+            // const ormMethods = new TarsusOrm()
+            // this.call(ormMethods);
             nextTick(() => {
                 console.log(vm.prototype);
             });
@@ -83,8 +86,10 @@ function PrimaryGenerateColumn(config: ColumnType) {
         const filed_length = config.length || "20";
         const filed_type = config.type || "bigint";
         const _column = { column_name, filed_name, filed_length, filed_type };
-
         context.addInitializer(function () {
+            // @ts-ignore
+            console.log('proto',this);
+            
             this.constructor.prototype.__columns__[filed_name] = _column;
         });
     };
