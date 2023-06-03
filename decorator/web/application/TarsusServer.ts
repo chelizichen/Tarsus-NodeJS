@@ -1,17 +1,15 @@
-import { readdirSync } from 'fs';
+import { readdirSync } from "fs";
 import express, { Express } from "express";
 import { Application, ApplicationEvents } from "./index";
 import { TarsusGlobalPipe } from "../pipe";
 import { nextTick, cwd } from "process";
 import path from "path";
 import { TarsusOrm } from "../orm/TarsusOrm";
-import { ServantUtil, parseToObj } from "../../util/servant";
-import { TarsusProxy } from "../proxy";
-import { TarsusProxyService } from "../service/TarsusProxyService";
+import { ServantUtil } from "../../util/servant";
 import { TarsusCache } from "../../cache/TarsusCache";
 import { TarsusOberserver } from "../ober/TarsusOberserver";
 import { TarsusStreamProxy } from "../../microservice/application/TarsusStreamProxy";
-// import cluster from "cluster";
+import cluster from "cluster";
 // import { cpus } from "os";
 
 function loadController(args: Function[]) {
@@ -22,11 +20,14 @@ function loadController(args: Function[]) {
   ApplicationEvents.emit(Application.LOAD_SERVER);
 }
 
-function loadServer(config?:{
-  ms:boolean // 是否启用微服务
+/**
+ * @description 加载服务的函数，开启NodeJS服务集群
+ */
+function loadServer(config?: {
+  ms: boolean; // 是否启用微服务
 }) {
   // 加载配置
-  ApplicationEvents.emit(Application.LOAD_CONFIG,config);
+  ApplicationEvents.emit(Application.LOAD_CONFIG, config);
 
   // 最后监听
   ApplicationEvents.emit(Application.LOAD_LISTEN);
@@ -40,14 +41,13 @@ function loadInit(callback: (app: Express) => void) {
 }
 
 function loadMs(config) {
-  console.log("config--",config);
-  
-  nextTick(async () => {
-    // 根据 tarsus.config 初始化信息 
-    let cache = new TarsusCache()
-    // 得到 微服务
-    await cache.getMsServer()
+  console.log("config--", config);
 
+  nextTick(async () => {
+    // 根据 tarsus.config 初始化信息
+    let cache = new TarsusCache();
+    // 得到 微服务
+    await cache.getMsServer();
 
     const taro_path = config.servant.taro || "src/taro";
     const full_path = path.resolve(cwd(), taro_path);
@@ -60,6 +60,9 @@ function loadMs(config) {
   });
 }
 
+/**
+ * @description 加载 http 服务的基础类
+ */
 const TarsusHttpApplication = (value: any, context: ClassDecoratorContext) => {
   context.addInitializer(() => {
     const app = TarsusOberserver.getApp();
@@ -69,15 +72,19 @@ const TarsusHttpApplication = (value: any, context: ClassDecoratorContext) => {
     const config_path = path.resolve(cwd(), "tarsus.config.js");
     const _config = require(config_path);
     const SERVER = _config.servant.project;
-    const parsedServer = ServantUtil.parse(SERVER);
-    const port = parsedServer.port || 8080;
+    const parsedServers = SERVER.map((item) => {
+      return ServantUtil.parse(item);
+    });
+    const ports = parsedServers.map((item) => {
+      return item.port;
+    });
 
     // 加载配置文件
     ApplicationEvents.on(Application.LOAD_CONFIG, function (props) {
       // 加载数据库
       ApplicationEvents.emit(Application.LOAD_DATABASE, _config);
       // 加载微服务
-      if(props && props.ms){
+      if (props && props.ms) {
         ApplicationEvents.emit(Application.LOAD_MS, _config);
       }
     });
@@ -98,18 +105,53 @@ const TarsusHttpApplication = (value: any, context: ClassDecoratorContext) => {
     );
 
     // 加载路由
-    app.use(TarsusOberserver.router)
+    app.use(TarsusOberserver.router);
 
     // 监听
     ApplicationEvents.on(Application.LOAD_LISTEN, () => {
       nextTick(() => {
         // 加载初始化方法
         ApplicationEvents.emit(Application.LOAD_INIT, app);
-        
-        app.listen(port, function () {
-          console.log("Server started at port:", port);
-          // 监听
-        });
+        // ******************************2023.6.3 开启集群******************************
+        if (cluster.isWorker) {
+          const __tarsus_port__ = process.env.__tarsus_port__;
+          // console.log(`子进程环境变量`,process.env);
+          const toMasterMessage = JSON.stringify({
+            port: __tarsus_port__,
+            pid: process.pid,
+          });
+
+          process.send(toMasterMessage);
+
+          console.log(`子进程已开启 ----- PID ${process.pid}`);
+          app.listen(__tarsus_port__, function () {
+            console.log("Server started at port:", __tarsus_port__);
+            // 监听
+          });
+        } else {
+          console.log(`主进程已开启 ———— PID: ${process.pid}`);
+          for (let i = 0; i < ports.length; i++) {
+            const forker = cluster.fork({
+              __tarsus_port__: ports[i],
+            });
+
+            forker.on("message", function (message) {
+              if (typeof message == "string") {
+                const data = JSON.parse(message as string);
+                console.log(data);
+              }
+            });
+            // 监听工作进程的退出事件
+            forker.on("exit", (worker, code, signal) => {
+              // console.log(`Worker process ${worker.process.pid} exited`);
+              // @ts-ignore
+              console.log(`Starting a new worker...`);
+              cluster.fork({
+                __tarsus_port__: ports[i],
+              });
+            });
+          }
+        }
       });
     });
   });

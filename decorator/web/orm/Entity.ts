@@ -88,7 +88,7 @@ function PrimaryGenerateColumn(config: ColumnType) {
         const _column = { column_name, filed_name, filed_length, filed_type };
         context.addInitializer(function () {
             // @ts-ignore
-            console.log('proto',this);
+            // console.log('proto',this);
             
             this.constructor.prototype.__columns__[filed_name] = _column;
         });
