@@ -47,7 +47,12 @@ class TarsusLoadBalance {
         TarsusLoadBalance.ServantMaps.set(key, value)
     }
 
-    // 拿到服务然后通过调用负载小的机器去执行请求。
+    /**
+     * @description 拿到服务然后通过调用负载小的机器去执行请求。
+     * 具体是 先拿到对应的服务名称，然后拿到对应的负载均衡类
+     * 每个负载均衡类里面又包含多个链接实例
+     * 根据每个链接的负载进行负载均衡
+     */
     static getServantToRequest(key: string, Request: any, Response: Response) {
         const tarsusLoadBalance = TarsusLoadBalance.getServant(key)
         tarsusLoadBalance.ProxySendRequest(Request, Response)
