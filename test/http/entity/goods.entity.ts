@@ -1,5 +1,5 @@
-import { TarsusOrm } from "../../../decorator";
 import { Column, Entity, PrimaryGenerateColumn } from "../../../decorator";
+import { Keyword } from "../../../decorator/web/orm/Entity";
 
 @Entity("fund_list")
 class FundList{
@@ -14,6 +14,7 @@ class FundList{
   fundEngName: string;
 
   @Column({ filed: "fund_name" })
+  @Keyword()
   fundName: string;
 
   @Column({ filed: "fund_type" })

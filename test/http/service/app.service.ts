@@ -1,4 +1,4 @@
-import { Repo, Repository } from "../../../decorator/web/orm/Repo";
+import { Pagination, Repo, Repository } from "../../../decorator/web/orm/Repo";
 import { Service } from "../../../decorator/web/service/index";
 import { FundList } from "../entity/goods.entity";
 
@@ -10,16 +10,23 @@ class AppService {
   private readonly FundList: Repository<FundList>;
 
   async hello() {
-    console.log("fundList", this.FundList.getList());
+    const pagination = new Pagination(['1','10'])
+    
+    const onlyPagination = await this.FundList.getList(pagination)
+    
+    const allArgs = await this.FundList.getList({
+      fundCode:"000001",
+    },pagination)
+
     const data = await this.FundList.query(
       "select * from fund_list where id = ?",
       ["1"],
-      FundList
     );
-
-    // FundList.getL
-    // await this.GoodsMapper.TestSelect([1,1]);
-    return data;
+    return {
+      data,
+      onlyPagination,
+      allArgs
+    };
   }
 }
 

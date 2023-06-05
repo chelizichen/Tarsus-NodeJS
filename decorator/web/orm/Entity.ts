@@ -1,6 +1,6 @@
 import { nextTick } from "process";
 import { TarsusOrm } from "./TarsusOrm";
-import {SQLTools} from "./Tools";
+import { singal_add_property} from "./Tools";
 
 interface ColumnType {
     filed?: string;
@@ -25,16 +25,7 @@ interface __column__ {
 export const TarsusEntitys = {}
 
 
-function singal_add_property(proto,property,args){
-    if(!proto[property]){
-        proto[property] = []
-    }
-    proto[property].push(args)
-}
 
-function singal_get_property(proto,property){
-    return proto[property]
-}
 
 
 // abstract class OrmMethods {
@@ -66,8 +57,8 @@ const Entity = (table: string) =>{
             // const ormMethods = new TarsusOrm()
             // this.call(ormMethods);
             nextTick(() => {
-                console.log(vm.prototype.fields)
-                new SQLTools(vm.prototype)
+                // console.log(vm.prototype.fields)
+                // new SQLTools(vm.prototype)
 
             })
         });
@@ -109,7 +100,16 @@ function PrimaryGenerateColumn(config: ColumnType) {
     };
 }
 
+function Keyword(field?:string){
+    return function(value:any,context:ClassFieldDecoratorContext){
+        let __keyword__ = field || context.name;
+        context.addInitializer(function () {
+            singal_add_property(this.constructor.prototype,"keyword", __keyword__)
+        });
+    }
+}
+
 // f
 
 
-export { Entity, Column, PrimaryGenerateColumn, __column__ };
+export { Entity, Column, PrimaryGenerateColumn, __column__,Keyword };
