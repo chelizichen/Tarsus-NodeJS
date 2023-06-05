@@ -1,5 +1,6 @@
 import { nextTick } from "process";
 import { TarsusOrm } from "./TarsusOrm";
+import {SQLTools} from "./Tools";
 
 interface ColumnType {
     filed?: string;
@@ -7,7 +8,7 @@ interface ColumnType {
     length?: number;
 }
 
-interface column_type {
+export interface column_type {
     column_name: string;
     filed_name: string;
     filed_length: string | number;
@@ -22,6 +23,18 @@ interface __column__ {
  * @description 存储每个实体的实例对象
  */
 export const TarsusEntitys = {}
+
+
+function singal_add_property(proto,property,args){
+    if(!proto[property]){
+        proto[property] = []
+    }
+    proto[property].push(args)
+}
+
+function singal_get_property(proto,property){
+    return proto[property]
+}
 
 
 // abstract class OrmMethods {
@@ -44,7 +57,6 @@ const Entity = (table: string) =>{
         proto.prototype = TarsusOrm.prototype;
         proto.prototype.__table__ = table_name;
         proto.prototype.__columns__ = {};
-    
         const inst = new proto()
         // const tarsusOrm = new TarsusOrm();
     
@@ -54,11 +66,14 @@ const Entity = (table: string) =>{
             // const ormMethods = new TarsusOrm()
             // this.call(ormMethods);
             nextTick(() => {
-                console.log(vm.prototype);
-            });
+                console.log(vm.prototype.fields)
+                new SQLTools(vm.prototype)
+
+            })
         });
     };
 };
+
 
 /**
  * @description 一般用于普通行
@@ -69,9 +84,10 @@ function Column(config: ColumnType) {
         const filed_name = config.filed || (context.name as string);
         const filed_length = config.length || "255";
         const filed_type = config.type || "varchar";
-        const _column = { column_name, filed_name, filed_length, filed_type };
+        const _column_ = { column_name, filed_name, filed_length, filed_type };
         context.addInitializer(function () {
-            this.constructor.prototype.__columns__[filed_name] = _column;
+            this.constructor.prototype.__columns__[filed_name] = _column_;
+            singal_add_property(this.constructor.prototype,"fields",_column_);
         });
     };
 };
@@ -85,12 +101,10 @@ function PrimaryGenerateColumn(config: ColumnType) {
         const filed_name = config.filed || (context.name as string);
         const filed_length = config.length || "20";
         const filed_type = config.type || "bigint";
-        const _column = { column_name, filed_name, filed_length, filed_type };
+        const _column_ = { column_name, filed_name, filed_length, filed_type };
         context.addInitializer(function () {
-            // @ts-ignore
-            // console.log('proto',this);
-            
-            this.constructor.prototype.__columns__[filed_name] = _column;
+            this.constructor.prototype.__columns__[filed_name] = _column_;
+            singal_add_property(this.constructor.prototype,"fields",_column_);
         });
     };
 }

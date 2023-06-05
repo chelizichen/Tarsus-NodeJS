@@ -1,5 +1,5 @@
 import { TarsusOrm } from "../../../decorator";
-import { Column, Entity, PrimaryGenerateColumn } from "../../../decorator/web/orm/Entity";
+import { Column, Entity, PrimaryGenerateColumn } from "../../../decorator";
 
 @Entity("fund_list")
 class FundList{
@@ -19,16 +19,4 @@ class FundList{
   @Column({ filed: "fund_type" })
   fundType: string;
 }
-
-// new Goods();
-
-// Goods.query(
-//   {
-//     sql: "select * from goods",
-//     args: [],
-//   },
-//   Goods
-// ).then((res) => {
-//   console.log(res);
-// });
 export { FundList };
