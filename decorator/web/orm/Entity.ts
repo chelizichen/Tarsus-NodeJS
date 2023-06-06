@@ -82,7 +82,7 @@ function Column(config: ColumnType) {
             singal_add_property(vm,"fields","[]",_column_);
         });
     };
-};
+}
 
 /**
  * @description 一般用于主键

@@ -9,7 +9,7 @@ interface PaginationType{
   sort:string;
   // desc | asc
   desc:string;
-};
+}
 
 class Pagination implements PaginationType{
   sort: string = "";
@@ -63,7 +63,8 @@ declare interface OrmMethods<T> {
    * @method 删除指定行
    * @param id 
    */
-  delOne(id:string|number): void;
+  delOne(id:string|number): Promise<any>;
+  del(options:Record<string, string|number>);
   /**
    * @method 保存
    * @param entity 

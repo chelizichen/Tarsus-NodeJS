@@ -132,13 +132,16 @@ SQLTools.prototype.getSQL = function () {
 
 // 先 buildWhere 再 del
 SQLTools.prototype.getDelSQL = function () {
+
 }
 
-// 只del一个 根据主键
+// 快捷方法 只del一个 根据主键
 SQLTools.prototype.delOne = function (index: string) {
+    console.log(this.__index__)
     this.sql_delOne = `delete
                        from ${this.__table__}
-                       where ${this.__index__} = ${index}`
+                       where ${this.__index__.filed_name} = ${index}`
+    return this.sql_delOne
 }
 
 

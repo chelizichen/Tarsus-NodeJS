@@ -18,6 +18,8 @@ class AppService {
       fundCode:"000001",
     },pagination)
 
+    const delOne = await this.FundList.delOne("1")
+
     const data = await this.FundList.query(
       "select * from fund_list where id = ?",
       ["1"],
@@ -25,7 +27,8 @@ class AppService {
     return {
       data,
       onlyPagination,
-      allArgs
+      allArgs,
+      delOne
     };
   }
 }
