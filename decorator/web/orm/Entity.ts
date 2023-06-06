@@ -77,8 +77,9 @@ function Column(config: ColumnType) {
         const filed_type = config.type || "varchar";
         const _column_ = { column_name, filed_name, filed_length, filed_type };
         context.addInitializer(function () {
-            this.constructor.prototype.__columns__[filed_name] = _column_;
-            singal_add_property(this.constructor.prototype,"fields",_column_);
+            let vm = this.constructor.prototype
+            vm.__columns__[filed_name] = _column_;
+            singal_add_property(vm,"fields","[]",_column_);
         });
     };
 };
@@ -94,8 +95,10 @@ function PrimaryGenerateColumn(config: ColumnType) {
         const filed_type = config.type || "bigint";
         const _column_ = { column_name, filed_name, filed_length, filed_type };
         context.addInitializer(function () {
-            this.constructor.prototype.__columns__[filed_name] = _column_;
-            singal_add_property(this.constructor.prototype,"fields",_column_);
+            let vm = this.constructor.prototype
+            vm.__columns__[filed_name] = _column_;
+            singal_add_property(vm,"fields","[]",_column_);
+            singal_add_property(vm,"__index__","{}",_column_);
         });
     };
 }
@@ -104,7 +107,8 @@ function Keyword(field?:string){
     return function(value:any,context:ClassFieldDecoratorContext){
         let __keyword__ = field || context.name;
         context.addInitializer(function () {
-            singal_add_property(this.constructor.prototype,"keyword", __keyword__)
+            let vm = this.constructor.prototype
+            singal_add_property(vm,"__keyword__","{}", __keyword__)
         });
     }
 }

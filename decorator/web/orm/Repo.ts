@@ -49,7 +49,8 @@ declare interface OrmMethods<T> {
   getList(options?:Record<string,any>,pagination?:Pagination): Promise<Array<T>>
   /**
    * @method 查询指定行
-   * @param id 
+   * @param options
+   * @param pagination
    */
   getList(options?:Record<string,any> | Pagination,pagination?:Pagination): Promise<Array<T>>
   /**
@@ -78,7 +79,7 @@ declare interface OrmMethods<T> {
    * @param args 
    */
   query(...args: any[]): any;
-};
+}
 
 type Repository<T> = OrmMethods<T> & T;
 

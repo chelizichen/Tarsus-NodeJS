@@ -51,7 +51,15 @@ class TarsusOrm<T = any> implements OrmMethods<T> {
     }
   }
   async findOne(id: string | number): Promise<T> {
-    throw new Error("Method not implemented.");
+    const sql = new SQLTools(this.constructor.prototype)
+    id = String(id)
+    const _sql_ = sql.buildWhere({id}).getSQL();
+    const data = this[PrepareToQuery]<T>(_sql_);
+    if(data && data instanceof  Array && data.length){
+      return data[0];
+    }else {
+      return null;
+    }
   }
   delOne(id: string | number): void {
     throw new Error("Method not implemented.");

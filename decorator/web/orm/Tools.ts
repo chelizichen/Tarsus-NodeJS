@@ -1,18 +1,34 @@
 /**
-    @desc SqlUtils 
-*/
-import { column_type } from "./Entity";
-import { Pagination } from "./Repo";
+ @desc SqlUtils
+ */
+import {column_type} from "./Entity";
+import {Pagination} from "./Repo";
 
 
 let SQLTools = function (proto: any) {
-    const { fields, __table__ } = proto
+    const {fields, __table__, __index__} = proto
     this.addColumn(fields)
-    this.sql_select_from = ""
+    this.__table__ = __table__
+    this.__index__ = __index__
     this.entity = proto;
+
+
+    // 查询的sql
+    this.sql_select_from = ""
+
+    // where 构建的sql
     this.sql_base_where = " where 1 = 1 and "
     this.sql_where = ""
+
+    // 分页的sql
     this.sql_pagination = ""
+
+    // 只删一个的sql
+    this.sql_delOne = "" // 构建del 的sql
+
+    // 构建删除的sql
+    this.sql_del = "" // 构建del 的sql
+
     this.getList(fields, __table__)
 
     //    this.buildWhere({
@@ -37,7 +53,7 @@ SQLTools.prototype.addColumn = function (args: Array<column_type>) {
     })
 }
 
-SQLTools.prototype.buildWhere = function (options) {
+SQLTools.prototype.buildWhere = function (options: Record<string, string>) {
     let where_sql = ''
     for (let v in options) {
         where_sql += `${this[v]} = ${options[v]}`
@@ -71,8 +87,7 @@ SQLTools.prototype.join = function (table: string, condition) {
     return this
 }
 /**
- * 
- * @param pagination 
+ * @param pagination
  */
 SQLTools.prototype.pagination = function (pagination: Pagination) {
     let [sort, limit] = ['', '']
@@ -98,6 +113,7 @@ SQLTools.prototype.pagination = function (pagination: Pagination) {
     return this;
 };
 
+// 默认为List 的
 SQLTools.prototype.getSQL = function () {
     let {
         sql_select_from,
@@ -106,26 +122,45 @@ SQLTools.prototype.getSQL = function () {
         sql_pagination
     } = this;
     // 如果 没进行where 查询 则base 为空
-    if(sql_where == ""){
+    if (sql_where == "") {
         sql_base_where = ""
     }
     const sql = sql_select_from + sql_base_where + sql_where + sql_pagination;
-    console.log('sql',sql);
-    
+    console.log('sql', sql);
     return sql;
-
 }
 
-function singal_add_property(proto, property, args) {
-    if (!proto[property]) {
-        proto[property] = []
+// 先 buildWhere 再 del
+SQLTools.prototype.getDelSQL = function () {
+}
+
+// 只del一个 根据主键
+SQLTools.prototype.delOne = function (index: string) {
+    this.sql_delOne = `delete
+                       from ${this.__table__}
+                       where ${this.__index__} = ${index}`
+}
+
+
+function singal_add_property(proto, property, type, args) {
+    if (type === "[]") {
+        if (!proto[property]) {
+            proto[property] = []
+        }
+        proto[property].push(args)
     }
-    proto[property].push(args)
+    if (type === "{}") {
+        if (!proto[property]) {
+            proto[property] = {}
+        }
+        proto[property] = args;
+    }
 }
 
 function singal_get_property(proto, property) {
     return proto[property]
 }
+
 export {
     SQLTools,
     singal_add_property,
