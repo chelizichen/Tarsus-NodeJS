@@ -1,8 +1,9 @@
-import { Column, Entity, PrimaryGenerateColumn } from "../../../decorator";
+import {Column, Entity, JoinColumn, OneToMany, PrimaryGenerateColumn} from "../../../decorator";
 import { Keyword } from "../../../decorator/web/orm/Entity";
+import {Tradehis} from "./trade";
 
 @Entity("fund_list")
-class FundList{
+class Fund{
   
   @PrimaryGenerateColumn({ filed: "id" })
   id: string;
@@ -19,5 +20,12 @@ class FundList{
 
   @Column({ filed: "fund_type" })
   fundType: string;
+
+  /**
+  两个表使用哪个字段进行关联
+  */
+  @OneToMany(Tradehis,"fund_code")
+  @JoinColumn("fund_code")
+  tradeList:Tradehis[]
 }
-export { FundList };
+export { Fund };

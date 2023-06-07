@@ -150,7 +150,9 @@ function singal_add_property(proto, property, type, args) {
         if (!proto[property]) {
             proto[property] = []
         }
-        proto[property].push(args)
+        if(proto[property].indexOf(item=>args) == -1){
+            proto[property].push(args)
+        }
     }
     if (type === "{}") {
         if (!proto[property]) {

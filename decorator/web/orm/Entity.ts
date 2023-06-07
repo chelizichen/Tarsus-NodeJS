@@ -1,6 +1,7 @@
-import { nextTick } from "process";
-import { TarsusOrm } from "./TarsusOrm";
-import { singal_add_property} from "./Tools";
+import {nextTick} from "process";
+import {TarsusOrm} from "./TarsusOrm";
+import {singal_add_property, SQLTools} from "./Tools";
+import _ from 'lodash';
 
 interface ColumnType {
     filed?: string;
@@ -24,8 +25,7 @@ interface __column__ {
  */
 export const TarsusEntitys = {}
 
-
-
+export type TarsusConstructor<T = any> = new (...args: any[]) => T
 
 
 // abstract class OrmMethods {
@@ -36,8 +36,8 @@ export const TarsusEntitys = {}
 /**
  * @param table 数据库中的表
  */
-const Entity = (table: string) =>{
-    return function(
+const Entity = (table: string) => {
+    return function (
         proto: new () => any,
         context: ClassDecoratorContext
     ) {
@@ -48,15 +48,25 @@ const Entity = (table: string) =>{
         proto.prototype = TarsusOrm.prototype;
         proto.prototype.__table__ = table_name;
         proto.prototype.__columns__ = {};
+
         const inst = new proto()
         // const tarsusOrm = new TarsusOrm();
-    
+
         TarsusEntitys[table_name] = inst;
         context.addInitializer(function () {
             const vm = this;
             // const ormMethods = new TarsusOrm()
             // this.call(ormMethods);
             nextTick(() => {
+                let reference = vm.prototype.__reference__
+                reference =  reference.map(item=>{
+                    let sql = undefined;
+                    let tools = new SQLTools(item.referenceEntity);
+                    item.getReferenceRow = function (referenceValue:string){
+//                        tools
+                    }
+//                    entity
+                })
                 // console.log(vm.prototype.fields)
                 // new SQLTools(vm.prototype)
 
@@ -75,11 +85,11 @@ function Column(config: ColumnType) {
         const filed_name = config.filed || (context.name as string);
         const filed_length = config.length || "255";
         const filed_type = config.type || "varchar";
-        const _column_ = { column_name, filed_name, filed_length, filed_type };
+        const _column_ = {column_name, filed_name, filed_length, filed_type};
         context.addInitializer(function () {
             let vm = this.constructor.prototype
             vm.__columns__[filed_name] = _column_;
-            singal_add_property(vm,"fields","[]",_column_);
+            singal_add_property(vm, "fields", "[]", _column_);
         });
     };
 }
@@ -93,66 +103,116 @@ function PrimaryGenerateColumn(config: ColumnType) {
         const filed_name = config.filed || (context.name as string);
         const filed_length = config.length || "20";
         const filed_type = config.type || "bigint";
-        const _column_ = { column_name, filed_name, filed_length, filed_type };
+        const _column_ = {column_name, filed_name, filed_length, filed_type};
         context.addInitializer(function () {
             let vm = this.constructor.prototype
             vm.__columns__[filed_name] = _column_;
-            singal_add_property(vm,"fields","[]",_column_);
-            singal_add_property(vm,"__index__","{}",_column_);
+            singal_add_property(vm, "fields", "[]", _column_);
+            singal_add_property(vm, "__index__", "{}", _column_);
         });
     };
 }
 
-function Keyword(field?:string){
-    return function(value:any,context:ClassFieldDecoratorContext){
+function Keyword(field?: string) {
+    return function (value: any, context: ClassFieldDecoratorContext) {
         let __keyword__ = field || context.name;
         context.addInitializer(function () {
             let vm = this.constructor.prototype
-            singal_add_property(vm,"__keyword__","{}", __keyword__)
+            singal_add_property(vm, "__keyword__", "{}", __keyword__)
         });
     }
 }
 
 /**
-* @description 一对一的关系
-    默认两边主键相连接
-*/
-function OneToOne(){
-    return function (value:any,context:ClassFieldDecoratorContext){
-
+ * @description 一对一的关系
+ 默认两边主键相连接
+ */
+function OneToOne<T = TarsusConstructor, R = string>(targetEntity: T, referenceColumn: R) {
+    // 将需要注入的实体和引用的行进行关联
+    return function (value: any, context: ClassFieldDecoratorContext) {
+//        context
     }
 }
 
 
 /**
-* @description 一对多的关系
-    一个主键、对应多个列，返回一个列表
-*/
-function OneToMany(){
-    return function (value:any,context:ClassFieldDecoratorContext){
-
+ * @description 一对多的关系
+ 一个主键、对应多个列，返回一个列表
+或许两次查询SQL是一个好的选择
+    {
+        a:'',
+        b:'',
+        c:{
+            d:'1',
+            e:'1',
+        }
+        f:[
+            { x:111,y:222},
+            { x:222,y:333},
+        ]
+    }
+ */
+function OneToMany<T = TarsusConstructor, R = string>(targetEntity: T,referenceColumn:R) {
+    return function (value: any, context: ClassFieldDecoratorContext) {
+        const name = context.name;
+        const referenceTable = targetEntity.constructor.prototype.__table__;
+        const referenceEntity = targetEntity.constructor.prototype;
+        context.addInitializer(function (){
+            let vm = this.constructor.prototype
+            Object.assign(vm.__columns__[name],{
+                type:"[]",
+                referenceColumn:referenceColumn,
+                referenceTable:referenceTable,
+                referenceEntity:referenceEntity
+            })
+            singal_add_property(vm, "__reference__", "[]", vm.__columns__[name])
+        })
     }
 }
 
 /**
-* @description 多对一的关系
-    多个列对应另一个表中的一列
-*/
-function ManyToOne(){
-    return function (value:any,context:ClassFieldDecoratorContext){
-
+ * @description 多对一的关系
+ 多个列对应另一个表中的一列
+    {
+        a:'',
+        b:'',
+        c:{
+            d:'1',
+            e:'1',
+        }
+    }
+ */
+function ManyToOne<T = TarsusConstructor, R = string>(targetEntity: T,referenceColumn:R) {
+    return function (value: any, context: ClassFieldDecoratorContext) {
+        const name = context.name;
+        const referenceTable = targetEntity.constructor.prototype.__table__;
+        context.addInitializer(function (){
+            let vm = this.constructor.prototype
+            Object.assign(vm.__columns__[name],{
+                type:"{}",
+                referenceColumn:referenceColumn,
+                referenceTable:referenceTable
+            })
+        })
     }
 }
 
 /**
-* @description 两边如何关联
-*/
-function JoinColumn(){
-    return function (value:any,context:ClassFieldDecoratorContext){
+ * @description 两边如何关联
+    @param joinColumn 主要用于如何关联其他表，以自身提供一个表
 
+ */
+function JoinColumn(joinColumn:string) {
+    return function (value: any, context: ClassFieldDecoratorContext) {
+        const name = context.name;
+        context.addInitializer(function (){
+            let vm = this.constructor.prototype
+            Object.assign(vm.__columns__[name],{
+                joinColumn:joinColumn
+            })
+        })
     }
 }
-
 
 
 // f
