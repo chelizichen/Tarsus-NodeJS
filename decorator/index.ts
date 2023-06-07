@@ -38,6 +38,10 @@ import {
   Inject,
   Post,
   Proxy,
+  OneToMany,
+  ManyToOne,
+  OneToOne,
+  JoinColumn
 } from "./web";
 
 // ***************CACHE********************
@@ -70,7 +74,7 @@ export { Controller };
 export { Get, Post, Proxy };
 
 // ******************ORM******************
-export { Entity, Column, PrimaryGenerateColumn };
+export { Entity, Column, PrimaryGenerateColumn,OneToMany,ManyToOne,OneToOne,JoinColumn };
 
 export { getConenction, TarsusOrm };
 

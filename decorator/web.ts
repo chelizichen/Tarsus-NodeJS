@@ -8,7 +8,7 @@ import { loadController, loadServer, loadInit } from "./web/application/TarsusSe
 import { Controller } from "./web/controller";
 import { Get, Post,Proxy } from "./web/method";
 import { getConenction, TarsusOrm } from "./web/orm";
-import { Entity, Column, PrimaryGenerateColumn } from "./web/orm/Entity";
+import { Entity, Column, PrimaryGenerateColumn,OneToMany,ManyToOne,OneToOne,JoinColumn } from "./web/orm/Entity";
 import { Mapper } from "./web/orm/Mapper";
 import { Select } from "./web/orm/sql";
 // import { body, query } from "./web/params/type";
@@ -36,7 +36,7 @@ export { Get, Post, Proxy };
 
 
 // ******************ORM******************
-export { Entity, Column, PrimaryGenerateColumn };
+export { Entity, Column, PrimaryGenerateColumn,OneToMany,ManyToOne,OneToOne,JoinColumn };
 
 
 

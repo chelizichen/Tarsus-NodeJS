@@ -113,7 +113,59 @@ function Keyword(field?:string){
     }
 }
 
+/**
+* @description 一对一的关系
+    默认两边主键相连接
+*/
+function OneToOne(){
+    return function (value:any,context:ClassFieldDecoratorContext){
+
+    }
+}
+
+
+/**
+* @description 一对多的关系
+    一个主键、对应多个列，返回一个列表
+*/
+function OneToMany(){
+    return function (value:any,context:ClassFieldDecoratorContext){
+
+    }
+}
+
+/**
+* @description 多对一的关系
+    多个列对应另一个表中的一列
+*/
+function ManyToOne(){
+    return function (value:any,context:ClassFieldDecoratorContext){
+
+    }
+}
+
+/**
+* @description 两边如何关联
+*/
+function JoinColumn(){
+    return function (value:any,context:ClassFieldDecoratorContext){
+
+    }
+}
+
+
+
 // f
 
 
-export { Entity, Column, PrimaryGenerateColumn, __column__,Keyword };
+export {
+    __column__,
+    Entity,
+    Column,
+    PrimaryGenerateColumn,
+    Keyword,
+    OneToMany,
+    ManyToOne,
+    JoinColumn,
+    OneToOne
+};
