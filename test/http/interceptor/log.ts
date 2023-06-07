@@ -1,9 +1,9 @@
 import { Request } from "express";
 import { ParamsDictionary } from "express-serve-static-core";
 import { ParsedQs } from "qs";
-import { FundList } from "../entity/goods.entity";
-import { TarsusInterCeptor } from "../../../decorator/web/aop/index";
-import { class_transformer } from "../../../decorator/web/pipe/index";
+import { TarsusInterCeptor } from "../../../decorator";
+import { class_transformer } from "../../../decorator";
+import {Fund} from "../entity/fund";
 
 class LogInterCeptor implements TarsusInterCeptor {
   handle(
@@ -13,7 +13,7 @@ class LogInterCeptor implements TarsusInterCeptor {
     if (!id) {
       return "NEED PARAMS ID OR SORT_TYPE_ID";
     }
-    req.query = class_transformer.plainToClass(req.query, FundList) as any;
+    req.query = class_transformer.plainToClass(req.query, Fund) as any;
   }
 }
 export {

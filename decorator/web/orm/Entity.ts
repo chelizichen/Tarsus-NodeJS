@@ -48,6 +48,7 @@ const Entity = (table: string) => {
         proto.prototype = TarsusOrm.prototype;
         proto.prototype.__table__ = table_name;
         proto.prototype.__columns__ = {};
+        proto.prototype.__reference__ = [];
 
         const inst = new proto()
         // const tarsusOrm = new TarsusOrm();
@@ -61,8 +62,10 @@ const Entity = (table: string) => {
                 let reference = vm.prototype.__reference__
                 reference =  reference.map(item=>{
                     let sql = undefined;
-                    let tools = new SQLTools(item.referenceEntity);
+                    console.log('item',item)
+//                    let tools = new SQLTools(item.referenceEntity);
                     item.getReferenceRow = function (referenceValue:string){
+
 //                        tools
                     }
 //                    entity
@@ -154,18 +157,24 @@ function OneToOne<T = TarsusConstructor, R = string>(targetEntity: T, referenceC
  */
 function OneToMany<T = TarsusConstructor, R = string>(targetEntity: T,referenceColumn:R) {
     return function (value: any, context: ClassFieldDecoratorContext) {
+//        const inst = new targetEntity<any>()
+        // const tarsusOrm = new TarsusOrm();
+
+
         const name = context.name;
         const referenceTable = targetEntity.constructor.prototype.__table__;
         const referenceEntity = targetEntity.constructor.prototype;
+        console.log("proto",referenceEntity)
         context.addInitializer(function (){
             let vm = this.constructor.prototype
-            Object.assign(vm.__columns__[name],{
+            let ref = vm.__columns__[name] || {}
+            Object.assign(ref,{
                 type:"[]",
                 referenceColumn:referenceColumn,
                 referenceTable:referenceTable,
                 referenceEntity:referenceEntity
             })
-            singal_add_property(vm, "__reference__", "[]", vm.__columns__[name])
+            singal_add_property(vm, "__reference__", "[]",ref)
         })
     }
 }
@@ -207,9 +216,11 @@ function JoinColumn(joinColumn:string) {
         const name = context.name;
         context.addInitializer(function (){
             let vm = this.constructor.prototype
-            Object.assign(vm.__columns__[name],{
+            let ref = vm.__columns__[name] || {}
+            Object.assign(ref,{
                 joinColumn:joinColumn
             })
+            singal_add_property(vm, "__reference__", "[]",ref)
         })
     }
 }

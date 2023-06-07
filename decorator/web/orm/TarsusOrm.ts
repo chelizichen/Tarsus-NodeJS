@@ -133,22 +133,47 @@ class TarsusOrm<T = any> implements OrmMethods<T> {
       });
     });
   }
+
   async [PrepareToQuery]<T>(sql: string, args: any[] = []): Promise<T> {
     const vm = TarsusOrm;
+    const that = this;
     return new Promise(async (resolve, reject) => {
       vm.connectionPool.getConnection((err, conn) => {
         if (err) {
           reject(err);
         }
-        conn.query(sql, args, function (err, resu) {
+        // 对数据做关联处理
+        conn.query(sql, args, async function (err, resu) {
           if (err) {
             reject(err);
           }
-          resolve(resu);
+
+          // @ts-ignore
+          if(that.__reference__){
+
+          }
+
+          const data = resu.map(item=>{
+
+            // @ts-ignore
+              if(that.__reference__){
+                // @ts-ignore
+              for(let v in that.__reference__){
+                console.log(v)
+                // @ts-ignore
+                console.log(that.__reference__[v])
+              }
+            }
+            return item
+          })
+          resolve(data);
         });
       });
     });
   }
+
+    del(options: Record<string, string | number>) {
+    }
 
   // static async queryTest(sql:string){
   //   const data = await ArcOrm.ConnectionPool.query(sql);
