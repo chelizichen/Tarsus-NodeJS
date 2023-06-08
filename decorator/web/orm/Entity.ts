@@ -1,6 +1,6 @@
-import {nextTick} from "process";
-import {TarsusOrm} from "./TarsusOrm";
-import {singal_add_property, SQLTools} from "./Tools";
+import { nextTick } from "process";
+import { TarsusOrm } from "./TarsusOrm";
+import { addReference, singal_add_property, SQLTools } from "./Tools";
 import _ from 'lodash';
 
 interface ColumnType {
@@ -14,6 +14,7 @@ export interface column_type {
     filed_name: string;
     filed_length: string | number;
     filed_type: string;
+    table_name:string;
 }
 
 interface __column__ {
@@ -44,7 +45,6 @@ const Entity = (table: string) => {
         // TarsusOrm.call(proto);
 
         const table_name = table || proto.name;
-
         proto.prototype = TarsusOrm.prototype;
         proto.prototype.__table__ = table_name;
         proto.prototype.__columns__ = {};
@@ -53,22 +53,26 @@ const Entity = (table: string) => {
         const inst = new proto()
         // const tarsusOrm = new TarsusOrm();
 
-        TarsusEntitys[table_name] = inst;
+        TarsusEntitys[proto.prototype] = inst;
+        // 这一步中 我们需要对数据库的查询语句做进一步的修改操作
         context.addInitializer(function () {
             const vm = this;
-            // const ormMethods = new TarsusOrm()
-            // this.call(ormMethods);
             nextTick(() => {
                 let reference = vm.prototype.__reference__
-                reference =  reference.map(item=>{
-                    let sql = undefined;
-                    console.log('item',item)
-//                    let tools = new SQLTools(item.referenceEntity);
-                    item.getReferenceRow = function (referenceValue:string){
+                reference = reference.map(item => {
+                //     let sql = undefined;
+                //     console.log('item', item)
+                    let tools = new SQLTools(TarsusEntitys[item.referenceEntity]);
+                    console.log(tools.getSQL());
+                    
+                //     console.log('SQL',tools.sql_select_from);
 
-//                        tools
-                    }
-//                    entity
+                //     //                     item.getReferenceRow = function (referenceValue:string){
+                //     //                         console.log('referenceValue',referenceValue);
+
+                //     // //                        tools
+                //     //                     }
+                //     //                    entity
                 })
                 // console.log(vm.prototype.fields)
                 // new SQLTools(vm.prototype)
@@ -88,9 +92,10 @@ function Column(config: ColumnType) {
         const filed_name = config.filed || (context.name as string);
         const filed_length = config.length || "255";
         const filed_type = config.type || "varchar";
-        const _column_ = {column_name, filed_name, filed_length, filed_type};
+        const _column_ = { column_name, filed_name, filed_length, filed_type,table_name:'' };
         context.addInitializer(function () {
             let vm = this.constructor.prototype
+            _column_.table_name = vm.__table__
             vm.__columns__[filed_name] = _column_;
             singal_add_property(vm, "fields", "[]", _column_);
         });
@@ -106,9 +111,10 @@ function PrimaryGenerateColumn(config: ColumnType) {
         const filed_name = config.filed || (context.name as string);
         const filed_length = config.length || "20";
         const filed_type = config.type || "bigint";
-        const _column_ = {column_name, filed_name, filed_length, filed_type};
+        const _column_ = { column_name, filed_name, filed_length, filed_type,table_name:'' };
         context.addInitializer(function () {
             let vm = this.constructor.prototype
+            _column_.table_name = vm.__table__
             vm.__columns__[filed_name] = _column_;
             singal_add_property(vm, "fields", "[]", _column_);
             singal_add_property(vm, "__index__", "{}", _column_);
@@ -133,7 +139,7 @@ function Keyword(field?: string) {
 function OneToOne<T = TarsusConstructor, R = string>(targetEntity: T, referenceColumn: R) {
     // 将需要注入的实体和引用的行进行关联
     return function (value: any, context: ClassFieldDecoratorContext) {
-//        context
+        //        context
     }
 }
 
@@ -155,26 +161,23 @@ function OneToOne<T = TarsusConstructor, R = string>(targetEntity: T, referenceC
         ]
     }
  */
-function OneToMany<T = TarsusConstructor, R = string>(targetEntity: T,referenceColumn:R) {
+function OneToMany<T extends TarsusConstructor = any, R = string>(targetEntity: T, referenceColumn: R) {
     return function (value: any, context: ClassFieldDecoratorContext) {
-//        const inst = new targetEntity<any>()
-        // const tarsusOrm = new TarsusOrm();
-
-
-        const name = context.name;
-        const referenceTable = targetEntity.constructor.prototype.__table__;
-        const referenceEntity = targetEntity.constructor.prototype;
-        console.log("proto",referenceEntity)
-        context.addInitializer(function (){
+        const inst = new targetEntity()
+        TarsusEntitys[targetEntity.prototype] = inst
+        const referenceTable = inst.__table__;
+        const referenceEntity = inst;
+        console.log("proto", referenceEntity)
+        context.addInitializer(function () {
             let vm = this.constructor.prototype
-            let ref = vm.__columns__[name] || {}
-            Object.assign(ref,{
-                type:"[]",
-                referenceColumn:referenceColumn,
-                referenceTable:referenceTable,
-                referenceEntity:referenceEntity
-            })
-            singal_add_property(vm, "__reference__", "[]",ref)
+            let ref = {
+                type: "[]",
+                referenceColumn: referenceColumn,
+                referenceTable: referenceTable,
+                referenceEntity: referenceEntity,
+                columnName: context.name
+            }
+            addReference(vm, "__reference__", "[]", ref)
         })
     }
 }
@@ -191,16 +194,16 @@ function OneToMany<T = TarsusConstructor, R = string>(targetEntity: T,referenceC
         }
     }
  */
-function ManyToOne<T = TarsusConstructor, R = string>(targetEntity: T,referenceColumn:R) {
+function ManyToOne<T = TarsusConstructor, R = string>(targetEntity: T, referenceColumn: R) {
     return function (value: any, context: ClassFieldDecoratorContext) {
         const name = context.name;
         const referenceTable = targetEntity.constructor.prototype.__table__;
-        context.addInitializer(function (){
+        context.addInitializer(function () {
             let vm = this.constructor.prototype
-            Object.assign(vm.__columns__[name],{
-                type:"{}",
-                referenceColumn:referenceColumn,
-                referenceTable:referenceTable
+            Object.assign(vm.__columns__[name], {
+                type: "{}",
+                referenceColumn: referenceColumn,
+                referenceTable: referenceTable
             })
         })
     }
@@ -211,16 +214,17 @@ function ManyToOne<T = TarsusConstructor, R = string>(targetEntity: T,referenceC
     @param joinColumn 主要用于如何关联其他表，以自身提供一个表
 
  */
-function JoinColumn(joinColumn:string) {
+function JoinColumn(joinColumn: string) {
     return function (value: any, context: ClassFieldDecoratorContext) {
-        const name = context.name;
-        context.addInitializer(function (){
+        context.addInitializer(function () {
             let vm = this.constructor.prototype
-            let ref = vm.__columns__[name] || {}
-            Object.assign(ref,{
-                joinColumn:joinColumn
-            })
-            singal_add_property(vm, "__reference__", "[]",ref)
+            let ref = {
+                joinColumn: joinColumn,
+                columnName: context.name
+            }
+
+
+            addReference(vm, "__reference__", "[]", ref)
         })
     }
 }

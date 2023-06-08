@@ -87,7 +87,7 @@ type Repository<T> = OrmMethods<T> & T;
 function Repo(Entity: new (...args: any[]) => any) {
   return function (value: any, context: ClassFieldDecoratorContext) {
     return function () {
-      return TarsusEntitys[Entity.prototype.__table__];
+      return TarsusEntitys[Entity.prototype];
     };
   };
 }

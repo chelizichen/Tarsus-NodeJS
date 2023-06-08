@@ -3,7 +3,7 @@ import _ from "lodash";
 import { __column__ } from "./Entity";
 import {OrmMethods, Pagination} from './Repo';
 import { SQLTools } from "./Tools";
-
+import { TarsusEntitys } from "./Entity";
 const PrepareToQuery = Symbol.for('PrepareToQuery')
 
 /**
@@ -20,12 +20,13 @@ class TarsusOrm<T = any> implements OrmMethods<T> {
     pagination?: Pagination
   ): Promise<T[]>;
   async getList(options?: unknown, pagination?: unknown): Promise<T[]> {
-    const sql = new SQLTools(this.constructor.prototype);
+    // @ts-ignore
+    const sql = new SQLTools(TarsusEntitys[this.constructor.prototype]);
     if (options) {
       // 单纯走分页
       if (options instanceof Pagination) {
         const _sql_ = sql.pagination(options).getSQL();
-        console.log(_sql_);
+        console.log('_sql_',_sql_);
 
         const data = await this[PrepareToQuery]<T[]>(_sql_);
         return data;
@@ -143,30 +144,32 @@ class TarsusOrm<T = any> implements OrmMethods<T> {
           reject(err);
         }
         // 对数据做关联处理
+        console.log(sql);
+        
         conn.query(sql, args, async function (err, resu) {
           if (err) {
             reject(err);
           }
 
-          // @ts-ignore
-          if(that.__reference__){
+          // // @ts-ignore
+          // if(that.__reference__){
 
-          }
+          // }
 
-          const data = resu.map(item=>{
+          // const data = resu.map(item=>{
 
-            // @ts-ignore
-              if(that.__reference__){
-                // @ts-ignore
-              for(let v in that.__reference__){
-                console.log(v)
-                // @ts-ignore
-                console.log(that.__reference__[v])
-              }
-            }
-            return item
-          })
-          resolve(data);
+          //   // @ts-ignore
+          //     if(that.__reference__){
+          //       // @ts-ignore
+          //     for(let v in that.__reference__){
+          //       console.log(v)
+          //       // @ts-ignore
+          //       console.log(that.__reference__[v])
+          //     }
+          //   }
+          //   return item
+          // })
+          resolve(resu);
         });
       });
     });
