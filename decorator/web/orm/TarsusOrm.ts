@@ -135,6 +135,15 @@ class TarsusOrm<T = any> implements OrmMethods<T> {
     });
   }
 
+  async del(options: Record<string, string | number>) {
+    const sql = new SQLTools(this.constructor.prototype);
+    sql.buildWhere(options)
+    const delSQL = sql.getDelSQL();
+    console.log(delSQL);
+    // const data = await this[PrepareToQuery](delSQL)
+    // console.log(data);
+  }
+  
   async [PrepareToQuery]<T>(sql: string, args: any[] = []): Promise<T> {
     const vm = TarsusOrm;
     const that = this;
@@ -175,8 +184,7 @@ class TarsusOrm<T = any> implements OrmMethods<T> {
     });
   }
 
-    del(options: Record<string, string | number>) {
-    }
+
 
   // static async queryTest(sql:string){
   //   const data = await ArcOrm.ConnectionPool.query(sql);

@@ -64,7 +64,7 @@ declare interface OrmMethods<T> {
    * @param id 
    */
   delOne(id:string|number): Promise<any>;
-  del(options:Record<string, string|number>);
+  del(options:Record<string, string|number>):Promise<any>;
   /**
    * @method 保存
    * @param entity 

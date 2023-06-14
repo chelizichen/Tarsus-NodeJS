@@ -208,7 +208,9 @@ SQLTools.prototype.getSQL = function () {
 
 // 先 buildWhere 再 del
 SQLTools.prototype.getDelSQL = function () {
-
+    return `
+        delete from ${this.__table__} ${this.sql_base_where} ${this.sql_where}
+    `;
 }
 
 // 快捷方法 只del一个 根据主键
