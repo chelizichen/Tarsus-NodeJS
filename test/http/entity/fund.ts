@@ -26,6 +26,7 @@ class Fund{
   */
   @OneToMany(Tradehis,"fund_code")
   @JoinColumn("fund_code")
-  tradeList:Tradehis[]
+  tradeList: Tradehis[]
+  
 }
 export { Fund };

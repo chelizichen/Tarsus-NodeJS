@@ -6,7 +6,9 @@ import {Pagination} from "./Repo";
 
 
 let SQLTools = function (proto: {fields:Array<column_type>;__table__:string;__index__:string;__reference__:any[]}) {
-    const {fields, __table__, __index__,__reference__} = proto
+    // 继承
+    
+    const { fields, __table__, __index__, __reference__ } = proto
     this.__table__ = __table__
     this.__index__ = __index__
 
@@ -91,9 +93,13 @@ SQLTools.prototype.handleReference = function(__reference__){
             return pre
         }
         return pre;
-    },[])
-
-    this.referenceTables =  ',' + referenceTables.join(',') 
+    }, [])
+    
+    if (this.referenceTables && this.referenceTables.length) {
+      this.referenceTables = "," + referenceTables.join(",");
+    } else {
+        this.referenceTables = ""
+    }
     this.referenceColumns = flat
     console.log(flat);
 }
@@ -116,11 +122,15 @@ SQLTools.prototype.getList = function (args: Array<column_type>, tableName: stri
     if(referenceColumns){
         params += ","
     }
+    console.log(select);
+    console.log(params);
+    console.log(referenceColumns);
+    
     this.sql_select_from = select + params  + referenceColumns + from
     // this.sql_where += 
-    this.handleData = function(data){
+    // this.handleData = function(data){
         
-    }
+    // }
 }
 
 SQLTools.prototype.addColumn = function (args: Array<column_type>) {

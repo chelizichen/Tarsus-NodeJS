@@ -1,3 +1,4 @@
+import { isProxy } from "util/types";
 import { TarsusEntitys } from "./Entity";
 
 interface PaginationType{
@@ -84,10 +85,34 @@ declare interface OrmMethods<T> {
 
 type Repository<T> = OrmMethods<T> & T;
 
+/**
+ * @description 对ORM 做代理增添属性
+ */
+function TarsusOrmProxy(target) {
+  // 
+  const OrmMethods = target.__ormMethods__
+  const methods = Object.getOwnPropertyNames(
+    Object.getPrototypeOf(OrmMethods)
+  ).filter((name) => typeof OrmMethods[name] === "function"  && name!="constructor");
+  
+  for (let v of methods) {
+    target[v] = new Proxy(OrmMethods[v], {
+      'apply': function (target,thisArg,args) {
+        return Reflect.apply(target,thisArg,args)
+      }
+    });
+    delete OrmMethods[v]
+  }
+  return target
+}
+
 function Repo(Entity: new (...args: any[]) => any) {
   return function (value: any, context: ClassFieldDecoratorContext) {
     return function () {
-      return TarsusEntitys[Entity.prototype];
+      const targetEntity = TarsusOrmProxy(TarsusEntitys[Entity.prototype]);
+      console.log("__reference__",TarsusEntitys[Entity.prototype]);
+      
+      return targetEntity;
     };
   };
 }

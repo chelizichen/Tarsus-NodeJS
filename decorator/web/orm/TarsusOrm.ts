@@ -4,7 +4,7 @@ import { __column__ } from "./Entity";
 import {OrmMethods, Pagination} from './Repo';
 import { SQLTools } from "./Tools";
 import { TarsusEntitys } from "./Entity";
-const PrepareToQuery = Symbol.for('PrepareToQuery')
+// const PrepareToQuery = Symbol.for('PrepareToQuery')
 
 /**
  * @description Tarsus ORM 对象与实体映射类
@@ -26,9 +26,7 @@ class TarsusOrm<T = any> implements OrmMethods<T> {
       // 单纯走分页
       if (options instanceof Pagination) {
         const _sql_ = sql.pagination(options).getSQL();
-        console.log('_sql_',_sql_);
-
-        const data = await this[PrepareToQuery]<T[]>(_sql_);
+        const data = await this.PrepareToQuery<T[]>(_sql_);
         return data;
       } // 如果走有参数的
       else if (typeof options == "object" && options != null) {
@@ -37,12 +35,12 @@ class TarsusOrm<T = any> implements OrmMethods<T> {
         if (pagination instanceof Pagination) {
           console.log(sql);
           const _sql_ = sql.pagination(options).getSQL();
-          const data = await this[PrepareToQuery]<T[]>(_sql_);
+          const data = await this.PrepareToQuery<T[]>(_sql_);
           return data;
         } // 走无分页参数
         else {
           const _sql_ = sql.getSQL();
-          const data = await this[PrepareToQuery]<T[]>(_sql_);
+          const data = await this.PrepareToQuery<T[]>(_sql_);
           return data;
         }
       }
@@ -55,7 +53,7 @@ class TarsusOrm<T = any> implements OrmMethods<T> {
     const sql = new SQLTools(this.constructor.prototype)
     id = String(id)
     const _sql_ = sql.buildWhere({id}).getSQL();
-    const data = this[PrepareToQuery]<T>(_sql_);
+    const data = this.PrepareToQuery<T>(_sql_);
     if(data && data instanceof  Array && data.length){
       return data[0];
     }else {
@@ -64,7 +62,7 @@ class TarsusOrm<T = any> implements OrmMethods<T> {
   }
   async delOne(id: string | number): Promise<any> {
     const sql = new SQLTools(this.constructor.prototype);
-    const data = await this[PrepareToQuery](sql);
+    const data = await this.PrepareToQuery(sql);
     return data
   }
   save(entity: T): void {
@@ -140,11 +138,11 @@ class TarsusOrm<T = any> implements OrmMethods<T> {
     sql.buildWhere(options)
     const delSQL = sql.getDelSQL();
     console.log(delSQL);
-    // const data = await this[PrepareToQuery](delSQL)
+    // const data = await this.PrepareToQuery(delSQL)
     // console.log(data);
   }
   
-  async [PrepareToQuery]<T>(sql: string, args: any[] = []): Promise<T> {
+  private async  PrepareToQuery<T>(sql: string, args: any[] = []): Promise<T> {
     const vm = TarsusOrm;
     const that = this;
     return new Promise(async (resolve, reject) => {

@@ -10,7 +10,6 @@ class appController {
 
   @Get("say")
   public async say() {
-    console.log("app",this);
     const data = await this.AppService.hello()
     return ret.success(data)
   }

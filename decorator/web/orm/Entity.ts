@@ -3,6 +3,8 @@ import { TarsusOrm } from "./TarsusOrm";
 import { addReference, singal_add_property, SQLTools } from "./Tools";
 import _ from 'lodash';
 
+
+
 interface ColumnType {
     filed?: string;
     type?: string;
@@ -14,7 +16,7 @@ export interface column_type {
     filed_name: string;
     filed_length: string | number;
     filed_type: string;
-    table_name:string;
+    table_name: string;
 }
 
 interface __column__ {
@@ -42,43 +44,31 @@ const Entity = (table: string) => {
         proto: new () => any,
         context: ClassDecoratorContext
     ) {
-        // TarsusOrm.call(proto);
-
-        const table_name = table || proto.name;
-        proto.prototype = TarsusOrm.prototype;
-        proto.prototype.__table__ = table_name;
-        proto.prototype.__columns__ = {};
-        proto.prototype.__reference__ = [];
-
-        const inst = new proto()
-        // const tarsusOrm = new TarsusOrm();
-
-        TarsusEntitys[proto.prototype] = inst;
-        // 这一步中 我们需要对数据库的查询语句做进一步的修改操作
-        context.addInitializer(function () {
-            const vm = this;
-            nextTick(() => {
-                let reference = vm.prototype.__reference__
-                reference = reference.map(item => {
-                //     let sql = undefined;
-                //     console.log('item', item)
-                    let tools = new SQLTools(TarsusEntitys[item.referenceEntity]);
-                    console.log(tools.getSQL());
-                    
-                //     console.log('SQL',tools.sql_select_from);
-
-                //     //                     item.getReferenceRow = function (referenceValue:string){
-                //     //                         console.log('referenceValue',referenceValue);
-
-                //     // //                        tools
-                //     //                     }
-                //     //                    entity
-                })
-                // console.log(vm.prototype.fields)
-                // new SQLTools(vm.prototype)
-
-            })
-        });
+        if (!TarsusEntitys[proto.prototype]) {
+            proto.prototype.__ormMethods__ = new TarsusOrm();
+            // ORM 工具 
+            // const tarsusOrm = new TarsusOrm()
+            const table_name = table || proto.name;
+            proto.prototype.__table__ = table_name;
+            proto.prototype.__columns__ = {};
+            proto.prototype.__reference__ = [];
+ 
+            let inst = new proto();
+            // inst. = Object.assign(inst,tarsusOrm)
+            TarsusEntitys[proto.prototype] = inst;
+            // 这一步中 我们需要对数据库的查询语句做进一步的修改操作
+            context.addInitializer(function () {
+                const vm = this;
+                nextTick(() => {
+                    let reference = vm.prototype.__reference__;
+                    reference = reference.map((item) => {
+                        let tools = new SQLTools(
+                            TarsusEntitys[item.referenceEntity]
+                        );
+                    });
+                });
+            });
+        }
     };
 };
 
@@ -92,7 +82,7 @@ function Column(config: ColumnType) {
         const filed_name = config.filed || (context.name as string);
         const filed_length = config.length || "255";
         const filed_type = config.type || "varchar";
-        const _column_ = { column_name, filed_name, filed_length, filed_type,table_name:'' };
+        const _column_ = { column_name, filed_name, filed_length, filed_type, table_name: '' };
         context.addInitializer(function () {
             let vm = this.constructor.prototype
             _column_.table_name = vm.__table__
@@ -111,7 +101,7 @@ function PrimaryGenerateColumn(config: ColumnType) {
         const filed_name = config.filed || (context.name as string);
         const filed_length = config.length || "20";
         const filed_type = config.type || "bigint";
-        const _column_ = { column_name, filed_name, filed_length, filed_type,table_name:'' };
+        const _column_ = { column_name, filed_name, filed_length, filed_type, table_name: '' };
         context.addInitializer(function () {
             let vm = this.constructor.prototype
             _column_.table_name = vm.__table__
@@ -163,12 +153,17 @@ function OneToOne<T = TarsusConstructor, R = string>(targetEntity: T, referenceC
  */
 function OneToMany<T extends TarsusConstructor = any, R = string>(targetEntity: T, referenceColumn: R) {
     return function (value: any, context: ClassFieldDecoratorContext) {
-        const inst = new targetEntity()
-        TarsusEntitys[targetEntity.prototype] = inst
+        let inst;
+        if (!TarsusEntitys[targetEntity.prototype]) {
+            inst = new targetEntity();
+            TarsusEntitys[targetEntity.prototype] = inst;
+        }
+        inst = TarsusEntitys[targetEntity.prototype];
+
         const referenceTable = inst.__table__;
         const referenceEntity = inst;
-        console.log("proto", referenceEntity)
         context.addInitializer(function () {
+            debugger;
             let vm = this.constructor.prototype
             let ref = {
                 type: "[]",
@@ -217,13 +212,12 @@ function ManyToOne<T = TarsusConstructor, R = string>(targetEntity: T, reference
 function JoinColumn(joinColumn: string) {
     return function (value: any, context: ClassFieldDecoratorContext) {
         context.addInitializer(function () {
+            debugger;
             let vm = this.constructor.prototype
             let ref = {
                 joinColumn: joinColumn,
                 columnName: context.name
             }
-
-
             addReference(vm, "__reference__", "[]", ref)
         })
     }
