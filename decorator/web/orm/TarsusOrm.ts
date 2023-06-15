@@ -20,7 +20,7 @@ class TarsusOrm<T = any> implements OrmMethods<T> {
     pagination?: Pagination
   ): Promise<T[]>;
   async getList(options?: unknown, pagination?: unknown): Promise<T[]> {
-    // @ts-ignore
+    // 先拿对应的数据 再拿联结的数据
     const sql = new SQLTools(TarsusEntitys[this.constructor.prototype]);
     if (options) {
       // 单纯走分页

@@ -12,7 +12,7 @@ class AppService {
   async hello() {    
     const pagination = new Pagination(["1", "1000000"]);
     // getList
-    debugger;
+    // debugger;
 
     // console.log("this.Fund.getList", this.Fund.getList);
     const onlyPagination = await this.Fund.getList(pagination);

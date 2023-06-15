@@ -1,3 +1,6 @@
+/**
+ * @deprecated
+ */
 const Select = (sql:string) =>{
     return function(value:any,context:ClassMethodDecoratorContext){
         const copy_value = value;
