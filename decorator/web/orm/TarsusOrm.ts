@@ -112,19 +112,19 @@ class TarsusOrm<T = any> implements OrmMethods<T> {
             reject(err);
           }
           if (resu && resu.length) {
-            // const fields = EntityMap.get(targetEntity.name) as Map<string, string>;
-            const __columns__ = tgvm.__columns__;
+            // // const fields = EntityMap.get(targetEntity.name) as Map<string, string>;
+            // const __columns__ = tgvm.__columns__;
 
-            // mapper orm
-            const data = resu.map((item) => {
-              const __item__ = {};
-              for (let v in __columns__) {
-                let { column_name } = __columns__[v];
-                __item__[column_name] = item[v];
-              }
-              return __item__;
-            });
-            resolve(data);
+            // // mapper orm
+            // const data = resu.map((item) => {
+            //   const __item__ = {};
+            //   for (let v in __columns__) {
+            //     let { column_name } = __columns__[v];
+            //     __item__[column_name] = item[v];
+            //   }
+            //   return __item__;
+            // });
+            resolve(resu);
           } else {
             resolve(resu);
           }
