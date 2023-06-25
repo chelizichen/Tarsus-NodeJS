@@ -21,9 +21,6 @@ class Fund{
   @Column({ filed: "fund_type" })
   fundType: string;
 
-  /**
-  两个表使用哪个字段进行关联
-  */
   @OneToMany(Tradehis,"fund_code")
   @JoinColumn("fund_code")
   tradeList: Tradehis[]

@@ -110,8 +110,11 @@ function Repo(Entity: new (...args: any[]) => any) {
   return function (value: any, context: ClassFieldDecoratorContext) {
     return function () {
       const targetEntity = TarsusOrmProxy(TarsusEntitys[Entity.prototype]);
+<<<<<<< HEAD
       console.log("__reference__",TarsusEntitys[Entity.prototype].__proto__);
       
+=======
+>>>>>>> fc31a59e74dfd2cfe1e267691292ca5e55ad83a3
       return targetEntity;
     };
   };

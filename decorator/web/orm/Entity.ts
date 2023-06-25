@@ -39,6 +39,7 @@ const Entity = (table: string) => {
         proto: new () => any,
         context: ClassDecoratorContext
     ) {
+<<<<<<< HEAD
         if (!TarsusEntitys[proto.prototype]) {
             proto.prototype.__ormMethods__ = new TarsusOrm();
             // ORM 工具 
@@ -64,6 +65,23 @@ const Entity = (table: string) => {
                 });
             });
         }
+=======
+        proto.prototype.__ormMethods__ = new TarsusOrm();
+        // ORM 工具 
+        // const tarsusOrm = new TarsusOrm()
+        const table_name = table || proto.name;
+        proto.prototype.__table__ = table_name;
+        proto.prototype.__columns__ = {};
+        proto.prototype.__reference__ = [];
+        
+        let inst = new proto();
+        // inst. = Object.assign(inst,tarsusOrm)
+        TarsusEntitys[proto.prototype] = inst;
+        // 这一步中 我们需要对数据库的查询语句做进一步的修改操作
+        context.addInitializer(function () {
+            const vm = this;
+        });
+>>>>>>> fc31a59e74dfd2cfe1e267691292ca5e55ad83a3
     };
 };
 
@@ -145,6 +163,7 @@ function OneToOne<T = TarsusConstructor, R = string>(targetEntity: T, referenceC
     }
  */
 function OneToMany<T extends TarsusConstructor = any, R = string>(targetEntity: T, referenceColumn: R) {
+
     return function (value: any, context: ClassFieldDecoratorContext) {
         let inst;
         if (!TarsusEntitys[targetEntity.prototype]) {
@@ -155,8 +174,9 @@ function OneToMany<T extends TarsusConstructor = any, R = string>(targetEntity: 
 
         const referenceTable = inst.__table__;
         const referenceEntity = inst;
+        
         context.addInitializer(function () {
-            debugger;
+            // debugger;
             let vm = this.constructor.prototype
             let ref = {
                 type: "[]",
@@ -165,8 +185,9 @@ function OneToMany<T extends TarsusConstructor = any, R = string>(targetEntity: 
                 referenceEntity: referenceEntity,
                 columnName: context.name
             }
-            addReference(vm, "__reference__", "[]", ref)
+            addReference(vm, "__reference__", "[]", {[context.name]:ref})
         })
+
     }
 }
 
@@ -205,13 +226,15 @@ function ManyToOne<T = TarsusConstructor, R = string>(targetEntity: T, reference
 function JoinColumn(joinColumn: string) {
     return function (value: any, context: ClassFieldDecoratorContext) {
         context.addInitializer(function () {
-            debugger;
+            console.log("join");
+            
+            // debugger;
             let vm = this.constructor.prototype
             let ref = {
                 joinColumn: joinColumn,
                 columnName: context.name
             }
-            addReference(vm, "__reference__", "[]", ref)
+            addReference(vm, "__reference__", "[]", {[context.name]:ref})
         })
     }
 }
