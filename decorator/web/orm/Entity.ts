@@ -31,11 +31,6 @@ export const TarsusEntitys = {}
 export type TarsusConstructor<T = any> = new (...args: any[]) => T
 
 
-// abstract class OrmMethods {
-//     abstract getList(pagination: Pagination);
-// }
-
-
 /**
  * @param table 数据库中的表
  */
@@ -50,10 +45,10 @@ const Entity = (table: string) => {
             // const tarsusOrm = new TarsusOrm()
             const table_name = table || proto.name;
             proto.prototype.__table__ = table_name;
-            proto.prototype.__columns__ = {};
             proto.prototype.__reference__ = [];
  
             let inst = new proto();
+            
             // inst. = Object.assign(inst,tarsusOrm)
             TarsusEntitys[proto.prototype] = inst;
             // 这一步中 我们需要对数据库的查询语句做进一步的修改操作
@@ -86,7 +81,6 @@ function Column(config: ColumnType) {
         context.addInitializer(function () {
             let vm = this.constructor.prototype
             _column_.table_name = vm.__table__
-            vm.__columns__[filed_name] = _column_;
             singal_add_property(vm, "fields", "[]", _column_);
         });
     };
@@ -105,7 +99,6 @@ function PrimaryGenerateColumn(config: ColumnType) {
         context.addInitializer(function () {
             let vm = this.constructor.prototype
             _column_.table_name = vm.__table__
-            vm.__columns__[filed_name] = _column_;
             singal_add_property(vm, "fields", "[]", _column_);
             singal_add_property(vm, "__index__", "{}", _column_);
         });
