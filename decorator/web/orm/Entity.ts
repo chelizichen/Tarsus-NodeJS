@@ -39,33 +39,6 @@ const Entity = (table: string) => {
         proto: new () => any,
         context: ClassDecoratorContext
     ) {
-<<<<<<< HEAD
-        if (!TarsusEntitys[proto.prototype]) {
-            proto.prototype.__ormMethods__ = new TarsusOrm();
-            // ORM 工具 
-            // const tarsusOrm = new TarsusOrm()
-            const table_name = table || proto.name;
-            proto.prototype.__table__ = table_name;
-            proto.prototype.__reference__ = [];
- 
-            let inst = new proto();
-            
-            // inst. = Object.assign(inst,tarsusOrm)
-            TarsusEntitys[proto.prototype] = inst;
-            // 这一步中 我们需要对数据库的查询语句做进一步的修改操作
-            context.addInitializer(function () {
-                const vm = this;
-                nextTick(() => {
-                    let reference = vm.prototype.__reference__;
-                    reference = reference.map((item) => {
-                        let tools = new SQLTools(
-                            TarsusEntitys[item.referenceEntity]
-                        );
-                    });
-                });
-            });
-        }
-=======
         proto.prototype.__ormMethods__ = new TarsusOrm();
         // ORM 工具 
         // const tarsusOrm = new TarsusOrm()
@@ -81,7 +54,6 @@ const Entity = (table: string) => {
         context.addInitializer(function () {
             const vm = this;
         });
->>>>>>> fc31a59e74dfd2cfe1e267691292ca5e55ad83a3
     };
 };
 
