@@ -1,6 +1,9 @@
 import express, { Express } from "express";
 import { TarsusEvent } from "../../microservice/application/TarsusEvent";
 
+
+const { TarsusStream } = require("tarsus-cli");
+
 class TarsusOberserver {
 
   public static app: Express = undefined;
@@ -23,13 +26,8 @@ class TarsusOberserver {
     return TarsusOberserver.TarsusEvents;
   }
 
-  public static TarsusStream = undefined;
   public static getStream() {
-    if (!TarsusOberserver.TarsusStream) {
-      const { TarsusStream } = require("tarsus-cli");
-      TarsusOberserver.TarsusStream = TarsusStream;
-    }
-    return TarsusOberserver.TarsusStream;
+    return TarsusStream;
   }
 
   public static StreamMap: Record<string, { request: string, response: string }> = {}

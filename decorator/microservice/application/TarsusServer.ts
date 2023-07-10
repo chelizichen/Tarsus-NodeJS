@@ -53,6 +53,11 @@ class TarsusServer {
 
     let head = data.subarray(0, data.indexOf(proto[2]));
     
+    console.log(_request);
+    
+    console.log(TarsusOberserver.StreamMap);
+    console.log(head.toString());
+    
     let { request, response } = TarsusOberserver.StreamMap[head.toString()];
     
     if (request != _request.toString()) {
@@ -100,8 +105,10 @@ class TarsusServer {
 
         buf.writeUInt32BE(getId, 0);
         buf.write(toJson, 4);
+        console.log('写出的buf',buf.toString());
         this.socket.write(buf, function (err) {
           if (err) {
+            
             console.log("服务端写入错误", err);
           }
           console.log("服务端写入成功");

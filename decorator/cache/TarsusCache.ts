@@ -5,6 +5,7 @@ import { cwd } from "process";
 import { ServantUtil } from "../util/servant";
 import { TarsusProxyService } from "../web/service/TarsusProxyService";
 import { TarsusProxy } from "../web/proxy";
+import { TarsusLoadBalance } from "../gateway/LoadBalance";
 
 class TarsusCache {
   RedisTemplate: RedisClientType;
@@ -49,30 +50,13 @@ class TarsusCache {
         return groups;
       },{})
 
-
-      // data.forEach((item) => {
-      //   const toObj = ServantUtil.parse(item);
-      //   console.log(toObj.serverGroup," ", toObj.serverProject , " ", toObj.proto, " is load");
-      //   console.log(toObj);
-        
-      //   if(toObj.proto == "ms"){
-      //     let proxy_instance = new TarsusProxy(toObj.host, Number(toObj.port));
-      //     toObj.language == "java" ? (proxy_instance.java = true) : "";
-          
-      //     let isMicroServiceExist = TarsusProxyService.MicroServices.get(toObj.serverProject)
-
-      //     if(isMicroServiceExist){
-            
-      //     }else{
-      //       TarsusProxyService.MicroServices.set(toObj.serverProject, proxy_instance);
-      //     }
-      //   }
-
-      //   if(toObj.proto == "http"){
-      //     TarsusProxyService.HttpServices.set(toObj.serverProject, toObj);
-      //   }
-
-      // });
+      
+      console.log('MsGroup',_groupMs);
+      
+      for(let v in _groupMs){
+        const loadBalance = new TarsusLoadBalance(_groupMs[v],v);
+        TarsusLoadBalance.setServant(v,loadBalance)
+      }
     });
   }
   public async setServant(){

@@ -2,6 +2,7 @@ import { Socket } from "net";
 import { EventEmitter } from "node:events";
 import { call } from "../../microservice/utils/call";
 import os from 'os'
+import moment from 'moment'
 /**
  * @description 微服务接口代理层
  */
@@ -93,7 +94,7 @@ class TarsusProxy {
       request:"GetSystemLoadInfoReq",
       data:{
         host: os.hostname(),
-        time: Date.now()
+        time: moment(moment.now()).format("YYYY-MM-DD hh:mm:ss")
       },
     })
     return data
@@ -143,6 +144,10 @@ class TarsusProxy {
     }
     clearInterval(this.intervalConnect);
     this.intervalConnect = false;
+  }
+
+  public isConnection(){
+    return this.socket.connecting
   }
 }
 

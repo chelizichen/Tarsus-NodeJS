@@ -63,7 +63,7 @@ const TarsusMsApplication = (value, context) => {
       dirs.forEach((interFace) => {
         let interFace_path = path.resolve(full_path, interFace);
         const singalClazz = require(interFace_path);
-
+        
         for (let v in singalClazz) {
           TarsusStreamProxy.TarsusStream.define_struct(singalClazz[v]);
         }

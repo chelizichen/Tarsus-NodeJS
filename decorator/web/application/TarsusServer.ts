@@ -48,15 +48,30 @@ function loadMs(config) {
     let cache = new TarsusCache();
     // 得到 微服务
     await cache.getMsServer();
+    (function(){
+      const taro_path = config.servant.taro || "src/taro";
+      const full_path = path.resolve(cwd(), taro_path);
+      const dirs = readdirSync(full_path);
+      dirs.forEach((interFace) => {
+        let taro_path = path.resolve(full_path, interFace);
+        // 将会存储到 TarsusStream 的 Map 里
+        TarsusStreamProxy.SetStream(taro_path);
+      });
+    })();
 
-    const taro_path = config.servant.taro || "src/taro";
-    const full_path = path.resolve(cwd(), taro_path);
-    const dirs = readdirSync(full_path);
-    dirs.forEach((interFace) => {
-      let taro_path = path.resolve(full_path, interFace);
-      // 将会存储到 TarsusStream 的 Map 里
-      TarsusStreamProxy.SetStream(taro_path);
-    });
+    (function(){
+      const struct_path = config.servant.struct || "src/struct";
+      const full_path = path.resolve(cwd(), struct_path);
+      const dirs = readdirSync(full_path);
+      dirs.forEach((interFace) => {
+        let interFace_path = path.resolve(full_path, interFace);
+        const singalClazz = require(interFace_path);
+        
+        for (let v in singalClazz) {
+          TarsusStreamProxy.TarsusStream.define_struct(singalClazz[v]);
+        }
+      });
+    })()
   });
 }
 

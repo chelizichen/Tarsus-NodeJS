@@ -83,22 +83,28 @@ class TarsusLoadBalance {
             let arrs:any[] = await Promise.all(this.hostList.map(async item => {
                 return new Promise((resolve)=>{
                     const { service, weight } = item;
-                    // 拿到负载信息
-                    let args = service.getLoadInfoArgs()
-                    let curr = String(service.uid);
-                    service.TarsusEvents.on(curr, function (ret) {
-                        const LB = JSON.parse(ret);
-                        let data = LB.data;
-                        item.currWeight = Number((data / Number(weight)).toFixed(2))
-                        resolve(item)
-                    });
-                    service.write(args);
+                    console.log("即将发送负载请求");
+                    console.log(service.isConnection());
+                    
+                    // if(service.isConnection()){
+                        // 拿到负载信息
+                        let args = service.getLoadInfoArgs()
+                        let curr = String(service.uid);
+                        service.TarsusEvents.on(curr, function (ret) {
+                            const LB = JSON.parse(ret);
+                            let data = LB.data;
+                            item.currWeight = Number((data / Number(weight)).toFixed(2))
+                            resolve(item)
+                        });
+                        service.write(args);
+                    // }
+                    // resolve(item)
                 })
-               
+    
             }))
             arrs = arrs.sort((a, b) => a.weight - b.weight);
             this.hostList = arrs
-        }, 1000)
+        }, 10000)
     }
 
     /**
