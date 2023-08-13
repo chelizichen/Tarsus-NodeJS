@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "strictPropertyInitialization": false,
+        "esModuleInterop":true,
+        "downlevelIteration":true,
+        "lib": ["ES6","ESNext"]
+    },
+    "include": ["src"],
+    "exclude": ["node_modules"]
+}

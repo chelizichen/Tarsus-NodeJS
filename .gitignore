@@ -1,3 +1,6 @@
 node_modules
 
 dist
+
+decorator/main_control/__test_web__/node_modules
+
