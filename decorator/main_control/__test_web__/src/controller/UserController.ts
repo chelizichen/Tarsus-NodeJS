@@ -1,10 +1,10 @@
 import {Controller, Get} from "../../../decorator/http/router";
-
+import Ret from '../utils/ret'
 @Controller("/user")
 class UserController {
 
     @Get("/list")
-    async getUserList(req, res) {
+    getUserList(req, res) {
         return Ret.success("hello world")
     }
 }

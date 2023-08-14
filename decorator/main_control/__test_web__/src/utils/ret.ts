@@ -7,3 +7,5 @@ class Ret{
         }
     }
 }
+
+export default Ret

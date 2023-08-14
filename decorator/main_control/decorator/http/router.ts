@@ -28,7 +28,9 @@ function methods_factory(type: METHODS) {
                 func = func.bind(this);
 
                 router[type](current_route, async (req, res) => {
+                    console.log("执行前")
                     const data = await func(req);
+                    console.log("执行后")
                     if (!res.destroyed) {
                         res.json(data);
                     }
@@ -46,7 +48,6 @@ const Remote = methods_factory(METHODS.REMOTE)
 const Controller = (interFace: string) => {
     return function (controller: new () => any, context: ClassDecoratorContext) {
         controller.prototype.interFace = interFace;
-        new controller()
     };
 };
 

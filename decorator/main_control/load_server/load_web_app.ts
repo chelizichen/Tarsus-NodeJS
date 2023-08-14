@@ -99,7 +99,14 @@ function LoadGlobalPipe(...args: any[]) {
 }
 
 function LoadController(controllers: any) {
-    load_web_app.router = controllers;
+    if(controllers.length){
+        for (let i = 0; i < controllers.length; i++) {
+            // console.log(controllers)
+            let controller = controllers[i]
+            const controller_inst = new controller();
+            console.log(controller_inst.interFace,"is loading success")
+        }
+    }
 }
 
 function LoadInit(callBack?: (app: express.Express) => void) {
