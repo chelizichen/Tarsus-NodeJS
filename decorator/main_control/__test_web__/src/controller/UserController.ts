@@ -4,7 +4,7 @@ import Ret from '../utils/ret'
 class UserController {
 
     @Get("/list")
-    getUserList(req, res) {
+    getUserList(req) {
         return Ret.success("hello world")
     }
 }

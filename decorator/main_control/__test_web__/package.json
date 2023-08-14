@@ -12,6 +12,7 @@
     "moment": "^2.29.4",
     "mysql": "^2.18.1",
     "redis": "^4.3.1",
+    "require-dir": "^1.2.0",
     "tarsus-cli": "^1.2.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "5.0.2",

@@ -9,7 +9,8 @@ const cwd = process.cwd;
 export enum config_enum {
     project = "project",
     database = "database",
-    servant = "servant"
+    servant = "servant",
+    taro="taro"
 }
 
 type void_func = (...args: any[]) => void;
