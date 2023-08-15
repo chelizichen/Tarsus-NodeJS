@@ -1,8 +1,8 @@
-import { EventEmitter } from 'node:events';
+import {EventEmitter} from 'node:events';
 
 const ApplicationEvents = new EventEmitter();
 
-enum Application{
+enum Application {
     LOAD_INTERFACE = "loadinterface",
     LOAD_MICROSERVICE = "loadmicroservice",
     GET_INTERFACE = "getinterface",
@@ -11,17 +11,18 @@ enum Application{
     LOAD_STRUCT = "loadstruct",
 }
 
-function loadMicroService(){
+function loadMicroService() {
     ApplicationEvents.emit(Application.LOAD_MICROSERVICE)
 }
 
-function loadInterFace(args?:any[]){
-    if(args){
-        ApplicationEvents.emit(Application.LOAD_INTERFACE,args)
-    }else{
+function loadInterFace(args?: any[]) {
+    if (args) {
+        ApplicationEvents.emit(Application.LOAD_INTERFACE, args)
+    } else {
         ApplicationEvents.emit(Application.REQUIRE_INTERFACE)
     }
 }
+
 export {
     Application,
     loadMicroService,
