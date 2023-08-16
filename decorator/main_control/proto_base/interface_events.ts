@@ -24,6 +24,7 @@ class Interface_Events {
      * @param CallBack -> Function
      */
     register(Head: string, CallBack: (...args: any[]) => Promise<any>) {
+        console.log("注册接口",Head)
         this.events[Head] = CallBack;
     }
 

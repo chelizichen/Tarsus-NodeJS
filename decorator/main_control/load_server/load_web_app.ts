@@ -42,7 +42,7 @@ const load_web_app: loadWebApp = {
         load_web_app.app = express();
         const app = load_web_app.app;
         app.use(express.json())
-
+        app.set('view engine', 'html');
         load_web_app.events.on(Emits.START,function (){
             console.log("before start",load_web_app.http_config)
             load_web_app.app.listen(load_web_app.http_config.port, function () {

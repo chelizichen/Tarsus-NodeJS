@@ -1,4 +1,4 @@
-const { TarsusStream } = require("tarsus-cli");
+const { TarsusStream } = require("tarsus-cli/taro");
 
 const stream_proxy = {
     TarsusStream,

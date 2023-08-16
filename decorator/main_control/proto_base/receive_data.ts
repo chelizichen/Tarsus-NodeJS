@@ -1,5 +1,4 @@
 import {Server, Socket, createServer} from "net";
-import Interface_Events from "./interface_events";
 import load_ms_app from "../load_server/load_ms_app";
 import {proto} from "../decorator/http/call";
 import stream_proxy from "./taro_proxy";
@@ -9,20 +8,14 @@ type ConnOpt = { port: number; host: string };
 class Receive_Data {
     public Net!: Server;
     public socket!: Socket;
-    public static Interface_Events = load_ms_app.interface_events;
 
     constructor(opts: ConnOpt) {
         const {port, host} = opts;
         this.createServer({port, host});
-        Receive_Data.Interface_Events = new Interface_Events();
         console.log("server start at " + host + ":" + port);
     }
 
-    registerEvents(events: Map<string, any>) {
-        events.forEach((func, key) => {
-            Receive_Data.Interface_Events.register(key, func);
-        });
-    }
+
 
     createServer({port, host}: ConnOpt) {
         // 绑定this
@@ -89,7 +82,7 @@ class Receive_Data {
 
         Promise.race([
             this.timeout(timeout),
-            Receive_Data.Interface_Events.emit(head, ...requestParams),
+            load_ms_app.interface_events.emit(head, ...requestParams),
         ])
             .then((res: any) => {
                 console.log(res);

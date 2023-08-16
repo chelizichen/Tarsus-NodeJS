@@ -1,6 +1,7 @@
 import load_ms_app from "../../load_server/load_ms_app";
 import Interface_Events from "../../proto_base/interface_events";
 import stream_proxy from "../../proto_base/taro_proxy";
+import {nextTick} from "process";
 
 const interFaceMaps = new Map();
 const TarsusEvents = load_ms_app.interface_events
@@ -22,12 +23,15 @@ const TarsusInterFace = (interFace: string) => {
 function Stream(request:string,response:string) {
     return function (value:(...args:any[])=>any,context:ClassMethodDecoratorContext) {
         context.addInitializer(function () {
-            // @ts-ignore
-            const getHead = `[#1]${this.interFace}[#2]${context.name}`;
-            stream_proxy.StreamMap[getHead] = {
-                request,
-                response,
-            };
+            nextTick(()=>{
+                // 注册 interFace ， request ，response
+                // @ts-ignore
+                const getHead = `[#1]${this.interFace}[#2]${context.name}`;
+                stream_proxy.StreamMap[getHead] = {
+                    request,
+                    response,
+                };
+            })
         })
     }
 }
