@@ -4,6 +4,12 @@ import {parseToObj, ServantUtil} from "../../util/servant";
 
 import load_data from "../load_data/load_data";
 import {EventEmitter} from "events";
+import {Load_Balance} from "../proto_base/load_balance";
+import load_proto from "../proto_base";
+import path from "path";
+import {cwd} from "process";
+import {readdirSync} from "fs";
+import stream_proxy from "../proto_base/taro_proxy";
 
 type void_func = (...args: any[]) => void;
 
@@ -27,7 +33,37 @@ type loadWebApp = {
 
 enum Emits {
     INIT = "init",
-    START = "start"
+    START = "start",
+    TARO = "taro",
+    STRUCT = "struct"
+}
+
+export function LoadTaro(url?: string) {
+    load_web_app.events.on(Emits.TARO, function () {
+        const taro_path = url || "src/taro";
+        const full_path = path.resolve(cwd(), taro_path);
+        const dirs = readdirSync(full_path);
+        dirs.forEach((interFace) => {
+            let taro_path = path.resolve(full_path, interFace);
+            // 将会存储到 TarsusStream 的 Map 里
+            stream_proxy.SetStream(taro_path);
+        });
+    })
+}
+
+export function LoadStruct(url?: string) {
+    load_web_app.events.on(Emits.STRUCT, function () {
+        const struct_path = url || "src/struct";
+        const full_path = path.resolve(cwd(), struct_path);
+        const dirs = readdirSync(full_path);
+        dirs.forEach((interFace) => {
+            let interFace_path = path.resolve(full_path, interFace);
+            const singalClazz = require(interFace_path);
+            for (let v in singalClazz) {
+                stream_proxy.TarsusStream.define_struct(singalClazz[v]);
+            }
+        });
+    })
 }
 
 
@@ -59,6 +95,7 @@ const load_web_app: loadWebApp = {
             // we can load microservice when we start a web or gateway application
             if (config.load_ms) {
                 const servant = get_config(config_enum.servant);
+                console.log("***************开启网关*******************")
                 load_web_app.load_servant(servant)
             }
 
@@ -72,6 +109,9 @@ const load_web_app: loadWebApp = {
 
             load_web_app.events.emit(Emits.START)
 
+            load_web_app.events.emit(Emits.TARO)
+            load_web_app.events.emit(Emits.STRUCT)
+
         })
     },
     load_servant: function (servant: string[]) {
@@ -79,13 +119,21 @@ const load_web_app: loadWebApp = {
         const get_servant_group = {}
         for (let i = 0; i < servant_array.length; i++) {
             let item = servant_array[i]
-            let server_name = item.serverName
+            let server_name = item.serverProject
             if(!get_servant_group[server_name]){
                 get_servant_group[server_name] = []
             }
             get_servant_group[server_name].push(item)
         }
-        console.log(get_servant_group)
+
+        for (let i in get_servant_group){
+            const servants = get_servant_group[i]
+            const load_balance = new Load_Balance(servants,i);
+            load_proto.set_servant(i,load_balance)
+        }
+        console.log('parse_server',get_servant_group)
+        console.log("***************开启网关*******************")
+
     },
 
     load_global_pipe: function () {

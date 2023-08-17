@@ -1,0 +1,49 @@
+// TaroUser  Created By leemulus 2023.3.21
+// 用来测试协议接口
+// 目前已知 BUG ，在反序列化参数时 在遇到对象连在一起时会出现序列化错误
+
+struct CommParams  {
+
+    Basic               :   {
+        1   token       :   string;
+    };
+
+    User                :   {
+        1   id          :   string;
+        2   name        :   string;
+        3   age         :   string;
+        4   fullName    :   string;
+        5   address     :   string;
+    };
+
+    GetUserByIdReq      :   {
+        1   id          :   int;
+        2   basic       :   Basic;
+    };
+
+    GetUserByIdRes      :   {
+        1   code        :   int;
+        2   data        :   User;
+        3   message     :   string;
+    };
+
+    GetUserListReq      :   {
+        1   basic       :   Basic;
+        2   ids         :   List<int>;
+    };
+
+    GetUserListRes      :   {
+        1   code        :   int;
+        2   data        :   List<User>;
+        3   message     :   string;
+    };
+
+};
+
+
+// 测试接口
+
+interface TaroInterFace  {
+    int getUserById(Request : GetUserByIdReq, Response : GetUserByIdRes);
+    int getUserList(Request : GetUserListReq, Response : GetUserListRes);
+};

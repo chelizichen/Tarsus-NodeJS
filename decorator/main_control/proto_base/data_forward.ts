@@ -1,5 +1,5 @@
 import { Socket } from "net";
-import { EventEmitter } from "node:events";
+import { EventEmitter } from "events";
 import os from 'os'
 import moment from 'moment'
 import {call} from "../decorator/http/call";

@@ -1,6 +1,6 @@
 import {ServantUtil} from "../../util";
 import {Load_Balance} from "./load_balance";
-import {Response} from "express";
+import {Response, Request} from "express";
 
 import load_data from "../load_data/load_data";
 
@@ -15,15 +15,13 @@ let load_proto = {
     get_servant(key: string) {
         return load_proto.servant_maps.get(key)
     },
-    get_servant_to_trans(key: string, Request: any, Response: Response) {
-        const load_balance = load_proto.get_servant(key)
-        load_balance.ProxySendRequest(Request, Response)
-    },
-    transmit(req,res){
-        let { body, query } = req;
-        let merge = Object.assign({},body,query)
-        const { proxy } = body;
-        load_proto.get_servant_to_trans(proxy,merge,res)
+    transmit(req: Request, res: Response) {
+        let {body, query} = req;
+        let merge = Object.assign({}, body, query)
+        const {proxy} = merge;
+        const load_balance = load_proto.get_servant(proxy)
+        debugger;
+        load_balance.ProxySendRequest(merge, res)
     }
 
 }
@@ -53,3 +51,5 @@ async function getMsServer() {
         load_proto.set_servant(v, loadBalance)
     }
 }
+
+export default load_proto

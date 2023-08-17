@@ -74,6 +74,7 @@ let load_ms_app = {
         load_ms_app.events.on(Emits.INIT, function () {
             load_ms_app.events.emit(Emits.INTERFACE)
             load_ms_app.events.emit(Emits.TARO)
+            load_ms_app.events.emit(Emits.STRUCT)
         })
 
         // 执行START 后，会执行INIT方法

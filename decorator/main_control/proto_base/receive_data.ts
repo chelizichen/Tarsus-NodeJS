@@ -16,7 +16,6 @@ class Receive_Data {
     }
 
 
-
     createServer({port, host}: ConnOpt) {
         // 绑定this
         let bind_recieve = this.receive.bind(this);

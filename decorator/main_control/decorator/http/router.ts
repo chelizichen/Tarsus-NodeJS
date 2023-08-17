@@ -3,7 +3,7 @@ import load_web_app from "../../load_server/load_web_app";
 export enum METHODS {
     GET = "get",
     POST = "post",
-    REMOTE = "all",
+    INVOKE = "all",
 }
 
 function create_url(interFace: string, method: string): string {
@@ -28,13 +28,13 @@ function methods_factory(type: METHODS) {
                 func = func.bind(this);
 
                 router[type](current_route, async (req, res) => {
-                    console.log("执行前")
-                    const data = await func(req);
-                    console.log("执行后")
+                    const data = await func(req, type == METHODS.INVOKE ? res : undefined);
                     if (!res.destroyed) {
                         res.json(data);
                     }
                 });
+
+
             });
         };
     };
@@ -43,7 +43,7 @@ function methods_factory(type: METHODS) {
 const Get = methods_factory(METHODS.GET)
 const Post = methods_factory(METHODS.POST)
 
-const Remote = methods_factory(METHODS.REMOTE)
+const INVOKE = methods_factory(METHODS.INVOKE)
 
 const Controller = (interFace: string) => {
     return function (controller: new () => any, context: ClassDecoratorContext) {
@@ -52,4 +52,4 @@ const Controller = (interFace: string) => {
 };
 
 
-export {Get, Post, Remote, Controller};
+export {Get, Post, INVOKE, Controller};

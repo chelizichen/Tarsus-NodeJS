@@ -1,0 +1,25 @@
+/**
+* @description 系统参数
+* 心跳检测 ｜ 负载均衡
+*/
+
+struct TaroSystemStruct  {
+
+    GetSystemLoadInfoReq    :   {
+        1   host        :   string; // 主机
+        2   time        :   string; // 发送时间
+    };
+
+    GetSystemLoadInfoRes    :   {
+        1   isAlive     :   int;    // 心跳检测
+        2   data        :   string; // 负载率
+    };
+
+};
+
+
+// 测试接口
+
+interface SystemInterFace  {
+    int getLoadInfo(Request : GetSystemLoadInfoReq, Response : GetSystemLoadInfoRes);
+};

@@ -1,6 +1,6 @@
 
 const call_config = {
-    stream:require('tarsus-cli/taro'),
+    stream:require('tarsus-cli/taro').TarsusStream,
     parse:function (...args:any[]){
         return call_config.stream.parse(...args)
     },

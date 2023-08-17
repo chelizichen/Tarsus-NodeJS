@@ -13,6 +13,7 @@ function T_LB_Request(url) {
     }
 }
 
+type Data_ForWard_Group = Array<parseToObj & { currWeight: number } & { service: Data_Forward }>
 
 /**
  * @TarsusLoadBalance 负载均衡 BaseClass
@@ -24,7 +25,7 @@ function T_LB_Request(url) {
  */
 class Load_Balance {
 
-    public hostList: Array<parseToObj & { currWeight: number } & { service: Data_Forward }> = [];
+    public hostList:Data_ForWard_Group  = [];
     public totalWeight = 0;
     public servantName = ""
     /**
@@ -34,7 +35,7 @@ class Load_Balance {
         return os.loadavg()[0]
     }
     
-    constructor(hostList: Array<parseToObj & { currWeight: 0 } & { service: Data_Forward }> = [], servantName: string) {
+    constructor(hostList: Data_ForWard_Group = [], servantName: string) {
         this.servantName = servantName;
         // 给定权重列表
         this.hostList = hostList.map(item => {
@@ -48,7 +49,7 @@ class Load_Balance {
         this.totalWeight = hostList.reduce((sum, server) => sum + Number(server.weight), 0);
 
         // 开启分钟轮询
-        this.TimesSending()
+        // this.TimesSending()
     }
 
 
