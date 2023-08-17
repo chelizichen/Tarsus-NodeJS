@@ -22,12 +22,12 @@ type loadWebApp = {
     before_listen: any;
     global_pipe: any[];
     router: express.Router;
-    http_config:parseToObj;
+    http_config: parseToObj;
 }
 
-enum Emits{
-    INIT="init",
-    START="start"
+enum Emits {
+    INIT = "init",
+    START = "start"
 }
 
 
@@ -37,19 +37,19 @@ const load_web_app: loadWebApp = {
     global_pipe: void "express global pipe",
     before_listen: void "use callback function before listen",
     events: new EventEmitter(),
-    http_config:void "http config for web application",
+    http_config: void "http config for web application",
     init: function () {
         load_web_app.app = express();
         const app = load_web_app.app;
         app.use(express.json())
         app.set('view engine', 'html');
-        load_web_app.events.on(Emits.START,function (){
-            console.log("before start",load_web_app.http_config)
+        load_web_app.events.on(Emits.START, function () {
+            console.log("before start", load_web_app.http_config)
             load_web_app.app.listen(load_web_app.http_config.port, function () {
                 console.log(`server is started at localhost:${load_web_app.http_config.port}`)
             })
         })
-        load_web_app.events.on(Emits.INIT,async function (config: initConfig){
+        load_web_app.events.on(Emits.INIT, async function (config: initConfig) {
             load_config.init();
             const get_config = load_config.get_config;
             await load_data.init(get_config(config_enum.database))
@@ -74,13 +74,23 @@ const load_web_app: loadWebApp = {
 
         })
     },
-    load_servant: function () {
-
+    load_servant: function (servant: string[]) {
+        const servant_array: parseToObj[] = servant.map(item => ServantUtil.parse(item));
+        const get_servant_group = {}
+        for (let i = 0; i < servant_array.length; i++) {
+            let item = servant_array[i]
+            let server_name = item.serverName
+            if(!get_servant_group[server_name]){
+                get_servant_group[server_name] = []
+            }
+            get_servant_group[server_name].push(item)
+        }
+        console.log(get_servant_group)
     },
 
     load_global_pipe: function () {
         // load global pipe
-        if(!load_web_app.global_pipe){
+        if (!load_web_app.global_pipe) {
             return
         }
         load_web_app.global_pipe.forEach((Pipe) => {
@@ -99,30 +109,29 @@ function LoadGlobalPipe(...args: any[]) {
 }
 
 function LoadController(controllers: any) {
-    if(controllers.length){
+    if (controllers.length) {
         for (let i = 0; i < controllers.length; i++) {
             // console.log(controllers)
             let controller = controllers[i]
             const controller_inst = new controller();
-            console.log(controller_inst.interFace,"is loading success")
+            console.log(controller_inst.interFace, "is loading success")
         }
     }
 }
 
 function LoadInit(callBack?: (app: express.Express) => void) {
     // set init before listening port
-    function voidCallBack(){
+    function voidCallBack() { }
 
-    }
     load_web_app.before_listen = callBack || voidCallBack;
 }
 
 function LoadServer(config: initConfig) {
-    load_web_app.events.emit(Emits.INIT,config);
+    load_web_app.events.emit(Emits.INIT, config);
 }
 
 
 export default load_web_app
 export {
-    LoadServer,LoadController,LoadInit,LoadGlobalPipe
+    LoadServer, LoadController, LoadInit, LoadGlobalPipe
 }
