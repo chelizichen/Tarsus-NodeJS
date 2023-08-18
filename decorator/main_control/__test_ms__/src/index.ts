@@ -3,14 +3,13 @@ import {LoadInterface, LoadServer, LoadStruct, LoadTaro} from "../../load_server
 import TaroInterFaceImpl from "./interface/TaroInterFace";
 
 @TarsusMsApplication
-class ArcServerTest {
+class MicroService {
     static main() {
         LoadInterface([TaroInterFaceImpl]);
         LoadTaro()
         LoadStruct()
         LoadServer();
-
     }
 }
 
-ArcServerTest.main()
+MicroService.main()

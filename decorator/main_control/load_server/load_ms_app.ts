@@ -41,6 +41,7 @@ export function LoadTaro(url?: string) {
             let taro_path = path.resolve(full_path, interFace);
             // 将会存储到 TarsusStream 的 Map 里
             stream_proxy.SetStream(taro_path);
+            console.log("taro_path - ",taro_path,' - is load success')
         });
     })
 }
@@ -52,6 +53,7 @@ export function LoadStruct(url?: string) {
         const dirs = readdirSync(full_path);
         dirs.forEach((interFace) => {
             let interFace_path = path.resolve(full_path, interFace);
+            console.log("struct_path - ",interFace_path,'- is load success')
             const singalClazz = require(interFace_path);
             for (let v in singalClazz) {
                 stream_proxy.TarsusStream.define_struct(singalClazz[v]);

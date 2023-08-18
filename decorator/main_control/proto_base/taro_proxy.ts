@@ -1,7 +1,8 @@
-const { TarsusStream } = require("tarsus-cli/taro");
+const { TarsusStream,TarsusReadStream } = require("tarsus-cli/taro");
 
 const stream_proxy = {
     TarsusStream,
+    TarsusReadStream,
     SetStream(url:string) {
         new TarsusStream(url);
     },

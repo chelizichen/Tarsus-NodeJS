@@ -27,14 +27,19 @@ function methods_factory(type: METHODS) {
 
                 func = func.bind(this);
 
-                router[type](current_route, async (req, res) => {
-                    const data = await func(req, type == METHODS.INVOKE ? res : undefined);
-                    if (!res.destroyed) {
-                        res.json(data);
-                    }
-                });
-
-
+                if(type === METHODS.INVOKE){
+                    router[type](current_route, async (req, res) => {
+                        func(req,res);
+                    });
+                }
+                else {
+                    router[type](current_route, async (req, res) => {
+                        const data = await func(req);
+                        if (!res.destroyed) {
+                            res.json(data);
+                        }
+                    });
+                }
             });
         };
     };
