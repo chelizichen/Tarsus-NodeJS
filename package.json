@@ -1,10 +1,7 @@
 {
   "name": "tarsus",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "description": "new ts-decorator for express server",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/types/index.d.ts",
   "repository": {
     "url": "https://github.com/chelizichen/tarsus",
     "type": "git"
@@ -16,30 +13,26 @@
     "ioc"
   ],
   "exports": {
-    ".": {
-      "require": "./dist/index.js",
-      "import": "./dist/index.mjs",
-      "types": "./dist/types/index.d.ts"
+
+    "./httpservice": {
+      "require": "./dist/httpservice.js",
+      "import": "./dist/httpservice.mjs",
+      "types": "./dist/types/httpservice.d.ts"
     },
-    "./web": {
-      "require": "./dist/web.js",
-      "import": "./dist/web.mjs",
-      "types": "./dist/types/web.d.ts"
+    "./microservice": {
+      "require": "./dist/microservice.js",
+      "import": "./dist/microservice.mjs",
+      "types": "./dist/types/microservice.d.ts"
     },
-    "./ms": {
-      "require": "./dist/ms.js",
-      "import": "./dist/ms.mjs",
-      "types": "./dist/types/ms.d.ts"
+    "./ioc": {
+      "require": "./dist/ioc.js",
+      "import": "./dist/ioc.mjs",
+      "types": "./dist/types/ioc.d.ts"
     },
     "./util": {
       "require": "./dist/util.js",
       "import": "./dist/util.mjs",
       "types": "./dist/types/util.d.ts"
-    },
-    "./cache": {
-      "require": "./dist/cache.js",
-      "import": "./dist/cache.mjs",
-      "types": "./dist/types/cache.d.ts"
     }
   },
   "scripts": {
@@ -47,9 +40,9 @@
     "http": "ts-node-dev test/http/index.ts",
     "server": "ts-node-dev test/microservice/index.ts",
     "build": " tsc --project tsconfig.build.json --format cjs,esm",
-    "pkg": "tsc --project tsconfig.pkg.json && tsup decorator --format cjs,esm",
-    "test:proxy": "ts-node-dev decorator/web/proxy/TarsusRequest.ts",
-    "servant": "ts-node-dev decorator/util/servant.ts",
+    "pkg": "tsc --project tsconfig.pkg.json && tsup lib --format cjs,esm",
+    "test:proxy": "ts-node-dev lib/web/proxy/TarsusRequest.ts",
+    "servant": "ts-node-dev lib/util/servant.ts",
     "orm": "ts-node-dev test/http/entity/goods.entity.ts"
   },
   "author": "",
@@ -63,8 +56,8 @@
     "mysql": "^2.18.1",
     "redis": "^4.3.1",
     "tarsus-cli": "^1.2.94",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "5.0.2",
+    "ts-node-dev": "^2.0.0-0",
+    "typescript": "^5.2.1-rc",
     "yaml": "^2.2.1"
   },
   "devDependencies": {

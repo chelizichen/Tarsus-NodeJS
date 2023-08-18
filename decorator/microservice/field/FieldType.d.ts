@@ -1,1 +1,0 @@
-export type requiedField = string | number;

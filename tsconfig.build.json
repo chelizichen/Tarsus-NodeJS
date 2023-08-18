@@ -12,6 +12,6 @@
     "./test",
   ],
   "exclude": [
-    "./decorator"
+    "./lib"
   ]
 }

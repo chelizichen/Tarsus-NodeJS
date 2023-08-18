@@ -2,7 +2,7 @@ node_modules
 
 dist
 
-decorator/main_control/__test_web__/node_modules
+test/__test_web__/node_modules
 
-decorator/main_control/__test_ms__/node_modules
+test/__test_ms__/node_modules
 

@@ -10,7 +10,7 @@
     "target": "ES2015"
   },
   "include": [
-    "./decorator/*",
+    "./lib/*"
   ],
   "exclude": [
     "./test"
