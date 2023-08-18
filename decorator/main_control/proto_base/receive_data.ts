@@ -42,7 +42,7 @@ class Receive_Data {
 
         let _request = this.unpkgHead(4, data, true)
 
-
+        debugger
         let head = data.subarray(0, data.indexOf(proto[2]));
 
         let {request, response} = stream_proxy.StreamMap[head.toString()];

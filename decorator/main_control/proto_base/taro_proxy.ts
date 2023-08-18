@@ -3,11 +3,11 @@ const { TarsusStream } = require("tarsus-cli/taro");
 const stream_proxy = {
     TarsusStream,
     SetStream(url:string) {
-        new stream_proxy.TarsusStream(url);
+        new TarsusStream(url);
     },
 
     Parse(...args:any[]) {
-        return stream_proxy.TarsusStream.parse(...args);
+        return TarsusStream.parse(...args);
     },
     StreamMap:{}
 }
