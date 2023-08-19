@@ -95,8 +95,8 @@ class Load_Balance {
             try {
                 const str = call(Request);
                 let curr = String(ServantInst.uid);
-                ServantInst.currEvents.on(curr, function (args) {
-                    const _to_json_ = JSON.parse(args);
+                ServantInst.currEvents.on(curr, function (data) {
+                    const _to_json_ = JSON.parse(data);
                     if (!Response.destroyed) {
                         Response.json(_to_json_);
                     }
