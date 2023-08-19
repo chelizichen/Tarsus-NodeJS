@@ -1,6 +1,6 @@
 {
   "name": "tarsus",
-  "version": "1.4.0",
+  "version": "1.4.2",
   "description": "new ts-decorator for express server",
   "repository": {
     "url": "https://github.com/chelizichen/tarsus",
@@ -14,25 +14,25 @@
   ],
   "exports": {
 
-    "./httpservice": {
-      "require": "./dist/httpservice.js",
-      "import": "./dist/httpservice.mjs",
-      "types": "./dist/types/httpservice.d.ts"
+    "./core/httpservice": {
+      "require": "./core/httpservice.js",
+      "import": "./core/httpservice.mjs",
+      "types": "./core/types/httpservice.d.ts"
     },
-    "./microservice": {
-      "require": "./dist/microservice.js",
-      "import": "./dist/microservice.mjs",
-      "types": "./dist/types/microservice.d.ts"
+    "./core/microservice": {
+      "require": "./core/microservice.js",
+      "import": "./core/microservice.mjs",
+      "types": "./core/types/microservice.d.ts"
     },
-    "./ioc": {
-      "require": "./dist/ioc.js",
-      "import": "./dist/ioc.mjs",
-      "types": "./dist/types/ioc.d.ts"
+    "./core/ioc": {
+      "require": "./core/ioc.js",
+      "import": "./core/ioc.mjs",
+      "types": "./core/types/ioc.d.ts"
     },
-    "./util": {
-      "require": "./dist/util.js",
-      "import": "./dist/util.mjs",
-      "types": "./dist/types/util.d.ts"
+    "./core/util": {
+      "require": "./core/util.js",
+      "import": "./core/util.mjs",
+      "types": "./core/types/util.d.ts"
     }
   },
   "scripts": {
