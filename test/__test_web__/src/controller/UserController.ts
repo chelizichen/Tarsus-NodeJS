@@ -1,6 +1,6 @@
 import {Controller, Get, INVOKE} from "../../../../lib/decorator/http/router";
 import Ret from '../utils/ret'
-import load_proto from "../../../../lib/main_control/proto_base";
+import { $Transmit } from "../../../../lib/main_control/proto_base";
 @Controller("/user")
 class UserController {
 
@@ -12,7 +12,7 @@ class UserController {
     @INVOKE("/invoke")
     invoke(req,res){
         debugger;
-        load_proto.transmit(req,res);
+        $Transmit(req,res);
     }
 }
 

@@ -3,6 +3,7 @@ module.exports = {
         project: "@TarsusDemoProject/NodeProxyDemo -l node -t @tarsus/http -h 127.0.0.1 -p 12011",
         servant: [
             "@TarsusDemoProject/NodeServer -l node -t @tarsus/ms -h 127.0.0.1 -p 12012 -w 10",
+            '@TarsusDemoProject/JavaDemo -l java -t @tarsus/ms -h 127.0.0.1 -p 12013 -w 10'
         ],
         database: {
             default: true,

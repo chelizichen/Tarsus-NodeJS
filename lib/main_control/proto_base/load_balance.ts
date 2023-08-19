@@ -42,6 +42,7 @@ class Load_Balance {
             item.currWeight = 0;
             const { host, port } = item
             item.service = new Data_Forward(host, Number(port))
+            item.service.java = (item.language == "java")
             return item;
         })
 

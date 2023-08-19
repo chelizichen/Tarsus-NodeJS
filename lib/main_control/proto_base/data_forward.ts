@@ -64,6 +64,7 @@ class Data_Forward {
         if (this.java) {
             buf += "[#ENDL#]\n";
             new_str = this.join_buf(buf);
+            // console.log("写入的数据 - java",new_str);
             this.socket.write(new_str, async (err) => {
                 if (err) {
                     console.log(err);
