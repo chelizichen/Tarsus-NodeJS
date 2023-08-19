@@ -1,6 +1,6 @@
 {
   "name": "tarsus",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "new ts-decorator for express server",
   "repository": {
     "url": "https://github.com/chelizichen/tarsus",
@@ -13,7 +13,6 @@
     "ioc"
   ],
   "exports": {
-
     "./core/httpservice": {
       "require": "./core/httpservice.js",
       "import": "./core/httpservice.mjs",
@@ -40,8 +39,9 @@
     "http": "ts-node-dev test/http/index.ts",
     "server": "ts-node-dev test/microservice/index.ts",
     "build": " tsc --project tsconfig.build.json --format cjs,esm",
-    "pkg": "tsc --project tsconfig.pkg.json && tsup lib --format cjs,esm",
-    "test:proxy": "ts-node-dev lib/web/proxy/TarsusRequest.ts",
+    "pkg": "tsc --project tsconfig.pkg.json",
+    "tsup":"tsup lib --format cjs,esm -d core --target es2017 --clean  --tsconfig tsconfig.pkg.json",
+    "test:proxy": "ts-node-dev lib/web/proxy/TarsusRequest.ts --dts-resolve",
     "servant": "ts-node-dev lib/util/servant.ts",
     "orm": "ts-node-dev test/http/entity/goods.entity.ts"
   },
