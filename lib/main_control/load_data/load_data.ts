@@ -6,7 +6,7 @@ const load_data = {
         const {host, user, password, database, port, connectionLimit} = config;
         const pool = await mysql.createPool({host, user, database, port, password, connectionLimit});
         load_data.pool = pool
-
+        
         // load_data.rds = createClient();
         // load_data.rds.connect();
     },

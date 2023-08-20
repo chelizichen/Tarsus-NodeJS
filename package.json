@@ -1,6 +1,6 @@
 {
   "name": "tarsus",
-  "version": "1.4.3",
+  "version": "1.4.6",
   "description": "new ts-decorator for express server",
   "repository": {
     "url": "https://github.com/chelizichen/tarsus",
@@ -13,6 +13,7 @@
     "ioc"
   ],
   "exports": {
+    "./core/*": "./core/*",
     "./core/httpservice": {
       "require": "./core/httpservice.js",
       "import": "./core/httpservice.mjs",
