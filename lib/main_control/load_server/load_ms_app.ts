@@ -8,6 +8,7 @@ import {readdirSync} from "fs";
 import stream_proxy from "../proto_base/taro_proxy";
 import {nextTick} from "process";
 import Receive_Data from "../proto_base/receive_data";
+import load_data from "../load_data/load_data";
 
 export enum Emits {
     INIT = "init",
@@ -70,6 +71,7 @@ let load_ms_app = {
     init: function () {
         load_config.init();
         const get_config = load_config.get_config;
+        load_data.init(get_config(config_enum.database))
         const ms_config: parseToObj = ServantUtil.parse(get_config(config_enum.project));
         load_ms_app.config = ms_config;
 
@@ -96,7 +98,7 @@ let load_ms_app = {
     interfaces: void 'rpc interfaces',
     taro: void 'taro struct',
     interface_events: new Interface_Events(),
-    config: <parseToObj>void 'ms config'
+    config: <parseToObj>void 'ms config',
 }
 
 export default load_ms_app;

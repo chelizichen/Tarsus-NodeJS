@@ -1,6 +1,6 @@
 {
   "name": "tarsus",
-  "version": "1.4.6",
+  "version": "1.4.8",
   "description": "new ts-decorator for express server",
   "repository": {
     "url": "https://github.com/chelizichen/tarsus",
@@ -33,6 +33,11 @@
       "require": "./core/util.js",
       "import": "./core/util.mjs",
       "types": "./core/types/util.d.ts"
+    },
+    "./core/database": {
+      "require": "./core/database.js",
+      "import": "./core/database.mjs",
+      "types": "./core/types/database.d.ts"
     }
   },
   "scripts": {
