@@ -2,7 +2,8 @@ import TarsusMsApplication from "./decorator/app/microservice";
 import {
     TarsusInterFace,
     TarsusMethod,
-    Stream
+    Stream,
+    TarsusReflect
 } from "./decorator/ms/interface";
 import {
     LoadInterface,
@@ -19,5 +20,6 @@ export {
     LoadTaro,
     LoadStruct,
     LoadServer,
-    TarsusMsApplication
+    TarsusMsApplication,
+    TarsusReflect
 };

@@ -10,7 +10,8 @@ export enum config_enum {
     project = "project",
     database = "database",
     servant = "servant",
-    taro="taro"
+    taro="taro",
+    proxy="proxy"
 }
 
 type void_func = (...args: any[]) => void;

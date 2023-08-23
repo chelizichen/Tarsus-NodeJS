@@ -1,7 +1,9 @@
 import load_ms_app from "../../main_control/load_server/load_ms_app";
 import Interface_Events from "../../main_control/proto_base/interface_events";
 import stream_proxy from "../../main_control/proto_base/taro_proxy";
-import {nextTick} from "process";
+import { nextTick } from "process";
+
+import httpproxy from '../../main_control/proto_base/proxy_call'
 
 const TarsusEvents = load_ms_app.interface_events
 
@@ -35,8 +37,33 @@ function Stream(request: string, response: string) {
     }
 }
 
+
+const TarsusReflect = (reflect: string, proxy: string) => {
+    return function <TFunction extends Function>(value: TFunction, context: ClassDecoratorContext<any>) {
+        let reflect$methods = Object.keys(value.prototype)
+        for (let index = 0; index < reflect$methods.length; index++) {
+            const element = reflect$methods[index];
+            value.prototype[element] = async function (data: any, resp: any) {
+                const request = {
+                    interface: reflect,
+                    proxy: proxy,
+                    method: element,
+                    request: data.__proto__.name,
+                    data,
+                }
+                const ret = await httpproxy({
+                    data: request,
+                    method: 'post',
+                })
+                return ret;
+            }
+        }
+    }
+}
+
 export {
     TarsusInterFace,
     TarsusMethod,
-    Stream
+    Stream,
+    TarsusReflect
 };
