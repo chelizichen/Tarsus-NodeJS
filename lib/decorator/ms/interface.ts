@@ -37,8 +37,13 @@ function Stream(request: string, response: string) {
     }
 }
 
-
-const TarsusReflect = (reflect: string, proxy: string) => {
+/**
+ * 
+ * @param proxy 代理的服务
+ * @param reflect 代理的接口
+ * @returns 
+ */
+const TarsusReflect = (proxy: string, reflect: string) => {
     return function <TFunction extends Function>(value: TFunction, context: ClassDecoratorContext<any>) {
         let reflect$methods = Object.keys(value.prototype)
         for (let index = 0; index < reflect$methods.length; index++) {

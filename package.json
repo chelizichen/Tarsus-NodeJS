@@ -1,6 +1,6 @@
 {
   "name": "tarsus",
-  "version": "1.4.9",
+  "version": "1.4.92",
   "description": "new ts-decorator for express server",
   "repository": {
     "url": "https://github.com/chelizichen/tarsus",

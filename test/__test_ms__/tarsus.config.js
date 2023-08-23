@@ -11,6 +11,6 @@ module.exports = {
             port: 3306,
             connectionLimit: 10,
         },
-        proxy:'@TarsusDemoProject/NodeProxyDemo -l node -t @tarsus/http -h 127.0.0.1/proxy/invoke -p 12011'
+        proxy:'http://127.0.0.1/proxy/invoke'
     },
 };
