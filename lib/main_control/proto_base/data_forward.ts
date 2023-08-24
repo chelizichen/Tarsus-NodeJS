@@ -8,7 +8,7 @@ import {call} from "../../decorator/http/call";
  * 数据转发层,每个链接都是一个 代理实例，上层只需要考虑如何进行数据传输
  */
 class Data_Forward {
-    public uid = 1;
+    // public uid = 1;
 
     public java = false;
     public socket: Socket;
@@ -55,15 +55,14 @@ class Data_Forward {
         });
     }
 
-    write(buf: string) {
+    write(eid:string,buf: string) {
         let len = Buffer.from(buf).byteLength;
-        let new_buf = Buffer.allocUnsafe(len + 4);
-
+        let new_buf = Buffer.allocUnsafe(len + 8);
         let new_str = "";
         // 如果为Java 则需要加尾判断
         if (this.java) {
             buf += "[#ENDL#]\n";
-            new_str = this.join_buf(buf);
+            new_str = eid + buf;
             // console.log("写入的数据 - java",new_str);
             this.socket.write(new_str, async (err) => {
                 if (err) {
@@ -74,15 +73,14 @@ class Data_Forward {
         }
         // Nodejs 则正常通信 参照 taf-nodejs
         else {
-            new_buf.writeUInt32BE(this.uid, 0);
-            new_buf.write(buf, 4, "utf8");
+            new_buf.write(eid, 0);
+            new_buf.write(buf, 8, "utf8");
             this.socket.write(new_buf, async (err) => {
                 if (err) {
                     console.log(err);
                 }
             });
         }
-        this.uid++;
     }
 
     // 拿到负载信息
@@ -100,31 +98,17 @@ class Data_Forward {
         return data
     }
 
-    join_buf(buf: string): string {
-        let len = String(this.uid).length;
-        if (len == 1) {
-            return "000" + this.uid + buf;
-        } else if (len == 2) {
-            return "00" + this.uid + buf;
-        } else if (len == 3) {
-            return "0" + this.uid + buf;
-        } else if (len == 4) {
-            return "" + this.uid + buf;
-        }
-    }
+    // join_buf(buf: string): string {
+    //     let uid = uid(4);
+    //     return uid + buf
+    // }
 
     receive_from_microService() {
         this.socket.on("data", (chunk: Buffer) => {
-            let getId;
-            let body;
-            if (this.java) {
-                getId = Number.parseInt(chunk.subarray(0, 4).toString());
-            } else {
-                getId = chunk.readUInt32BE(0);
-            }
-            body = chunk.subarray(4, chunk.length);
+            let getId = chunk.subarray(0,8);
+            let body = chunk.subarray(4,chunk.length);
+            body = chunk.subarray(8, chunk.length);
             console.log(body.toString());
-
             this.currEvents.emit(getId.toString(), body.toString());
         });
     }

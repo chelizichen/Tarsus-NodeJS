@@ -3,6 +3,7 @@ import { Response } from "express";
 import {parseToObj} from "../../util/servant";
 import Data_Forward from "./data_forward";
 import {call} from "../../decorator/http/call";
+import {uid} from "uid";
 
 // 调用负载的请求
 function T_LB_Request(url) {
@@ -91,17 +92,17 @@ class Load_Balance {
      */
     ProxySendRequest(Request: any, Response: Response) {
         let ServantInst = this.hostList[0].service
+        let eid = uid(8);// 事件ID四位
         if (ServantInst) {
             try {
                 const str = call(Request);
-                let curr = String(ServantInst.uid);
-                ServantInst.currEvents.on(curr, function (data) {
+                ServantInst.currEvents.on(eid, function (data) {
                     const _to_json_ = JSON.parse(data);
                     if (!Response.destroyed) {
                         Response.json(_to_json_);
                     }
                 });
-                ServantInst.write(str);
+                ServantInst.write(eid,str);
             } catch (e) {
                 const error = {
                     code: "-91000",
@@ -109,7 +110,6 @@ class Load_Balance {
                 }
                 Response.json(error);
             }
-
             // 为 EventEmitter 注册事件
         } else {
             return 0;

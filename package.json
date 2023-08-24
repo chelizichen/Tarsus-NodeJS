@@ -70,6 +70,7 @@
     "tarsus-cli": "^1.2.94",
     "ts-node-dev": "^2.0.0-0",
     "typescript": "^5.2.1-rc",
+    "uid": "^2.0.2",
     "yaml": "^2.2.1"
   },
   "devDependencies": {
