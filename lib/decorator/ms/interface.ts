@@ -71,9 +71,21 @@ const TarsusReflect = (proxy: string, reflect: string) => {
     }
 }
 
+const UseImpl = (injectAble:(...args:any[])=>any)=>{
+    return (value: any, context: ClassFieldDecoratorContext) => {
+        if (context.kind == "field") {
+            return function () {
+                let injectAbleClass = load_ms_app.implCollects(injectAble.prototype);
+                return injectAbleClass;
+            };
+        }
+    };
+}
+
 export {
     TarsusInterFace,
     TarsusMethod,
     Stream,
-    TarsusReflect
+    TarsusReflect,
+    UseImpl
 };
