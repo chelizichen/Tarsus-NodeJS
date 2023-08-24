@@ -4,6 +4,7 @@ import stream_proxy from "../../main_control/proto_base/taro_proxy";
 import { nextTick } from "process";
 
 import httpproxy from '../../main_control/proto_base/proxy_call'
+import Receive_Data from "../../main_control/proto_base/receive_data";
 
 const TarsusEvents = load_ms_app.interface_events
 
@@ -50,17 +51,21 @@ const TarsusReflect = (proxy: string, reflect: string) => {
             const element = reflect$methods[index];
             value.prototype[element] = async function (data: any, resp: any) {
                 const request = {
-                    interface: reflect,
+                    interFace: reflect,
                     proxy: proxy,
                     method: element,
                     request: data.__proto__.name,
                     data,
                 }
-                const ret = await httpproxy({
-                    data: request,
-                    method: 'post',
-                })
-                return ret;
+
+                const ret = await Receive_Data.CrossRequest(request);
+                return ret
+                // 暂时不用Http调用 目测可以使用 没测过
+                // const ret = await httpproxy({
+                //     data: request,
+                //     method: 'post',
+                // })
+                // return ret;
             }
         }
     }

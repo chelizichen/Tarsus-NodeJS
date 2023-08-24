@@ -86,7 +86,7 @@ let load_ms_app = {
             load_ms_app.events.emit(Emits.INIT)
             nextTick(() => {
                 const {port, host} = load_ms_app.config
-                new Receive_Data({
+                load_ms_app.tcpConn =  new Receive_Data({
                     port: Number(port),
                     host: host,
                 })
@@ -99,6 +99,7 @@ let load_ms_app = {
     taro: void 'taro struct',
     interface_events: new Interface_Events(),
     config: <parseToObj>void 'ms config',
+    tcpConn:<Receive_Data> void "tcp链接实例"
 }
 
 export default load_ms_app;

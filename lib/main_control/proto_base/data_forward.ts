@@ -3,6 +3,7 @@ import { EventEmitter } from "events";
 import os from 'os'
 import moment from 'moment'
 import {call} from "../../decorator/http/call";
+import {crossEnum, crossproxy} from "./proxy_call";
 /**
  * @description
  * 数据转发层,每个链接都是一个 代理实例，上层只需要考虑如何进行数据传输
@@ -18,7 +19,6 @@ class Data_Forward {
     public intervalConnect: any = false;
 
     public currEvents = new EventEmitter();
-
     constructor(host: string, port: number) {
         this.host = host;
         this.port = port;
@@ -109,7 +109,31 @@ class Data_Forward {
             let body = chunk.subarray(4,chunk.length);
             body = chunk.subarray(8, chunk.length);
             console.log(body.toString());
-            this.currEvents.emit(getId.toString(), body.toString());
+            // if(this.currEvent)
+            let eid = getId.toString("utf-8")
+            if(this.currEvents.listenerCount(eid) > 0){
+                return this.currEvents.emit(eid, body.toString("utf-8"));
+            }
+
+            // 如果 cross proxy 已有该id 的监听值 ，则代表是返回值
+            if(crossproxy.listenerCount(eid)>0){
+                crossproxy.emit(eid,body)
+                return;
+            }
+
+            // 如果该链接没有事件没有获取到eid，则被认为是跨服务调用的Stream
+            // 先一次性创建事件监听ID，拿到数据后再将该数据重新写入该链接完成调用
+            this.currEvents.once(eid, (data:Buffer)=>{
+                this.write(eid,data.toString())
+            })
+
+            // 调用跨服务的事件
+            crossproxy.emit(crossEnum.sendRequest,eid,body)
+
+            // 代理事件接收到eid 后 将数据传回至当前链接
+            crossproxy.once(eid, (data)=>{
+                this.currEvents.emit(eid,data)
+            })
         });
     }
 

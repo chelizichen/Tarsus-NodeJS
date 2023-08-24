@@ -1,13 +1,21 @@
 import {Server, Socket, createServer} from "net";
 import load_ms_app from "../load_server/load_ms_app";
-import {proto} from "../../decorator/http/call";
+import {call, proto} from "../../decorator/http/call";
 import stream_proxy from "./taro_proxy";
+import {EventEmitter} from "events";
+import {uid} from "uid";
 
 type ConnOpt = { port: number; host: string };
+
+enum RecieveData{ 
+    proxyReq="proxyReq",
+}
 
 class Receive_Data {
     public Net!: Server;
     public socket!: Socket;
+
+    static CrossEvents = new EventEmitter();
 
     constructor(opts: ConnOpt) {
         const {port, host} = opts;
@@ -15,27 +23,52 @@ class Receive_Data {
         console.log("server start at " + host + ":" + port);
     }
 
+    /**
+     * @description 跨服务调用接口
+     */
+    static CrossRequest(data:Record<string,any>):Promise<any>{
+        const eid = uid(8)
+        const args = call(data)
+        const proxy:string = data.proxy;
+        const buf = Buffer.alloc(args.length + 24)
+        buf.write(eid,0)
+        buf.write(proxy,8,16)
+        buf.write(args,24)
+        Receive_Data.CrossEvents.emit(RecieveData.proxyReq,buf)
+        return new Promise((resolve)=>{
+            Receive_Data.CrossEvents.once(eid,function (data:Buffer){
+                // 这拿到的数据是JSON
+                let toString = data.subarray(8,data.length).toString("utf-8")
+                let toObject = JSON.parse(toString)
+                resolve(toObject)
+            })
+        })
+    }
 
     createServer({port, host}: ConnOpt) {
-        // 绑定this
-        let bind_recieve = this.receive.bind(this);
-        let bind_connection = this.connection.bind(this);
-        let bind_err = this.error.bind(this);
-
         this.Net = createServer((socket) => {
             this.socket = socket;
-            this.socket.on("data", bind_recieve);
-            this.socket.on("error", bind_err);
-            this.Net.on("connection", bind_connection);
+            this.socket.on("data", this.receive);
+            this.socket.on("error", this.error);
+            this.Net.on("connection", this.connection);
         });
         this.Net.listen(port, host);
+
+        Receive_Data.CrossEvents.on(RecieveData.proxyReq, (buffer:Buffer)=>{
+            this.socket.write(buffer)
+        })
     }
 
     async receive(data: Buffer) {
         console.log("receive data -- ", data.toString());
+        let getId = data.subarray(0,8).toString("utf-8")
 
-        let getId = data.readInt32BE(0)
-        data = data.subarray(4, data.length)
+        if(Receive_Data.CrossEvents.listenerCount(getId) > 0){
+            Receive_Data.CrossEvents.emit(getId,data)
+            return;
+        }
+
+        data = data.subarray(8, data.length)
         let head_end = data.indexOf("[##]");
         let timeout = Number(this.unpkgHead(2, data));
         let body_len = Number(this.unpkgHead(3, data));
@@ -54,9 +87,9 @@ class Receive_Data {
             }
             let toJson = JSON.stringify(data);
             let len = Buffer.from(toJson).byteLength;
-            let buf = Buffer.alloc(len + 4);
-            buf.writeUInt32BE(getId, 0);
-            buf.write(toJson, 4);
+            let buf = Buffer.alloc(len + 8);
+            buf.write(getId, 0);
+            buf.write(toJson, 8);
             this.socket.write(buf, function (err) {
                 if (err) {
                     console.log("服务端写入错误", err);
@@ -88,10 +121,10 @@ class Receive_Data {
 
                 let toJson = JSON.stringify(res);
                 let len = Buffer.from(toJson).byteLength;
-                let buf = Buffer.alloc(len + 4);
+                let buf = Buffer.alloc(len + 8);
 
-                buf.writeUInt32BE(getId, 0);
-                buf.write(toJson, 4);
+                buf.write(getId.toString(), 0);
+                buf.write(toJson, 8);
                 console.log('写出的buf', buf.toString());
                 this.socket.write(buf, function (err) {
                     if (err) {
@@ -115,7 +148,9 @@ class Receive_Data {
         console.log("tarsus-ms-err", err);
     }
 
-    connection() {
+    // 需要储存一份网关的数据
+    connection(...args:any[]) {
+        console.log(args)
         console.log("有新用户链接");
     }
 

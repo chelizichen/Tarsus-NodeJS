@@ -19,8 +19,6 @@ eid + head + body
 
 <request 请求结构体>
 
-<type 类型 0 默认请求 1 跨服务调用>
-
 <timeout 超时上报时间>
 
 <timeSpent 花费时间>

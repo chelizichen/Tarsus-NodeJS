@@ -7,7 +7,7 @@ const call_config = {
 }
 
 export function call(pkg: any) {
-    const { method, data, interFace, timeout,request } = pkg;
+    const { method, data, interFace, timeout = 60000,request } = pkg;
 
     console.log(call_config.stream);
 

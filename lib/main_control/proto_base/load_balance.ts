@@ -4,6 +4,8 @@ import {parseToObj} from "../../util/servant";
 import Data_Forward from "./data_forward";
 import {call} from "../../decorator/http/call";
 import {uid} from "uid";
+import Data_forward from "./data_forward";
+import load_proto from "./index";
 
 // 调用负载的请求
 function T_LB_Request(url) {
@@ -69,14 +71,14 @@ class Load_Balance {
                     // if(service.isConnection()){
                     // 拿到负载信息
                     let args = service.getLoadInfoArgs()
-                    let curr = String(service.uid);
-                    service.currEvents.on(curr, function (ret) {
+                    const eid = uid(8)
+                    service.currEvents.on(eid, function (ret) {
                         const LB = JSON.parse(ret);
                         let data = LB.data;
                         item.currWeight = Number((data / Number(weight)).toFixed(2))
                         resolve(item)
                     });
-                    service.write(args);
+                    service.write(eid,args);
                     // }
                     // resolve(item)
                 })
@@ -115,7 +117,6 @@ class Load_Balance {
             return 0;
         }
     }
-
 
     /**
      * @description 心跳检测
