@@ -77,11 +77,11 @@ const UseImpl = (injectAble:new (...args:any[])=>any)=>{
             return;
         }
         return function () {
-            if(!load_ms_app.implCollects[injectAble.prototype]){
+            if(!load_ms_app.implCollects.get(injectAble.prototype)){
                 const interFace_inst = new injectAble()   
-                load_ms_app.implCollects[injectAble.prototype] = interFace_inst
+                load_ms_app.implCollects.set(injectAble.prototype,interFace_inst)
             }
-            let injectAbleClass = load_ms_app.implCollects[injectAble.prototype];
+            let injectAbleClass = load_ms_app.implCollects.get(injectAble.prototype);
             return injectAbleClass;
         };
     };
