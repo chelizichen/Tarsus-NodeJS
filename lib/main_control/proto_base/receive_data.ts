@@ -46,11 +46,16 @@ class Receive_Data {
     }
 
     createServer({port, host}: ConnOpt) {
+        // 绑定this
+        let bind_recieve = this.receive.bind(this);
+        let bind_connection = this.connection.bind(this);
+        let bind_err = this.error.bind(this);
+
         this.Net = createServer((socket) => {
             this.socket = socket;
-            this.socket.on("data", this.receive);
-            this.socket.on("error", this.error);
-            this.Net.on("connection", this.connection);
+            this.socket.on("data", bind_recieve);
+            this.socket.on("error", bind_err);
+            this.Net.on("connection", bind_connection);
         });
         this.Net.listen(port, host);
 

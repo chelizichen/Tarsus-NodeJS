@@ -1,6 +1,6 @@
 {
   "name": "tarsus",
-  "version": "1.4.92",
+  "version": "1.4.93",
   "description": "new ts-decorator for express server",
   "repository": {
     "url": "https://github.com/chelizichen/tarsus",
@@ -43,6 +43,11 @@
       "require": "./core/proxy.js",
       "import": "./core/proxy.mjs",
       "types": "./core/types/proxy.d.ts"
+    },
+    "./core/schedule": {
+      "require": "./core/schedule.js",
+      "import": "./core/schedule.mjs",
+      "types": "./core/types/schedule.d.ts"
     }
   },
   "scripts": {

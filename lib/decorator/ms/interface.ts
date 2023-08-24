@@ -71,14 +71,19 @@ const TarsusReflect = (proxy: string, reflect: string) => {
     }
 }
 
-const UseImpl = (injectAble:(...args:any[])=>any)=>{
+const UseImpl = (injectAble:new (...args:any[])=>any)=>{
     return (value: any, context: ClassFieldDecoratorContext) => {
-        if (context.kind == "field") {
-            return function () {
-                let injectAbleClass = load_ms_app.implCollects(injectAble.prototype);
-                return injectAbleClass;
-            };
+        if (context.kind !== "field") {
+            return;
         }
+        return function () {
+            if(!load_ms_app.implCollects[injectAble.prototype]){
+                const interFace_inst = new injectAble()   
+                load_ms_app.implCollects[injectAble.prototype] = interFace_inst
+            }
+            let injectAbleClass = load_ms_app.implCollects[injectAble.prototype];
+            return injectAbleClass;
+        };
     };
 }
 

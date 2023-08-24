@@ -27,6 +27,10 @@ function LoadInterface(interfaces: any[]) {
         }
         for (let i = 0; i < load_ms_app.interfaces.length; i++) {
             const interFace = load_ms_app.interfaces[i];
+            // 已有 直接return
+            if(load_ms_app.implCollects[interFace.prototype]){
+                return
+            }
             let interFace_inst = new interFace();
             load_ms_app.implCollects[interFace.prototype] = interFace_inst;
 
@@ -78,8 +82,6 @@ let load_ms_app = {
         load_ms_app.config = ms_config;
 
         load_ms_app.events.on(Emits.INIT, function () {
-            load_ms_app.implCollects = {};
-
             load_ms_app.events.emit(Emits.INTERFACE)
             load_ms_app.events.emit(Emits.TARO)
             load_ms_app.events.emit(Emits.STRUCT)
@@ -104,7 +106,7 @@ let load_ms_app = {
     interface_events: new Interface_Events(),
     config: <parseToObj>void 'ms config',
     tcpConn:<Receive_Data> void "tcp链接实例",
-    implCollects:void 'server impl instances <prototype,instance>'
+    implCollects: {}
 }
 
 export default load_ms_app;

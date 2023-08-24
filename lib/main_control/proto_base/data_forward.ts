@@ -106,8 +106,7 @@ class Data_Forward {
     receive_from_microService() {
         this.socket.on("data", (chunk: Buffer) => {
             let getId = chunk.subarray(0,8);
-            let body = chunk.subarray(4,chunk.length);
-            body = chunk.subarray(8, chunk.length);
+            let body = chunk.subarray(8,chunk.length);
             console.log(body.toString());
             // if(this.currEvent)
             let eid = getId.toString("utf-8")

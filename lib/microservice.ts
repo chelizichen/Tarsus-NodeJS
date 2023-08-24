@@ -3,7 +3,8 @@ import {
     TarsusInterFace,
     TarsusMethod,
     Stream,
-    TarsusReflect
+    TarsusReflect,
+    UseImpl
 } from "./decorator/ms/interface";
 import {
     LoadInterface,
@@ -21,5 +22,6 @@ export {
     LoadStruct,
     LoadServer,
     TarsusMsApplication,
-    TarsusReflect
+    TarsusReflect,
+    UseImpl
 };
