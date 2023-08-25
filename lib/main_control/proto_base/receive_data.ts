@@ -4,6 +4,7 @@ import {call, proto} from "../../decorator/http/call";
 import stream_proxy from "./taro_proxy";
 import {EventEmitter} from "events";
 import {uid} from "uid";
+import { FastStringify } from "../load_schema";
 
 type ConnOpt = { port: number; host: string };
 
@@ -123,8 +124,10 @@ class Receive_Data {
         ])
             .then((res: any) => {
                 console.log(res);
-
-                let toJson = JSON.stringify(res);
+                console.log('1');
+                let toJson = FastStringify(response,res);
+                console.log('2');
+                
                 let len = Buffer.from(toJson).byteLength;
                 let buf = Buffer.alloc(len + 8);
 

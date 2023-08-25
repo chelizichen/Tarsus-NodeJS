@@ -9,6 +9,7 @@ import stream_proxy from "../proto_base/taro_proxy";
 import {nextTick} from "process";
 import Receive_Data from "../proto_base/receive_data";
 import load_data from "../load_data/load_data";
+import load_schema, { generateSchemaFromMap } from "../load_schema";
 
 export enum Emits {
     INIT = "init",
@@ -49,6 +50,17 @@ function LoadTaro(url?: string) {
             stream_proxy.SetStream(taro_path);
             console.log("taro_path - ", taro_path, ' - is load success')
         });
+        console.log("********** TARO 结构体 已全部加载完成 ************");
+        console.log("********** 即将加载 json::Schema ************");
+        
+        const structMaps = stream_proxy.TarsusStream.struct_map
+        console.log('structMaps',structMaps);
+        
+        const schemaMaps = generateSchemaFromMap(structMaps)
+        load_schema.dtoMaps = schemaMaps;
+
+        console.log("********** 加载完成 json::Schema ************");
+
     })
 }
 

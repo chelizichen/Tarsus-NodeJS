@@ -1,6 +1,6 @@
 {
   "name": "tarsus",
-  "version": "1.4.94",
+  "version": "1.4.95",
   "description": "new ts-decorator for express server",
   "types": "./core/types",
   "repository": {
@@ -53,8 +53,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "http": "ts-node-dev test/http/index.ts",
-    "server": "ts-node-dev test/microservice/index.ts",
+    "http": "ts-node-dev test/__test_web__/index.ts",
+    "server": "ts-node-dev test/__test_ms__/index.ts",
     "build": " tsc --project tsconfig.build.json --format cjs,esm",
     "pkg": "tsc --project tsconfig.pkg.json",
     "tsup": "tsup lib --format cjs,esm -d core --target es2017 --clean  --tsconfig tsconfig.pkg.json",
@@ -69,6 +69,7 @@
     "axios": "^1.4.0",
     "cron": "^2.4.1",
     "express": "^4.18.2",
+    "fast-json-stringify": "^5.8.0",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "mysql": "^2.18.1",
