@@ -108,11 +108,12 @@ class Data_Forward {
             let getId = chunk.subarray(0,8);
             let body = chunk.subarray(8,chunk.length);
             console.log(body.toString());
-            // if(this.currEvent)
+
             let eid = getId.toString("utf-8")
             if(this.currEvents.listenerCount(eid) > 0){
                 return this.currEvents.emit(eid, body.toString("utf-8"));
             }
+
 
             // 如果 cross proxy 已有该id 的监听值 ，则代表是返回值
             if(crossproxy.listenerCount(eid)>0){
@@ -127,7 +128,7 @@ class Data_Forward {
             })
 
             // 调用跨服务的事件
-            crossproxy.emit(crossEnum.sendRequest,eid,body)
+            crossproxy.emit(crossEnum.sendRequest,eid,body,this.java)
 
             // 代理事件接收到eid 后 将数据传回至当前链接
             crossproxy.once(eid, (data)=>{
