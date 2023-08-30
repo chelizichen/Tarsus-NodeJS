@@ -26,7 +26,7 @@ let crossproxy = new EventEmitter();
 
 crossproxy.on(crossEnum.sendRequest,function (eid:string,body:Buffer,isJava:boolean){
     // 跨服务协议包含 请求eid 服务proxy名 数据 stf
-    const proxy = body.subarray(0,16).toString().replace(/\0/g, '');;
+    const proxy = body.subarray(0,16).toString().replace(/\0/g, '').replace(/ /g,"");
     const stf = body.subarray(16,body.length).toString();
     const load_balance:Load_Balance = load_proto.get_servant(proxy)
     const data_forward = load_balance.hostList[0];
