@@ -17,9 +17,12 @@ class UserController {
     }
 
     @Get("/limit_test")
-    @Limit(limit_type.ALL,10,60) // 60秒内十次最大限制
+    @Limit(limit_type.ALL,2,600000) // 60秒内十次最大限制
     async limitTest(){
-        return ""
+        return {
+            code:0,
+            message:"success"
+        }
     }
 }
 

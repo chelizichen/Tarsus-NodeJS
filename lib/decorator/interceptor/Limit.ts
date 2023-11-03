@@ -42,9 +42,11 @@ const LimitContainer = {
         if (key_type == limit_type.ALL) {
             const curr = LimitContainer.keys[key];
             if (curr >= max_num) {
+                console.log('请求失败，达到最大限度 key - [%s] - value[%s]',key,LimitContainer.keys[key]);
                 return false;
             }
             LimitContainer.keys[key] = curr + 1;
+            console.log('请求通过 key - [%s] - value[%s]',key,LimitContainer.keys[key]);
             return true;
         }
         if (key_type == limit_type.RdsKey) {
@@ -89,12 +91,13 @@ const Limit = (
             key = type;
             LimitContainer.setKey(limit_type.RdsKey, key, num, period);
         }
+        console.log('注册节流任务',key,num,period);
         async function limit_interceptor_fn<This = unknown>(
             this: This,
             ...args: any[]
         ) {
             const add_succ = await LimitContainer.addKey(key);
-            if (add_succ) {
+            if (!add_succ) {
                 return { code: -9, message: "请求达到最大限制" };
             } else {
                 let data = value.call(this, ...args);
