@@ -1,5 +1,5 @@
 import * as mysql from "mysql";
-// import {createClient} from "../__test_web__/node_modules/redis";
+import { RedisClientType, createClient } from "redis";
 
 const load_data = {
     init: async function (config: Record<string, any>) {
@@ -8,11 +8,11 @@ const load_data = {
         const pool = await mysql.createPool({host, user, database, port, password, connectionLimit});
         load_data.pool = pool
         console.log('*********** database config ***********');
-        // load_data.rds = createClient();
-        // load_data.rds.connect();
+        load_data.rds = createClient();
+        load_data.rds.connect();
     },
     pool: <mysql.Pool> void "database connection",
-    rds:void "redis connection"
+    rds: <RedisClientType> void "redis connection"
 
 }
 
