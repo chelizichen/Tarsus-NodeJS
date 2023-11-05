@@ -1,5 +1,5 @@
-import {Controller, Get, INVOKE} from "../../../../lib/decorator/http/router";
-import {Limit, limit_type} from "../../../../lib/decorator/interceptor/Limit";
+import {Controller, Get, INVOKE, Post} from "../../../../lib/decorator/http/router";
+import {Limit, limitType} from "../../../../lib/decorator/interceptor/Limit";
 import Ret from '../utils/ret'
 import { $Transmit } from "../../../../lib/main_control/proto_base";
 @Controller("/user")
@@ -17,8 +17,17 @@ class UserController {
     }
 
     @Get("/limit_test")
-    @Limit(limit_type.ALL,2,600000) // 60秒内十次最大限制
-    async limitTest(){
+    @Limit(limitType.ROUTER,2,10000) // 10秒内2次最大限制 单个路由
+    async limitTest(req,res){
+        return {
+            code:0,
+            message:"success"
+        }
+    }
+
+    @Get("/ip_limit_test")
+    @Limit(limitType.IP,2,10000) // 10秒内2次最大限制
+    async IpLimitTest(req,res){
         return {
             code:0,
             message:"success"
