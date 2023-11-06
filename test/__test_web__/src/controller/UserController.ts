@@ -25,7 +25,7 @@ class UserController {
         }
     }
 
-    @Get("/ip_limit_test")
+    @Post("/ip_limit_test")
     @Limit(limitType.IP,2,10000) // 10秒内2次最大限制
     async IpLimitTest(){
         return {
