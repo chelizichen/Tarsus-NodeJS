@@ -1,6 +1,4 @@
 // TaroUser  Created By leemulus 2023.3.21
-// 用来测试协议接口
-// 目前已知 BUG ，在反序列化参数时 在遇到对象连在一起时会出现序列化错误
 
 struct CommParams  {
 

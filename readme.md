@@ -1,24 +1,27 @@
 <h2 align="center">TARSUS-NODE</h2>
 
-<p align="center"><b>基于 TypeScript 和 Express 的 HttpServer 库，提供了一系列基础功能，包括 Router、DTO、Validate、Pipe、Interceptor 等。同时该库还包括了 Tarssu-RPC 的 Client && Server 端。该库的设计目标是为开发者提供一套解决方案，可以应用于单体 HTTP 服务，也适用于多个微服务。</b></p>
+<p align="center">基于 TypeScript 和 Express 的 HttpServer 库，提供了一系列基础功能，包括 Router、DTO、Validate、Pipe、Interceptor 等。</p>
+
+<p align="center"><b>同时该库还包括了 Tarssu-RPC 的 Client && Server 端。该库的设计目标是为开发者提供一套解决方案，可以应用于单体 HTTP 服务，也适用于多个微服务。
+</b></p>
 
 # 目录
 
 - [目录](#目录)
   - [快速入门](#快速入门)
   - [Http](#http)
-    - [启动服务](#启动服务)
+    - [快速启动](#快速启动)
     - [路由](#路由)
     - [管道](#管道)
     - [拦截器](#拦截器)
   - [MicroService](#microservice)
-    - [快速启动](#快速启动)
+    - [快速启动](#快速启动-1)
     - [协议](#协议)
-    - [远程调用](#远程调用)
     - [注册接口](#注册接口)
+    - [远程调用](#远程调用)
   - [其他](#其他)
-    - [数据校验](#数据校验)
     - [定时器](#定时器)
+    - [配置](#配置)
   - [维护者](#维护者)
 
 ## 快速入门
@@ -27,7 +30,7 @@
 
 ## Http
 
-### 启动服务
+### 快速启动
 
 先看代码
 
@@ -332,15 +335,347 @@ export default UserValidateObj
 
 ### 协议
 
-### 远程调用
+在进行远程函数调用时，我们首先需要确定相互之间调用的参数，返回的数据结构，调用的接口等。为此，我们需要先定义其协议。
+协议命名为taro, 代表 tarsus-object.该协议兼容 java,nodejs。
+
+开发该协议的步骤
+
+1. 定义数据结构：首先，需要按照协议定义的数据结构来创建相关的类和结构。在这个示例中，需要创建 Basic、User、GetUserByIdReq、GetUserByIdRes、GetUserListReq 和 GetUserListRes 类。
+
+2. 生成对应的协议文件：使用命令 taro to ts || java ./xxx.taro
+
+3. 实现接口：在生成协议文件以后，同时会看到对应的协议接口，根据接口定义，实现 TaroInterFace 接口中的方法，即 getUserById 和 getUserList。这些方法应该执行与协议规定的数据交换操作。
+
+4. 客户端和服务器实现：通常，协议将在客户端和服务器之间用于通信。因此，需要在客户端和服务器上实现协议的数据解析和构建逻辑。客户端将使用协议发送请求，服务器将解析请求并生成响应。
+
+5. 数据交换：客户端和服务器将使用协议定义的数据结构来构建请求和响应对象，并进行数据的序列化和反序列化，以确保数据正确传递。
+
+6. 测试和验证：在实现协议之后，需要进行测试和验证，以确保客户端和服务器能够按照协议进行正确的通信。
+
+完整的协议代码如下
+
+````c
+// TaroUser  Created By leemulus 2023.3.21
+// before cmd  taro to ts ./TaroUser.taro 
+
+struct CommParams  {
+
+    Basic               :   {
+        1   token       :   string;
+    };
+
+    User                :   {
+        1   id          :   string;
+        2   name        :   string;
+        3   age         :   string;
+        4   fullName    :   string;
+        5   address     :   string;
+    };
+
+    GetUserByIdReq      :   {
+        1   id          :   int;
+        2   basic       :   Basic;
+    };
+
+    GetUserByIdRes      :   {
+        1   code        :   int;
+        2   data        :   User;
+        3   message     :   string;
+    };
+
+    GetUserListReq      :   {
+        1   basic       :   Basic;
+        2   ids         :   List<int>;
+    };
+
+    GetUserListRes      :   {
+        1   code        :   int;
+        2   data        :   List<User>;
+        3   message     :   string;
+    };
+
+};
+
+
+// 用户接口
+interface TaroInterFace  {
+    int getUserById(Request : GetUserByIdReq, Response : GetUserByIdRes);
+    int getUserList(Request : GetUserListReq, Response : GetUserListRes);
+};
+````
+
+生成后的代码如下
+
+````ts
+// after cmd taro to ts ./TaroUser.taro 
+const { TarsusReadStream } = require("tarsus-cli/taro");
+export class Basic {
+  public token: string;
+  constructor(...args: any[]) {
+    const _TarsusReadStream = new TarsusReadStream("Basic", args);
+    this.token = _TarsusReadStream.read_string(1);
+  }
+}
+export class User {
+  public id: string;
+  public name: string;
+  public age: string;
+  public fullName: string;
+  public address: string;
+  constructor(...args: any[]) {
+    const _TarsusReadStream = new TarsusReadStream("User", args);
+    this.id = _TarsusReadStream.read_string(1);
+    this.name = _TarsusReadStream.read_string(2);
+    this.age = _TarsusReadStream.read_string(3);
+    this.fullName = _TarsusReadStream.read_string(4);
+    this.address = _TarsusReadStream.read_string(5);
+  }
+}
+export class GetUserByIdReq {
+  public id: number;
+  public basic: Basic;
+  constructor(...args: any[]) {
+    const _TarsusReadStream = new TarsusReadStream("GetUserByIdReq", args);
+    this.id = _TarsusReadStream.read_int(1);
+    this.basic = _TarsusReadStream.read_struct(2, "Basic");
+  }
+}
+export class GetUserByIdRes {
+  public code: number;
+  public data: User;
+  public message: string;
+  constructor(...args: any[]) {
+    const _TarsusReadStream = new TarsusReadStream("GetUserByIdRes", args);
+    this.code = _TarsusReadStream.read_int(1);
+    this.data = _TarsusReadStream.read_struct(2, "User");
+    this.message = _TarsusReadStream.read_string(3);
+  }
+}
+export class GetUserListReq {
+  public basic: Basic;
+  public ids: Array<number>;
+  constructor(...args: any[]) {
+    const _TarsusReadStream = new TarsusReadStream("GetUserListReq", args);
+    this.basic = _TarsusReadStream.read_struct(1, "Basic");
+    this.ids = _TarsusReadStream.read_list(2, "List<int>");
+  }
+}
+export class GetUserListRes {
+  public code: number;
+  public data: Array<User>;
+  public message: string;
+  constructor(...args: any[]) {
+    const _TarsusReadStream = new TarsusReadStream("GetUserListRes", args);
+    this.code = _TarsusReadStream.read_int(1);
+    this.data = _TarsusReadStream.read_list(2, "List<User>");
+    this.message = _TarsusReadStream.read_string(3);
+  }
+}
+````
 
 ### 注册接口
 
+我们希望微服务后台能像注册HTTP路由一样快速的注册接口，屏蔽底层的实现。为此，Tarsus提供了一系列的方法来支持这一点。
+同样的，在上面的协议文件里面，执行 taro inf ts ./TaroUser.taro后，
+会得到如下接口，一切看起来都像提前定义好了。
+
+````ts
+interface TaroInterFace {
+  getUserById(
+    Request: GetUserByIdReq,
+    Response: GetUserByIdRes
+  ): Promise<GetUserByIdRes>;
+  getUserList(
+    Request: GetUserListReq,
+    Response: GetUserListRes
+  ): Promise<GetUserListRes>;
+}
+````
+
+我们只需要手动实现这些接口即可。
+此外，我们还需要手动对这些类，接口进行注解定义，这看起来有些复杂，但是在熟练的使用后会发现一切都是那么自然。
+
+**@TarsusInterFace**用来注册RPC接口前缀。
+**@TarsusMethod**用来注册RPC接口方法。
+**@Stream("Request", "Response")**用来注册序列化的请求和响应。
+
+````ts
+@TarsusInterFace("TaroInterFaceTest")
+class TaroInterFaceImpl implements TaroInterFace {
+    @TarsusMethod
+    @Stream("GetUserByIdReq", "GetUserByIdRes")
+    getUserById(
+        Request: GetUserByIdReq,
+        Response: GetUserByIdRes
+    ): Promise<GetUserByIdRes> {
+        return new Promise((resolve, reject) => {
+            Response.code = 0;
+            Response.data = {
+                address: "1",
+                age: "11",
+                id: "11",
+                fullName: "11",
+                name: "11",
+            };
+            Response.message = Request.basic.token;
+            resolve(Response);
+        });
+    }
+
+    @TarsusMethod
+    @Stream("GetUserListReq", "GetUserListRes")
+    getUserList(
+        Request: GetUserListReq,
+        Response: GetUserListRes
+    ): Promise<GetUserListRes> {
+        return new Promise((resolve, reject) => {
+            Response.code = 0;
+            Response.data = Request.ids.map(el => {
+                let user = new User()
+                user.address = el + "address";
+                user.id = el + "id";
+                user.fullName = el + "fullName";
+                user.name = el + "name";
+                user.age = el + "age";
+                return user;
+            })
+            Response.message = Request.basic.token;
+            resolve(Response);
+        });
+    }
+}
+````
+
+### 远程调用
+
+还记得**路由**部分讲的 **INVOKE** 和 **$Transmit** 吗？
+他们作为一个网关，用来执行远程调用微服务的接口方法,如下，是调用一个RPC方法所需要的参数
+当然我们不建议这么做，因为这样会有安全问题。我们可以注册对应的client端的路由，然后一个一个注册对应的方法。
+避免所有参数都是明文参数。
+
+````json
+{
+    "interFace": "TaroInterFaceTest",
+    "method": "getUserById",
+    "data": {
+        "id":"1",
+        "basic":{
+            "token":"testToken"
+        }
+    },
+    "proxy":"NodeServer",
+    "timeout": "60000",
+    "request":"GetUserByIdReq"
+}
+
+````
+
 ## 其他
 
-### 数据校验
-
 ### 定时器
+
+很多情况下我们需要定时器去计算一些数据，Tarsus封装了一些定时任务的装饰器。
+具体用法如下:
+
+````typescript
+@Schedule
+class ScheduleServer {
+    public userMap: UserMap = {}
+    public wordMap :WordMap = {}
+    public userSql = 'select * from users'
+    public wordSql = 'select en_name as en_word,own_mark,user_id from words '
+    @Cron("*/20 * * * *", true)
+    public async UserCacheMethod() {
+        const conn = await $PoolConn();
+        const that = this;
+        conn.query(that.userSql, function (_, resu) {
+            if (!resu.length) {
+                return
+            }
+            delete that.userMap;
+            console.log("START-----------开始同步用户表", moment().format("YYYY-MM-DD"))
+            that.userMap = lodash.keyBy(resu, "id")
+            console.log('同步数据',JSON.stringify(that.userMap))
+            console.log('同步数据',resu.length,"条")
+            console.log("END-----------同步用户表结束", moment().format("YYYY-MM-DD"))
+
+        })
+    }
+    @Cron("*/30 * * * *", false)
+    public async WordCacheMethod() {
+        const conn = await $PoolConn();
+        const that = this;
+        conn.query(that.wordSql, function (_, resu) {
+            console.log('resu',resu);
+            
+            if (!resu.length) {
+                return
+            }
+            delete that.wordMap;
+            console.log("START-----------开始同步单词表", moment().format("YYYY-MM-DD"))
+            const ret  = resu.map(item=>{
+                item.user_name = that.userMap[item.user_id].username
+                return item;
+            })
+            that.wordMap = lodash.keyBy(ret, "id")
+            console.log('同步数据',JSON.stringify(that.wordMap))
+            console.log('同步数据',resu.length,"条")
+            console.log("END-----------同步单词表结束", moment().format("YYYY-MM-DD"))
+        })
+    }
+}
+````
+
+### 配置
+
+提供两套配置，仅供参考
+
+````javascript
+// HttpClient 或者 RPC-Client端的配置
+// 当纯作为http服务时，servant可以不需要
+// 同时 load_Server 的 ms 配置也需要设置为 false
+// server.project 为该服务的配置，用来定义 服务组/服务名 -l 语言 node java可选 @tarsus/协议 http ms 可选 -h ip地址 -p 端口地址
+// server.servant 为网关层所需要的后台微服务的地址，写法与上面一致。
+// server.database 不多做介绍
+module.exports = {
+    server: {
+        project: "@TarsusDemoProject/NodeProxyDemo -l node -t @tarsus/http -h 127.0.0.1 -p 12011",
+        servant: [
+            "@TarsusDemoProject/NodeServer -l node -t @tarsus/ms -h 127.0.0.1 -p 12012 -w 10",
+            '@TarsusDemoProject/JavaServer -l java -t @tarsus/ms -h 127.0.0.1 -p 12013 -w 10'
+        ],
+        database: {
+            default: true,
+            type: "mysql",
+            host: "localhost",
+            username: "root",
+            password: "123456",
+            database: "test_db", //所用数据库
+            port: 3306,
+            connectionLimit: 10,
+        },
+    },
+};
+````
+
+````javascript
+// RPC-Server端的配置
+module.exports = {
+    server: {
+        project: "@TarsusDemoProject/NodeServer -l node -t @tarsus/ms -h 127.0.0.1 -p 12012",
+        database: {
+            default: true,
+            type: "mysql",
+            host: "localhost",
+            username: "root",
+            password: "123456",
+            database: "test_db", //所用数据库
+            port: 3306,
+            connectionLimit: 10,
+        },
+    },
+};
+````
 
 ## 维护者
 
