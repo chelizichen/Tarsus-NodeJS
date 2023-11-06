@@ -31,9 +31,15 @@ function methods_factory(type: METHODS) {
                     });
                 } else {
                     router[type](current_route, async (req:Request, res:Response) => {
-                        const data = await func(req);
-                        if (!res.destroyed) {
-                            res.json(data);
+                        try{
+                            const data = await func(req);
+                            if (!res.destroyed) {
+                                res.json(data);
+                            }
+                        }catch(e){
+                            if (!res.destroyed) {
+                                res.json(e)
+                            }
                         }
                     });
                 }

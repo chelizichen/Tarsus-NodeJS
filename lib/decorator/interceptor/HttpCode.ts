@@ -7,7 +7,7 @@ const HttpCode = (code:number) => {
             ...args: any[]
         ) {
             const [_,Response] = args as unknown as [any,Response];
-            let data = value.call(this, ...args);
+            let data = await value.call(this, ...args);
             Response.statusCode = code;
             return data;
         }

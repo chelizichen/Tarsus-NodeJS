@@ -4,10 +4,10 @@ function UseInterceptor(interceptor:TarsusInterceptor){
     return function (value:any,context:ClassMethodDecoratorContext){
         async function interceptor_func<This = unknown>(this: This, ...args: any[]) {
             const data = await interceptor.handle.call(this, ...args)
-            if (data) {
+            if (data && data !== null ) {
                 return data
             } else {
-                let data = value.call(this, ...args)
+                let data = await value.call(this, ...args)
                 return data
             }
         };

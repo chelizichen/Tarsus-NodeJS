@@ -1,7 +1,7 @@
 import { CronJob } from "cron";
 import load_data from "../../main_control/load_data/load_data";
 import { Request, Response } from "express";
-
+import { LimitError } from '../http/error'
 type router = string;
 type ip = string;
 type limitNum = number; // 限制请求数量
@@ -59,18 +59,13 @@ const LimitContainer = {
             IpConainer[key] = {}
         }
     },
-    async add_key(key: string,context?:[Request,Response]): Promise<boolean> {
+    async add_key(key: string,context?:[Request,Response]): Promise<void> {
         const max_num = LimitContainer.keys_max_num[key];
         const key_type = LimitContainer.keys_type[key];
         if (key_type == limitType.ROUTER) {
             const curr = LimitContainer.keys[key];
-            if (curr >= max_num) {
-                console.log('请求失败，达到最大限度 key - [%s] - value[%s]',key,LimitContainer.keys[key]);
-                return false;
-            }
+            if (curr >= max_num) throw LimitError();
             LimitContainer.keys[key] = curr + 1;
-            console.log('请求通过 key - [%s] - value[%s]',key,LimitContainer.keys[key]);
-            return true;
         }
         if(key_type == limitType.IP){
             const [req] = context;
@@ -78,23 +73,14 @@ const LimitContainer = {
             if(!ipRecord){
                 IpConainer[key][req.ip] = 1;
             }
-            if(ipRecord > max_num){
-                console.log('IP 拦截器请求失败，达到最大限度 key - [%s] - value[%s]',key,LimitContainer.keys[key]);
-                return false;
-            }
+            if(ipRecord > max_num) throw LimitError();
             IpConainer[key][req.ip] ++;
-            console.log('ip 拦截器',key,req.ip,IpConainer[key][req.ip]);
-            return true
         }
         if (key_type == limitType.RdsKey) {
             const curr = await load_data.rds.get(key);
-            if (curr >= max_num) {
-                return false;
-            }
+            if (curr >= max_num) throw LimitError()
             load_data.rds.incr(key);
-            return true;
         }
-        return true;
     },
 };
 
@@ -123,13 +109,13 @@ const Limit = (
             this: This,
             ...args: any[]
         ) {
-            // @ts-ignore
-            const add_succ = await LimitContainer.add_key(key,args);
-            if (!add_succ) {
-                return { code: -9, message: "请求达到最大限制" };
-            } else {
+            try{
+                // @ts-ignore
+                await LimitContainer.add_key(key,args);
                 let data = value.call(this, ...args);
                 return data;
+            }catch(e){
+                return e;
             }
         }
         return limit_interceptor_fn

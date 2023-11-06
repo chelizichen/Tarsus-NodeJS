@@ -9,7 +9,7 @@ const Redirect = (url:string,code:number) => {
             const [_,Response] = args as unknown as [any,Response];
             Response.statusCode  = code
             Response.redirect(url);
-            let data = value.call(this, ...args);
+            let data = await value.call(this, ...args);
             return data;
         }
         return limit_interceptor_fn
