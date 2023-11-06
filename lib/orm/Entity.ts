@@ -1,6 +1,8 @@
-import { TarsusOrm } from "./TarsusOrm";
-import { addReference, singal_add_property, SQLTools } from "./Tools";
+import {Repository} from "./Repo";
+import {TarsusOrm} from "./TarsusOrm";
+import {addReference, singal_add_property, SQLTools} from "./Tools";
 
+(Symbol as { metadata: symbol }).metadata ??= Symbol("Symbol.metadata");
 
 
 interface ColumnType {
@@ -36,41 +38,61 @@ const Entity = (table: string) => {
     return function (
         proto: new () => any,
         context: ClassDecoratorContext
-    ) {
-        proto.prototype.__ormMethods__ = new TarsusOrm();
-        // ORM 工具 
-        // const tarsusOrm = new TarsusOrm()
-        const table_name = table || proto.name;
-        proto.prototype.__table__ = table_name;
-        proto.prototype.__columns__ = {};
-        proto.prototype.__reference__ = [];
-        
-        let inst = new proto();
-        // inst. = Object.assign(inst,tarsusOrm)
-        TarsusEntitys[proto.prototype] = inst;
-        // 这一步中 我们需要对数据库的查询语句做进一步的修改操作
-        context.addInitializer(function () {
-            const vm = this;
-        });
+    ){
+        context.metadata.__table__ = table;    // 定义表
+        context.metadata.__columns__ = [];       // 定义表的列
+        context.metadata.__reference__ = [];       // 定义其他的引用 例如 leftJoin rightJoin join
+        context.metadata.__primaryKey__ = {};       // 主键
+
+        proto.prototype.save = function () {
+
+        }
+        proto.prototype.update = function () {
+
+        }
+
+        proto.prototype.insert = function () {
+
+        }
+
+        proto.prototype.delete = function () {
+
+        }
+
+        proto.prototype.delById = function () {
+
+        }
+
+        proto.prototype.getById = function () {
+
+        }
+
+        proto.prototype.query = function () {
+
+        }
+
+        proto.prototype.queryList = function () {
+
+        }
     };
 };
 
 
 /**
  * @description 一般用于普通行
+ * @Column({field:'id',length:255,type:'int'})
+ * public id : number;
  */
 function Column(config: ColumnType) {
     return function (value: any, context: ClassFieldDecoratorContext) {
-        const column_name = context.name;
-        const filed_name = config.filed || (context.name as string);
-        const filed_length = config.length || "255";
-        const filed_type = config.type || "varchar";
-        const _column_ = { column_name, filed_name, filed_length, filed_type, table_name: '' };
-        context.addInitializer(function () {
-            let vm = this.constructor.prototype
-            _column_.table_name = vm.__table__
-            singal_add_property(vm, "fields", "[]", _column_);
-        });
+        setImmediate(()=>{
+            const column_name = context.name;
+            const filed_name = config.filed || (context.name as string);
+            const filed_length = config.length || "255";
+            const filed_type = config.type || "varchar";
+            const column = {column_name, filed_name, filed_length, filed_type, table_name: context.metadata.__table__};
+            (context.metadata.__columns__ as any[]).push(column)
+        })
     };
 }
 
@@ -79,148 +101,83 @@ function Column(config: ColumnType) {
  */
 function PrimaryGenerateColumn(config: ColumnType) {
     return function (value: any, context: ClassFieldDecoratorContext) {
-        const column_name = context.name;
-        const filed_name = config.filed || (context.name as string);
-        const filed_length = config.length || "20";
-        const filed_type = config.type || "bigint";
-        const _column_ = { column_name, filed_name, filed_length, filed_type, table_name: '' };
-        context.addInitializer(function () {
-            let vm = this.constructor.prototype
-            _column_.table_name = vm.__table__
-            singal_add_property(vm, "fields", "[]", _column_);
-            singal_add_property(vm, "__index__", "{}", _column_);
-        });
+        setImmediate(()=>{
+            const column_name = context.name;
+            const filed_name = config.filed || (context.name as string);
+            const filed_length = config.length || "20";
+            const filed_type = config.type || "bigint";
+            const column = {column_name, filed_name, filed_length, filed_type, table_name: context.metadata.__table__};
+            (context.metadata.__columns__ as any[]).push(column);
+            context.metadata.__primaryKey__ = column;
+        })
     };
 }
 
-function Keyword(field?: string) {
+
+function LeftJoin(table: string, cause: string) {
     return function (value: any, context: ClassFieldDecoratorContext) {
-        let __keyword__ = field || context.name;
-        context.addInitializer(function () {
-            let vm = this.constructor.prototype
-            singal_add_property(vm, "__keyword__", "{}", __keyword__)
-        });
+        const join = {
+            joinTable: table,
+            table: context.metadata.__table__,
+            cause: cause,
+            type: 'leftJoin'
+        };
+        (context.metadata.__reference__ as any[]).push(join);
     }
 }
 
-/**
- * @description 一对一的关系
- 默认两边主键相连接
- */
-function OneToOne<T = TarsusConstructor, R = string>(targetEntity: T, referenceColumn: R) {
-    // 将需要注入的实体和引用的行进行关联
+function Join(table: string, cause: string) {
     return function (value: any, context: ClassFieldDecoratorContext) {
-        //        context
+        const join = {
+            joinTable: table,
+            table: context.metadata.__table__,
+            cause: cause,
+            type: 'Join'
+        };
+        (context.metadata.__reference__ as any[]).push(join);
     }
 }
 
-
-/**
- * @description 一对多的关系
- 一个主键、对应多个列，返回一个列表
-或许两次查询SQL是一个好的选择
-    {
-        a:'',
-        b:'',
-        c:{
-            d:'1',
-            e:'1',
-        }
-        f:[
-            { x:111,y:222},
-            { x:222,y:333},
-        ]
-    }
- */
-function OneToMany<T extends TarsusConstructor = any, R = string>(targetEntity: T, referenceColumn: R) {
-
+function RightJoin(table: string, cause: string) {
     return function (value: any, context: ClassFieldDecoratorContext) {
-        let inst;
-        if (!TarsusEntitys[targetEntity.prototype]) {
-            inst = new targetEntity();
-            TarsusEntitys[targetEntity.prototype] = inst;
-        }
-        inst = TarsusEntitys[targetEntity.prototype];
-
-        const referenceTable = inst.__table__;
-        const referenceEntity = inst;
-        
-        context.addInitializer(function () {
-            // debugger;
-            let vm = this.constructor.prototype
-            let ref = {
-                type: "[]",
-                referenceColumn: referenceColumn,
-                referenceTable: referenceTable,
-                referenceEntity: referenceEntity,
-                columnName: context.name
-            }
-            addReference(vm, "__reference__", "[]", {[context.name]:ref})
-        })
-
+        const join = {
+            joinTable: table,
+            table: context.metadata.__table__,
+            cause: cause,
+            type: 'rightJoin'
+        };
+        (context.metadata.__reference__ as any[]).push(join);
     }
 }
 
-/**
- * @description 多对一的关系
- 多个列对应另一个表中的一列
-    {
-        a:'',
-        b:'',
-        c:{
-            d:'1',
-            e:'1',
-        }
-    }
- */
-function ManyToOne<T = TarsusConstructor, R = string>(targetEntity: T, referenceColumn: R) {
-    return function (value: any, context: ClassFieldDecoratorContext) {
-        const name = context.name;
-        const referenceTable = targetEntity.constructor.prototype.__table__;
-        context.addInitializer(function () {
-            let vm = this.constructor.prototype
-            Object.assign(vm.__columns__[name], {
-                type: "{}",
-                referenceColumn: referenceColumn,
-                referenceTable: referenceTable
-            })
-        })
-    }
-}
+@Entity('user')
+class User {
+    @PrimaryGenerateColumn({length: 20, filed: 'id', type: 'int'})
+    public id: number;
 
-/**
- * @description 两边如何关联
-    @param joinColumn 主要用于如何关联其他表，以自身提供一个表
+    @Column({length: 255, filed: 'user_name', type: 'varchar'})
+    public userName: string;
 
- */
-function JoinColumn(joinColumn: string) {
-    return function (value: any, context: ClassFieldDecoratorContext) {
-        context.addInitializer(function () {
-            console.log("join");
-            
-            // debugger;
-            let vm = this.constructor.prototype
-            let ref = {
-                joinColumn: joinColumn,
-                columnName: context.name
-            }
-            addReference(vm, "__reference__", "[]", {[context.name]:ref})
-        })
-    }
+    @Column({length: 20, filed: 'age', type: 'varchar'})
+    public age: number;
+
+    @Column({length: 255, filed: 'phone_number', type: 'varchar'})
+    public phoneNumber: string;
 }
 
 
-// f
+const user = new User() as Repository<User>;
 
+console.log(user.save);
+user.userName = "11"
+console.log(user.userName);
 
 export {
     __column__,
     Entity,
     Column,
     PrimaryGenerateColumn,
-    Keyword,
-    OneToMany,
-    ManyToOne,
-    JoinColumn,
-    OneToOne
+    LeftJoin,
+    Join,
+    RightJoin,
 };

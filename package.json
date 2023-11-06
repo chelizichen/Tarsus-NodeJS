@@ -60,7 +60,7 @@
     "tsup": "tsup lib --format cjs,esm -d core --target es2017 --clean  --tsconfig tsconfig.pkg.json",
     "test:proxy": "ts-node-dev lib/web/proxy/TarsusRequest.ts --dts-resolve",
     "servant": "ts-node-dev lib/util/servant.ts",
-    "orm": "ts-node-dev test/http/entity/goods.entity.ts",
+    "orm": "ts-node-dev lib/orm/Entity.ts",
     "validate": "ts-node-dev lib/decorator/interceptor/__test__validate__.ts"
   },
   "author": "",
