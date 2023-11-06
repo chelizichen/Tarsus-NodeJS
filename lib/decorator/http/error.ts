@@ -20,6 +20,7 @@ const CacheError        = () => new TarsusError({ code: -8, message: 'error:缓�
 const LimitError        = () => new TarsusError({ code: -9, message: 'error:请求接口超出限制异常' })
 const PipeError         = () => new TarsusError({ code: -10, message: 'error:管道验证失败' })
 const InterceptorError  = () => new TarsusError({ code: -11, message: 'error:拦截器验证失败' })
+const TypeCheckError    = (message) => new TarsusError({ code:-21, message })
 
 export {
     InterFaceError      ,
@@ -33,5 +34,6 @@ export {
     LimitError          ,
     PipeError           ,
     InterceptorError    ,
+    TypeCheckError      ,
     TarsusError
 }

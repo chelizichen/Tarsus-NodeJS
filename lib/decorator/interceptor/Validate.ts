@@ -1,11 +1,14 @@
 import moment from 'moment';
 import validator from 'validator';
 import _ from 'lodash';
+import { TarsusError, TypeCheckError } from '../http/error';
 
 (Symbol as { metadata: symbol }).metadata ??= Symbol("Symbol.metadata");
 
 type IObj = Record<string, any>;
 type IClass = new (...args: any[]) => any;
+
+// https://juejin.cn/post/7277797749886418998 typecheck || throw Error在 typescript 中不被支持
 
 export function TarsusValidate(argument: any) { 
     // debugger;
@@ -28,17 +31,29 @@ export function plainToInstance(obj: IObj, target: IClass) {
     return instance
 }
 
-function classToPlain(instance: any) { }
+export function classToPlain(instance: any) {
+  if (typeof instance.toJSON === 'function') {
+    return instance.toJSON();
+  }
+  const plainObj = {};
+  for (const prop in instance) {
+    if (instance.hasOwnProperty(prop)) {
+      plainObj[prop] = instance[prop];
+    }
+  }
+  return plainObj;
+ }
 
 export function DataTransferOBJ() {
     return function (val: any, context: ClassDecoratorContext) {
-
+        context.metadata.__isDTO__ = true;
     };
 }
 
 
 function __IsInt(val: any): boolean {
-    return Number.isInteger(val);
+    if(!Number.isInteger(val)) throw TypeCheckError(`TypeError:${val} is not a int value`);
+    return true;
 }
 export function IsInt() {
     return function (val: any, context: ClassFieldDecoratorContext) {
@@ -51,8 +66,9 @@ export function IsInt() {
     }
 }
 
-function __IsString(val: any) {
-    return typeof val === "string";
+function __IsString(val: any):boolean {
+    if(!(typeof val === "string"))  throw TypeCheckError(`TypeError:${val} is not a string value`);
+    return true
 }
 
 export function IsString() {
@@ -66,8 +82,9 @@ export function IsString() {
     }
 }
 
-function __IsNumber(val: any) {
-    return typeof val === "number";
+function __IsNumber(val: any):boolean {
+    if(!(typeof val === "number"))throw TypeCheckError(`TypeError:${val} is not a string value`);
+    return true;
 }
 
 export function IsNumber() {
@@ -81,7 +98,8 @@ export function IsNumber() {
     }
 }
 function __IsArray(val: any) {
-    return Array.isArray(val);
+    if(!_.isArray(val)) throw TypeCheckError(`TypeError:${val} is not a Array`);
+    return true
 }
 
 export function IsArray() {
@@ -96,7 +114,8 @@ export function IsArray() {
 }
 
 function __MinLen(val: any, min: number) {
-    return val.length >= min;
+    if(!(val.length >= min)) throw TypeCheckError(`ValueError: value ${val} , min ${min}`);
+    return true
 }
 
 export function MinLen(min: number) {
@@ -111,7 +130,8 @@ export function MinLen(min: number) {
 }
 
 function __MaxLen(val: any, max: number) {
-    return val.length <= max;
+    if(!(val.length <= max))  throw TypeCheckError(`ValueError: value ${val} , max ${max}`);
+    return true;
 }
 
 export function MaxLen(max: number) {
@@ -126,7 +146,8 @@ export function MaxLen(max: number) {
 }
 
 function __IsNotEmpty(val: string): boolean {
-    return val.trim().length > 0;
+    if(!(val.trim().length > 0)) throw TypeCheckError(`ValueError:${val} is an empty value`);
+    return true;
 }
 
 export function IsNotEmpty() {
@@ -141,7 +162,8 @@ export function IsNotEmpty() {
 }
 
 function __IsBool(val: any): boolean {
-    return typeof val === "boolean";
+    if(!(typeof val === "boolean")) throw TypeCheckError(`TypeError:${val} is not a boolean value`);
+    return true;
 }
 
 export function IsBool() {
@@ -203,7 +225,8 @@ export function IsObject() {
 
 
 function __IsUrl(val: string): boolean {
-    return validator.isURL(val);
+    if(!(validator.isURL(val))) throw TypeCheckError(`TypeError:${val} is not a url`);
+    return true;
 }
 
 export function IsUrl() {
