@@ -1,5 +1,6 @@
 import load_web_app from "../../main_control/load_server/load_web_app";
 import {Request, Response} from 'express';
+import { TarsusError } from "./error";
 
 export enum METHODS {
     GET = "get",
@@ -33,6 +34,10 @@ function methods_factory(type: METHODS) {
                     router[type](current_route, async (req:Request, res:Response) => {
                         try{
                             const data = await func(req);
+                            if((data instanceof TarsusError || data instanceof Error)){
+                                (data as TarsusError).iCode = (data as TarsusError).iCode || -19;
+                                (data as TarsusError).iMessage = (data as TarsusError).iMessage || 'uncaught error'
+                            }
                             if (!res.destroyed) {
                                 res.json(data);
                             }

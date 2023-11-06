@@ -1,11 +1,12 @@
 import TarsusHttpApplication from "../../../lib/decorator/app/http";
 import {LoadController, LoadInit, LoadServer, LoadStruct, LoadTaro} from "../../../lib/main_control/load_server/load_web_app";
 import UserController from "./controller/UserController";
+import ValidateController from "./controller/ValidateControrller";
 
 @TarsusHttpApplication
 class HttpServer{
     static main(){
-        LoadController([UserController])
+        LoadController([UserController,ValidateController])
         // init
         LoadInit((app)=>{
             console.log("hello world")

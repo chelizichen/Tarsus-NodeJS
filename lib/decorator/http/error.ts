@@ -1,8 +1,11 @@
 class TarsusError extends Error {
-    public err:string
+    public err:any
+    public iCode:number;
+    public iMessage:string;
     constructor(err:any) {
         super(err.message);
-        this.err = err;
+        this.iMessage = err.message;
+        this.iCode = err.code;
     }
 }
 
@@ -30,4 +33,5 @@ export {
     LimitError          ,
     PipeError           ,
     InterceptorError    ,
+    TarsusError
 }

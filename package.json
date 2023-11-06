@@ -60,7 +60,8 @@
     "tsup": "tsup lib --format cjs,esm -d core --target es2017 --clean  --tsconfig tsconfig.pkg.json",
     "test:proxy": "ts-node-dev lib/web/proxy/TarsusRequest.ts --dts-resolve",
     "servant": "ts-node-dev lib/util/servant.ts",
-    "orm": "ts-node-dev test/http/entity/goods.entity.ts"
+    "orm": "ts-node-dev test/http/entity/goods.entity.ts",
+    "validate": "ts-node-dev lib/decorator/interceptor/__test__validate__.ts"
   },
   "author": "",
   "license": "ISC",
@@ -75,9 +76,11 @@
     "mysql": "^2.18.1",
     "redis": "^4.3.1",
     "tarsus-cli": "^1.2.94",
-    "ts-node-dev": "^2.0.0-0",
-    "typescript": "^5.2.1-rc",
+    "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.2.2",
     "uid": "^2.0.2",
+    "validator": "^13.11.0",
     "yaml": "^2.2.1"
   },
   "devDependencies": {
