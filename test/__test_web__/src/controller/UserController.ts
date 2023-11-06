@@ -18,7 +18,7 @@ class UserController {
 
     @Get("/limit_test")
     @Limit(limitType.ROUTER,2,10000) // 10秒内2次最大限制 单个路由
-    async limitTest(req,res){
+    async limitTest(){
         return {
             code:0,
             message:"success"
@@ -27,7 +27,7 @@ class UserController {
 
     @Get("/ip_limit_test")
     @Limit(limitType.IP,2,10000) // 10秒内2次最大限制
-    async IpLimitTest(req,res){
+    async IpLimitTest(){
         return {
             code:0,
             message:"success"

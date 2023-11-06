@@ -121,8 +121,9 @@ const Limit = (
         console.log('注册节流任务',type,key,num,period);
         async function limit_interceptor_fn<This = unknown>(
             this: This,
-            ...args: [Request,Response]
+            ...args: any[]
         ) {
+            // @ts-ignore
             const add_succ = await LimitContainer.add_key(key,args);
             if (!add_succ) {
                 return { code: -9, message: "请求达到最大限制" };
