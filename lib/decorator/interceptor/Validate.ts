@@ -31,6 +31,12 @@ export function plainToInstance(obj: IObj, target: IClass) {
     return instance
 }
 
+export function TransformObjToValidate(obj:IObj,target: IClass){
+    const instance = plainToInstance(obj,target)
+    return TarsusValidate(instance)
+}
+
+
 export function classToPlain(instance: any) {
   if (typeof instance.toJSON === 'function') {
     return instance.toJSON();
