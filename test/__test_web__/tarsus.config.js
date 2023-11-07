@@ -7,11 +7,11 @@ module.exports = {
         ],
         database: {
             default: true,
-            type: "mysql",
-            host: "localhost",
+            type: "mysql2",
+            host: "127.0.0.1",
             username: "root",
             password: "123456",
-            database: "test_db", //所用数据库
+            database: "word_server", //所用数据库
             port: 3306,
             connectionLimit: 10,
         },

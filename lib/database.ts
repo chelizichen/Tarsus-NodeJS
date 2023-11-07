@@ -1,39 +1,38 @@
+import knex from "knex";
 import load_data from "./main_control/load_data/load_data";
-import * as mysql from 'mysql';
 
-let pool = void 'mysql pool' as mysql.Pool
+let pool = void 'knex mysql client' as knex.Knex
 setImmediate(()=>{
     pool = load_data.pool
-    console.log('this pool', pool);
 })
 
 
-async function $PoolConn() :Promise<mysql.PoolConnection>{
-    return new Promise((resolve, reject) => {
-        pool.getConnection((err, conn) => {
-            if (err) {
-                reject(err)
-            }
-            resolve(conn)
-        })
-    })
-}
+// async function $PoolConn() :Promise<mysql.PoolConnection>{
+//     return new Promise((resolve, reject) => {
+//         pool.getConnection((err, conn) => {
+//             if (err) {
+//                 reject(err)
+//             }
+//             resolve(conn)
+//         })
+//     })
+// }
 
-async function $Query(sql, params) {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const conn = await $PoolConn() as mysql.PoolConnection
-            conn.query(sql, params, function (err, res) {
-                if (err) {
-                    reject(err)
-                }
-                resolve(res)
-            })
-        } catch (e) {
-            reject(e)
-        }
-    })
-}
+// async function $Query(sql, params) {
+//     return new Promise(async (resolve, reject) => {
+//         try {
+//             const conn = await $PoolConn() as mysql.PoolConnection
+//             conn.query(sql, params, function (err, res) {
+//                 if (err) {
+//                     reject(err)
+//                 }
+//                 resolve(res)
+//             })
+//         } catch (e) {
+//             reject(e)
+//         }
+//     })
+// }
 
 function LoadDataBase(data: Record<string, any>) {
     load_data.init(data)
@@ -42,6 +41,6 @@ function LoadDataBase(data: Record<string, any>) {
 export {
     pool,
     LoadDataBase,
-    $PoolConn,
-    $Query
+    // $PoolConn,
+    // $Query
 }
