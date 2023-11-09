@@ -25,8 +25,7 @@ function methods_factory(type: METHODS) {
         let router = load_web_app.router;
         return (func: any, context: ClassMethodDecoratorContext) => {
             context.addInitializer(function () {
-                // @ts-ignore
-                let current_route = create_url(context.metadata.interFace, url);
+                let current_route = create_url(context.metadata.interFace as string, url);
                 func = func.bind(this);
                 if (type === METHODS.INVOKE) {
                     _.invoke(router,type,...[current_route, async (req:Request, res:Response) => {
@@ -34,8 +33,10 @@ function methods_factory(type: METHODS) {
                     }])
                 } else {
                     _.invoke(router,type,...[current_route, async (req:Request, res:Response) => {
+                        _.set(context.metadata,"__request__",req)
+                        _.set(context.metadata,"__response__",res)
                         try{
-                            const data = await func(req);
+                            const data = await func(req,res);
                             if((data instanceof TarsusError || data instanceof Error)){
                                 (data as TarsusError).iCode = (data as TarsusError).iCode || -19;
                                 (data as TarsusError).iMessage = (data as TarsusError).iMessage || 'uncaught error'

@@ -1,4 +1,5 @@
 import { Response } from "express";
+import _ from "lodash";
 
 const HttpCode = (code:number) => {
     return function (value: any, context: ClassMethodDecoratorContext){
@@ -6,9 +7,9 @@ const HttpCode = (code:number) => {
             this: This,
             ...args: any[]
         ) {
-            const [_,Response] = args as unknown as [any,Response];
+            const response = _.get(context.metadata,'__response__') as Response;
             let data = await value.call(this, ...args);
-            Response.statusCode = code;
+            response.statusCode = code;
             return data;
         }
         return limit_interceptor_fn
