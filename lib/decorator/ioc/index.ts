@@ -5,7 +5,6 @@ const IocContainer = {
 }
 
 const Collect = (value: new (...args:any[]) => void, context: ClassDecoratorContext) => {
-    // get signal instance from prototype
     IocContainer.instance.set(value, new value());
 };
 
@@ -16,7 +15,6 @@ const Inject = (injectAble: new (...args:any[]) => any) => {
             let injectAbleClass = IocContainer.instance.get(injectAble);
             return injectAbleClass;
         };
-   
     };
 };
 

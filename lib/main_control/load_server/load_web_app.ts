@@ -1,7 +1,6 @@
 import express, {Express} from "express";
 import load_config, {config_enum} from "../load_config/load_config";
 import {parseToObj, ServantUtil} from "../../util/servant";
-
 import load_data from "../load_data/load_data";
 import {EventEmitter} from "events";
 import {Load_Balance} from "../proto_base/load_balance";
@@ -10,6 +9,7 @@ import path from "path";
 import {cwd} from "process";
 import {readdirSync} from "fs";
 import stream_proxy from "../proto_base/taro_proxy";
+(Symbol as { metadata: symbol }).metadata ??= Symbol("Symbol.metadata");
 
 type void_func = (...args: any[]) => void;
 
@@ -161,8 +161,8 @@ function LoadController(controllers: any) {
         for (let i = 0; i < controllers.length; i++) {
             // console.log(controllers)
             let controller = controllers[i]
-            const controller_inst = new controller();
-            console.log(controller_inst.interFace, "is loading success")
+            new controller();
+            console.log(controller[Symbol.metadata].interFace, "is loading success")
         }
     }
 }

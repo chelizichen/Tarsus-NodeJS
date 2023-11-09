@@ -322,7 +322,7 @@ function LeftJoin(table: new (...args:any[])=>any, cause: string) {
             });
             const tableName = metadata.__table__ as string;
             const [joinCondition1,joinCondition2] = cause.split('=');
-            const referenceCallBack = context.metadata.__reference__ as Function;
+            const referenceCallBack = context.metadata.__reference__ as (knex:Knex)=>Knex;
             let newCallBack = async (knex : Knex)=> {
                 return await referenceCallBack(knex).leftJoin(tableName,function(){
                     this.on(joinCondition1,"=",joinCondition2)  
@@ -341,27 +341,71 @@ function LeftJoin(table: new (...args:any[])=>any, cause: string) {
     }
 }
 
-function Join(table: string, cause: string) {
+function Join(table: new (...args:any[])=>any, cause: string) {
+    const metadata = table[Symbol.metadata]
+    if(!metadata.__isEntity__){
+        throw DecoratorError(`NotFound DecoratorError: ${table.name} is not a entity`)
+    }
     return function (value: any, context: ClassFieldDecoratorContext) {
-        const join = {
-            joinTable: table,
-            table: context.metadata.__table__,
-            cause: cause,
-            type: 'Join'
-        };
-        (context.metadata.__reference__ as any[]).push(join);
+        setImmediate(()=>{
+            const columns = (metadata.__columns__ as column_type[]) .map(item=>{
+                item.origin_field_name = item.field_name;
+                item.field_name = `${item.field_name} as ormPre__${context.name as string}__${item.field_name}`;
+                item.referenceColumn = context.name as string;
+                return item;
+            });
+            const tableName = metadata.__table__ as string;
+            const [joinCondition1,joinCondition2] = cause.split('=');
+            const referenceCallBack = context.metadata.__reference__ as (knex:Knex)=>Knex;
+            let newCallBack = async (knex : Knex)=> {
+                return await referenceCallBack(knex).join(tableName,function(){
+                    this.on(joinCondition1,"=",joinCondition2)  
+                })
+            };
+            context.metadata.__reference__ = newCallBack;
+            (context.metadata.__columns__ as any[]).push(...columns)
+            for(let value of columns){
+                _.set(
+                    context.metadata.__columnMap2field__ as Record<string,any>,
+                    value.origin_field_name,
+                    value.column_name
+                );
+            }
+        })
     }
 }
 
-function RightJoin(table: string, cause: string) {
+function RightJoin(table: new (...args:any[])=>any, cause: string) {
+    const metadata = table[Symbol.metadata]
+    if(!metadata.__isEntity__){
+        throw DecoratorError(`NotFound DecoratorError: ${table.name} is not a entity`)
+    }
     return function (value: any, context: ClassFieldDecoratorContext) {
-        const join = {
-            joinTable: table,
-            table: context.metadata.__table__,
-            cause: cause,
-            type: 'rightJoin'
-        };
-        (context.metadata.__reference__ as any[]).push(join);
+        setImmediate(()=>{
+            const columns = (metadata.__columns__ as column_type[]) .map(item=>{
+                item.origin_field_name = item.field_name;
+                item.field_name = `${item.field_name} as ormPre__${context.name as string}__${item.field_name}`;
+                item.referenceColumn = context.name as string;
+                return item;
+            });
+            const tableName = metadata.__table__ as string;
+            const [joinCondition1,joinCondition2] = cause.split('=');
+            const referenceCallBack = context.metadata.__reference__ as (knex:Knex)=>Knex;
+            let newCallBack = async (knex : Knex)=> {
+                return await referenceCallBack(knex).rightJoin(tableName,function(){
+                    this.on(joinCondition1,"=",joinCondition2)  
+                })
+            };
+            context.metadata.__reference__ = newCallBack;
+            (context.metadata.__columns__ as any[]).push(...columns)
+            for(let value of columns){
+                _.set(
+                    context.metadata.__columnMap2field__ as Record<string,any>,
+                    value.origin_field_name,
+                    value.column_name
+                );
+            }
+        })
     }
 }
 
