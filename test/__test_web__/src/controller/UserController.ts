@@ -2,7 +2,7 @@ import {Controller, Get, INVOKE, Post} from "../../../../lib/decorator/http/rout
 import {Limit, limitType} from "../../../../lib/decorator/interceptor/Limit";
 import Ret from '../utils/ret'
 import { $Transmit } from "../../../../lib/main_control/proto_base";
-@Controller("/user")
+@Controller("user")
 class UserController {
 
     @Get("/list")

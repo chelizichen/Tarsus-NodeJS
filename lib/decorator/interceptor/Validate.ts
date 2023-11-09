@@ -17,7 +17,11 @@ export function TarsusValidate(argument: any) {
     const fields:string[] = _.uniq(metadata.__records__);
     return fields.every(field=>{
         const validateItems = _.get(metadata,field) as Function[]
-        return validateItems.every(func=>func(_.get(instance, field)))
+        const validate = validateItems.every(func=>func(_.get(instance, field)));
+        if(!validate){
+            throw TypeCheckError(`ValidateError:${field}`)
+        }
+        return validate
     })
 }
 
@@ -152,7 +156,7 @@ export function MaxLen(max: number) {
 }
 
 function __IsNotEmpty(val: string): boolean {
-    if(!(val.trim().length > 0)) throw TypeCheckError(`ValueError:${val} is an empty value`);
+    if(!val || !(val.trim().length > 0)) throw TypeCheckError(`ValueError:${val} is an empty value`);
     return true;
 }
 
@@ -245,3 +249,21 @@ export function IsUrl() {
         (context.metadata[name] as Function[]).push(validateFunction)
     }
 }
+
+
+export function CheckStatus(status:Array<number>) {
+    return function (val: any, context: ClassFieldDecoratorContext) {
+        const name = context.name as string;
+        if (!context.metadata[name]) context.metadata[name] = [];
+        if (!context.metadata.__records__) context.metadata.__records__ = [];
+        (context.metadata.__records__ as string[]).push(name);
+        const validateFunction = (value) => {
+            value = _.toNumber(value);
+            return _.isNumber(value) && status.includes(value)
+        };
+        (context.metadata[name] as Function[]).push(validateFunction)
+    }
+}
+
+export const Required = IsNotEmpty;
+

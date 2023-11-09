@@ -8,6 +8,7 @@ export enum METHODS {
     GET = "get",
     POST = "post",
     INVOKE = "all",
+    PUT = 'put'
 }
 
 function create_url(interFace: string, method: string): string {
@@ -58,6 +59,7 @@ function methods_factory(type: METHODS) {
 
 const Get = methods_factory(METHODS.GET)
 const Post = methods_factory(METHODS.POST)
+const Put = methods_factory(METHODS.PUT)
 
 const INVOKE = methods_factory(METHODS.INVOKE)
 
@@ -68,4 +70,4 @@ const Controller = (interFace: string) => {
 };
 
 
-export {Get, Post, INVOKE, Controller};
+export {Get, Post, Put, INVOKE, Controller};
