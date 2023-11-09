@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGenerateColumn } from '../../../../lib/httpservice'
+import { Column, Entity, LeftJoin, PrimaryGenerateColumn } from '../../../../lib/httpservice'
+import User from './user';
 @Entity('words')
 class Words {
     @PrimaryGenerateColumn({})
@@ -23,6 +24,9 @@ class Words {
         return 1
     }})
     public type: string;
+
+    @LeftJoin(User,"words.user_id = users.id")
+    public User:User;
 }
 
 export default Words;

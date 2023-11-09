@@ -21,6 +21,7 @@ const LimitError        = () => new TarsusError({ code: -9, message: 'error:请�
 const PipeError         = () => new TarsusError({ code: -10, message: 'error:管道验证失败' })
 const InterceptorError  = () => new TarsusError({ code: -11, message: 'error:拦截器验证失败' })
 const TypeCheckError    = (message) => new TarsusError({ code:-21, message })
+const DecoratorError    = (message) => new TarsusError({ code:-31, message })
 
 export {
     InterFaceError      ,
@@ -35,5 +36,6 @@ export {
     PipeError           ,
     InterceptorError    ,
     TypeCheckError      ,
-    TarsusError
+    TarsusError         ,
+    DecoratorError      ,
 }
