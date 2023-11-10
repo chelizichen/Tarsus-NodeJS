@@ -3,6 +3,7 @@ import { pool } from "../database";
 import { DecoratorError } from "../decorator/http/error";
 import knex, { Knex } from "knex";
 import { IocContainer } from "../decorator/ioc";
+import { uid } from "uid";
 
 (Symbol as { metadata: symbol }).metadata ??= Symbol("Symbol.metadata");
 
@@ -409,6 +410,26 @@ function RightJoin(table: new (...args:any[])=>any, cause: string) {
     }
 }
 
+// function setPreContextName(contextName){
+//     return `__${contextName.name}__`
+// }
+
+function Transactional(){
+    return function(fn,context:ClassMethodDecoratorContext){
+        const knex = context.metadata.__knex__ as Knex;
+        const startTransactional = knex.transaction();
+        context.addInitializer(async function(...args:any[]){
+            fn = fn.bind(this)
+            const callback = await fn(...args)
+            try{
+                await callback((await startTransactional).commit)
+            }catch(e){
+                (await startTransactional).rollback()
+            }
+        })
+    }
+}
+
 export {
     __column__,
     Entity,
@@ -418,5 +439,6 @@ export {
     Join,
     RightJoin,
     Repository,
-    Pagination
+    Pagination,
+    Transactional
 };

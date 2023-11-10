@@ -1,31 +1,22 @@
-import moment from "moment";
 import { Controller, Get, Pagination, Post, TarsusError } from "../../../../lib/httpservice";
 import { Inject } from '../../../../lib/ioc'
-import { Repository } from "../../../../lib/httpservice";
-import Words from "../entity/words";
+import OrmService from "../service/OrmService";
 
 @Controller('orm')
 class OrmController{
 
-    @Inject(Words)
-    public Words : Repository<Words>
+    @Inject(OrmService) public OrmService:OrmService;
 
     @Get("getList")
     public async getList(){
-        const data = await this.Words.getList();
+        const data = await this.OrmService.getList();
         return data;
     }
 
     @Post("save")
     public async save(){
         try{
-            const words = new Words() as Repository<Words>
-            words.ownMark = '1';
-            words.enName = '1';
-            words.userId = '1';
-            words.createTime = moment().format("YYYY-MM-DD")
-            words.updateTime = words.createTime;
-            const ret = await this.Words.save(words)
+            const ret = await this.OrmService.save()
             return {
                 code:0,
                 ret
