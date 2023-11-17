@@ -10,7 +10,7 @@ class ValidateController {
     @UsePipe(new TestValidatePipe())
     getList(req:Request){
         const body = req.body;
-        return body;
+        return {iData:body};
     }
 
     @Post('/status')

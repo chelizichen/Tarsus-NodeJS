@@ -416,17 +416,17 @@ function RightJoin(table: new (...args:any[])=>any, cause: string) {
 
 function Transactional(){
     return function(fn,context:ClassMethodDecoratorContext){
-        const knex = context.metadata.__knex__ as Knex;
-        const startTransactional = knex.transaction();
-        context.addInitializer(async function(...args:any[]){
-            fn = fn.bind(this)
-            const callback = await fn(...args)
-            try{
-                await callback((await startTransactional).commit)
-            }catch(e){
-                (await startTransactional).rollback()
-            }
-        })
+        // const knex = context.metadata.__knex__ as Knex;
+        // const startTransactional = knex.transaction();
+        // context.addInitializer(async function(...args:any[]){
+        //     fn = fn.bind(this)
+        //     const callback = await fn(...args)
+        //     try{
+        //         await callback((await startTransactional).commit)
+        //     }catch(e){
+        //         (await startTransactional).rollback()
+        //     }
+        // })
     }
 }
 

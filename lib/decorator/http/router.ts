@@ -2,6 +2,7 @@ import load_web_app from "../../main_control/load_server/load_web_app";
 import {Request, Response} from 'express';
 import { TarsusError } from "./error";
 import _ from 'lodash';
+import { catchError, concatMap, from, scan, throwError,takeWhile } from "rxjs";
 (Symbol as { metadata: symbol }).metadata ??= Symbol("Symbol.metadata");
 
 export enum METHODS {
@@ -12,15 +13,24 @@ export enum METHODS {
 }
 
 function create_url(interFace: string, method: string): string {
-    if (!interFace.startsWith("/")) {
-        interFace = "/" + interFace;
-    }
-    if (!method.startsWith("/")) {
-        method = "/" + method
-    }
-    return interFace + method;
+    interFace = interFace.startsWith("/") ? interFace : `/${interFace}`;
+    method = method.startsWith("/") ? method : `/${method}`;
+    return `${interFace}${method}`;
 }
 
+const handleHttpObserve = from([
+    {key:"__rx__interceptor__",value:'handle.call'},
+    {key:"__rx__pipe__",value:"handle.call"},
+    {key:"__rx__router__",value:undefined}
+]);
+
+function EmptyFunction(){}
+function RxDone(){
+    return {
+        iCode:0,
+        iMessage:'ok'
+    }
+}
 function methods_factory(type: METHODS) {
     return function (url: string) {
         let router = load_web_app.router;
@@ -36,20 +46,50 @@ function methods_factory(type: METHODS) {
                     _.invoke(router,type,...[current_route, async (req:Request, res:Response) => {
                         _.set(context.metadata,"__request__",req)
                         _.set(context.metadata,"__response__",res)
-                        try{
-                            const data = await func(req,res);
-                            if((data instanceof TarsusError || data instanceof Error)){
-                                (data as TarsusError).iCode = (data as TarsusError).iCode || -19;
-                                (data as TarsusError).iMessage = (data as TarsusError).iMessage || 'uncaught error'
+                        const stream = handleHttpObserve.pipe(
+                            concatMap(async (Obj) => {
+                                try{
+                                    const {key,value} = Obj;
+                                    if(key === "__rx__router__"){
+                                        const data = await func(req,res)
+                                        _.set(context.metadata,'__rx__resp__',data)
+                                        return data;
+                                    }else{
+                                        const fn = (_.get(context.metadata,key) || EmptyFunction) as Function
+                                        await _.invoke(fn,value,...[this,req,res]);
+                                    }
+                                }catch(error){
+                                    _.set(context.metadata,'__rx__resp__',error)
+                                    return error
+                                }
+                            }),
+                            takeWhile(result => !(_.isError(result))),
+                            scan((accumulator, currentValue) => [...accumulator, currentValue], []), // 使用 scan 累积结果
+                            catchError(error => {
+                                return throwError(()=>{
+                                    _.set(context.metadata,'__rx__resp__',error)
+                                    return error
+                                });
+                            })
+                        )
+                        stream.subscribe({
+                            next(v){
+                                console.log(v);
+                            },
+                            error(data){
+                                const RESP = data || _.get(context.metadata,'__rx__resp__')
+                                if((RESP instanceof TarsusError || RESP instanceof Error)){
+                                    (RESP as TarsusError).iCode = (RESP as TarsusError).iCode || -19;
+                                    (RESP as TarsusError).iMessage = (RESP as TarsusError).iMessage || 'uncaught error'
+                                }
+                                res.send(RESP)
+                            },
+                            complete(){
+                                const iDATA = RxDone();
+                                const iRESP = _.get(context.metadata,'__rx__resp__')
+                                res.send(Object.assign({},iDATA,iRESP))
                             }
-                            if (!res.destroyed) {
-                                res.json(data);
-                            }
-                        }catch(e){
-                            if (!res.destroyed) {
-                                res.json(e)
-                            }
-                        }
+                        });
                     }])
                 }
             });
