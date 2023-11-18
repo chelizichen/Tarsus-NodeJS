@@ -18,11 +18,7 @@ function create_url(interFace: string, method: string): string {
     return `${interFace}${method}`;
 }
 
-const handleHttpObserve = from([
-    {key:"__rx__interceptor__",value:'handle.call'},
-    {key:"__rx__pipe__",value:"handle.call"},
-    {key:"__rx__router__",value:undefined}
-]);
+
 
 function EmptyFunction(){}
 function RxDone(){
@@ -36,6 +32,13 @@ function methods_factory(type: METHODS) {
         let router = load_web_app.router;
         return (func: any, context: ClassMethodDecoratorContext) => {
             context.addInitializer(function () {
+                const httphandleStream = [
+                    {key:"__rx__interceptor__",value:'handle.call'},
+                    {key:"__rx__pipe__",value:"handle.call"},
+                    {key:"__rx__router__",value:undefined}
+                ];
+                Object.freeze(httphandleStream); // 冻结
+                const handleHttpObserve = from(httphandleStream);
                 let current_route = create_url(context.metadata.interFace as string, url);
                 func = func.bind(this);
                 if (type === METHODS.INVOKE) {

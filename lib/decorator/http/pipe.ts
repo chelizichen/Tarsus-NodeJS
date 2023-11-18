@@ -1,9 +1,9 @@
 import { Request,Response,NextFunction } from "express"
-import { TarsusError } from "./error";
 import _ from "lodash";
+(Symbol as { metadata: symbol }).metadata ??= Symbol("Symbol.metadata");
 
 interface TarsusGlobalPipe{
-    next(req:Request,res:Response,next:NextFunction):void
+    handle(req:Request,res:Response,next:NextFunction):void
 }
 interface TarsusPipe{
     handle(req:Request):any;

@@ -3,6 +3,7 @@ import {LoadController, LoadInit, LoadServer, LoadStruct, LoadTaro} from "../../
 import OrmController from "./controller/OrmController";
 import UserController from "./controller/UserController";
 import ValidateController from "./controller/ValidateControrller";
+import Logger from "./pipe/GlobalPipe";
 
 @TarsusHttpApplication
 class HttpServer{
