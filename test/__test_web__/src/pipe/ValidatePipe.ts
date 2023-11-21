@@ -15,7 +15,20 @@ class TestValidatePipe implements TarsusPipe{
     }
 }
 
+class TestOtherValidatePipe implements TarsusPipe{
+    handle(req:Request){
+        req.body = plainToInstance(req.body,UserValidateObj)
+        console.log(req.body);
+        
+        const check = TarsusValidate(req.body)
+        
+        if(check){
+            throw PipeError();
+        }
+    }
+}
 
 export {
-    TestValidatePipe
+    TestValidatePipe,
+    TestOtherValidatePipe
 }

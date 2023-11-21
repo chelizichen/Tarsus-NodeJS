@@ -1,5 +1,6 @@
 import { Response } from "express";
 import _ from "lodash";
+import { RxConstant, setName } from "../http/define";
 
 const HttpCode = (code:number) => {
     return function (value: any, context: ClassMethodDecoratorContext){
@@ -7,7 +8,7 @@ const HttpCode = (code:number) => {
             this: This,
             ...args: any[]
         ) {
-            const response = _.get(context.metadata,'__response__') as Response;
+            const response = _.get(context.metadata,setName(RxConstant.__response__,context.name)) as Response;
             let data = await value.call(this, ...args);
             response.statusCode = code;
             return data;
