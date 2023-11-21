@@ -10,7 +10,7 @@ class ValidateController {
     @UsePipe(new TestValidatePipe())
     getList(req:Request){
         const body = req.body;
-        body.ip = '12011'
+        body.ip = '12001'
         return {iData:body};
     }
 

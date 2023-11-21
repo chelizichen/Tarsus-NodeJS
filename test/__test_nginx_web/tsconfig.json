@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "strictPropertyInitialization": false,
+        "esModuleInterop":true,
+        "downlevelIteration":true,
+        "target": "es5",
+        "lib": ["es2022", "ESNext"]
+    },
+    "include": [
+      "src"
+    ],
+    "exclude": ["node_modules"]
+}
