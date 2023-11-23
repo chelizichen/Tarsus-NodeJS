@@ -16,5 +16,6 @@ interface TarsusInterceptor{
 }
 
 export {
-    UseInterceptor,TarsusInterceptor
+    UseInterceptor,
+    TarsusInterceptor
 }

@@ -1,6 +1,6 @@
 {
   "name": "tarsus",
-  "version": "1.4.98",
+  "version": "1.4.99",
   "description": "new ts-decorator for express server",
   "types": "./core/types",
   "repository": {

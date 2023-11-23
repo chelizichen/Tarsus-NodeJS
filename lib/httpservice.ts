@@ -1,9 +1,10 @@
 import TarsusHttpApplication from "./decorator/app/http";
 import { TarsusInterceptor, UseInterceptor } from "./decorator/http/aop";
-import { InterFaceError, OutTimeError, TouchError, MakeDirError, ResetError, DBResetError, DBError, CacheError, LimitError, PipeError, InterceptorError, TypeCheckError, TarsusError } from "./decorator/http/error";
+import { InterFaceError, OutTimeError, TouchError, MakeDirError, ResetError, DBResetError, DBError, CacheError, LimitError, PipeError, InterceptorError, TypeCheckError, TarsusError, DecoratorError, TokenError } from "./decorator/http/error";
 import { TarsusGlobalPipe, TarsusPipe, UsePipe } from "./decorator/http/pipe";
-import { Controller, Get, Post,Put, INVOKE } from "./decorator/http/router";
+import { Controller, Get, Post, Put, INVOKE } from "./decorator/http/router";
 import { HttpCode } from "./decorator/interceptor/HttpCode";
+import { TarsusJwtValidate,JwtValidate } from "./decorator/interceptor/Jwt";
 import { Limit, limitType } from "./decorator/interceptor/Limit";
 import { Redirect } from "./decorator/interceptor/Redirect";
 import { TarsusValidate, plainToInstance, classToPlain, DataTransferOBJ, IsInt, IsString, IsArray, MinLen, MaxLen, IsNotEmpty, IsBool, MinDate, MaxDate, IsObject, IsUrl, TransformObjToValidate, CheckStatus,Required } from "./decorator/interceptor/Validate";
@@ -21,6 +22,8 @@ export {
     TarsusInterceptor,
     TarsusGlobalPipe,
     TarsusPipe,
+    TarsusJwtValidate,
+    JwtValidate,
     // validate
     TransformObjToValidate,
     TarsusValidate,
@@ -52,19 +55,21 @@ export {
     Limit,
     limitType,
     // error,
-    InterFaceError,
-    OutTimeError,
-    TouchError,
-    MakeDirError,
-    ResetError,
-    DBResetError,
-    DBError,
-    CacheError,
-    LimitError,
-    PipeError,
-    InterceptorError,
-    TypeCheckError,
-    TarsusError,
+    InterFaceError      ,
+    OutTimeError        ,
+    TouchError          ,
+    MakeDirError        ,
+    ResetError          ,
+    DBResetError        ,
+    DBError             ,
+    CacheError          ,
+    LimitError          ,
+    PipeError           ,
+    InterceptorError    ,
+    TypeCheckError      ,
+    TarsusError         ,
+    DecoratorError      ,
+    TokenError          ,
     // load
     LoadServer,
     LoadController,
