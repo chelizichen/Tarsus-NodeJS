@@ -1,6 +1,7 @@
 import { Response } from "express";
 import _ from "lodash";
 import { RxConstant, setName } from "../http/define";
+(Symbol as { metadata: symbol }).metadata ??= Symbol("Symbol.metadata");
 
 const HttpCode = (code:number) => {
     return function (value: any, context: ClassMethodDecoratorContext){

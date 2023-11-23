@@ -162,7 +162,6 @@ function LoadController(controllers: any) {
             // console.log(controllers)
             let controller = controllers[i]
             new controller();
-            console.log(controller[Symbol.metadata].interFace, "is loading success")
         }
     }
 }

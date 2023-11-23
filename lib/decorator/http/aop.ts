@@ -1,6 +1,7 @@
 import { Request,Response } from "express";
 import _ from "lodash";
 import { RxConstant, setName } from "./define";
+import { TarsusInterceptor } from "./interfaces";
 (Symbol as { metadata: symbol }).metadata ??= Symbol("Symbol.metadata");
 
 function UseInterceptor(interceptor:TarsusInterceptor){
@@ -11,11 +12,8 @@ function UseInterceptor(interceptor:TarsusInterceptor){
     }
 }
 
-interface TarsusInterceptor{
-    handle(req:Request):any;
-}
+
 
 export {
     UseInterceptor,
-    TarsusInterceptor
 }

@@ -1,15 +1,15 @@
 import { Request } from "express";
 import _ from "lodash";
 import { RxConstant, setName } from "../http/define";
+import { TarsusJwtValidate } from "../http/interfaces";
+(Symbol as { metadata: symbol }).metadata ??= Symbol("Symbol.metadata");
+
 // import { ParamsDictionary } from "express-serve-static-core";
 // import { ParsedQs } from "qs";
 // import { TokenError } from "../http/error";
 
 
 // 验证函数
-interface TarsusJwtValidate{
-    handle(req:Request):Promise<void>;
-}
 
 // class Demojwt implements TarsusJwtValidate{
 //     async handle(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<void> {
@@ -35,6 +35,5 @@ const JwtValidate = (jwtvalidate:TarsusJwtValidate)=>{
 }
 
 export {
-    TarsusJwtValidate,
     JwtValidate
 }
