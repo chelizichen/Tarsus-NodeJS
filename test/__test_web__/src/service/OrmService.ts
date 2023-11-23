@@ -2,7 +2,7 @@ import moment from "moment";
 import { Repository, TarsusError } from "../../../../lib/httpservice";
 import { Collect, Inject } from "../../../../lib/ioc";
 import Words from "../entity/words";
-import { Transactional } from "../../../../lib/orm/Entity";
+import { Transactional } from "../../../../lib/orm";
 
 @Collect
 class OrmService{

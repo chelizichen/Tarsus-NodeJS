@@ -35,12 +35,11 @@ export function plainToInstance(obj: IObj, target: IClass) {
     return instance
 }
 
-function TransformObjToValidate(obj:IObj,target: IClass){
+export function TransformObjToValidate(obj:IObj,target: IClass){
     const instance = plainToInstance(obj,target)
     return TarsusValidate(instance)
 }
 
-export const TarsusDTO = TransformObjToValidate;
 
 export function classToPlain(instance: any) {
   if (typeof instance.toJSON === 'function') {
@@ -55,11 +54,13 @@ export function classToPlain(instance: any) {
   return plainObj;
  }
 
-export function DataTransferOBJ() {
+function DataTransferOBJ() {
     return function (val: any, context: ClassDecoratorContext) {
         context.metadata.__isDTO__ = true;
     };
 }
+
+export const TarsusDTO = DataTransferOBJ
 
 
 function __IsInt(val: any): boolean {

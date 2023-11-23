@@ -1,6 +1,6 @@
-import { DataTransferOBJ, IsNumber, IsString, MinLen, MaxLen, Required, CheckStatus } from "../../../../lib/decorator/interceptor/Validate";
+import { TarsusDTO, IsNumber, IsString, MinLen, MaxLen, Required, CheckStatus } from "../../../../lib/decorator/interceptor/Validate";
 
-@DataTransferOBJ()
+@TarsusDTO()
 class UserValidateObj{
     @IsNumber()
     age:number;

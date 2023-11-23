@@ -1,17 +1,18 @@
 {
   "compilerOptions": {
-    "outDir": "dist",
+    "outDir": "core",
     "module": "commonjs",
     "noEmit": false,
     "esModuleInterop":true,
     "types": ["node"],
     "declaration":true,
-    "declarationDir": "./dist/types"
+    "declarationDir": "./types",
+    "target": "ES5"
   },
   "include": [
-    "./test",
+    "./lib/*",
   ],
   "exclude": [
-    "./lib"
+    "./test/*"
   ]
 }

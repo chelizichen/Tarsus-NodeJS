@@ -2,7 +2,7 @@
   "name": "tarsus",
   "version": "1.4.99",
   "description": "new ts-decorator for express server",
-  "types": "./core/types",
+  "types": "./types",
   "repository": {
     "url": "https://github.com/chelizichen/tarsus",
     "type": "git"
@@ -18,37 +18,37 @@
     "./core/httpservice": {
       "require": "./core/httpservice.js",
       "import": "./core/httpservice.mjs",
-      "types": "./core/types/httpservice.d.ts"
+      "types": "./types/httpservice.d.ts"
     },
     "./core/microservice": {
       "require": "./core/microservice.js",
       "import": "./core/microservice.mjs",
-      "types": "./core/types/microservice.d.ts"
+      "types": "./types/microservice.d.ts"
     },
     "./core/ioc": {
       "require": "./core/ioc.js",
       "import": "./core/ioc.mjs",
-      "types": "./core/types/ioc.d.ts"
+      "types": "./types/ioc.d.ts"
     },
     "./core/util": {
       "require": "./core/util.js",
       "import": "./core/util.mjs",
-      "types": "./core/types/util.d.ts"
+      "types": "./types/util.d.ts"
     },
     "./core/database": {
       "require": "./core/database.js",
       "import": "./core/database.mjs",
-      "types": "./core/types/database.d.ts"
+      "types": "./types/database.d.ts"
     },
     "./core/proxy": {
       "require": "./core/proxy.js",
       "import": "./core/proxy.mjs",
-      "types": "./core/types/proxy.d.ts"
+      "types": "./types/proxy.d.ts"
     },
     "./core/schedule": {
       "require": "./core/schedule.js",
       "import": "./core/schedule.mjs",
-      "types": "./core/types/schedule.d.ts"
+      "types": "./types/schedule.d.ts"
     }
   },
   "scripts": {
@@ -57,6 +57,7 @@
     "server": "ts-node-dev test/__test_ms__/index.ts",
     "rx": "ts-node-dev test/__test_rx__/index.ts",
     "pkg": "tsc --project tsconfig.pkg.json",
+    "build": "tsc --project tsconfig.build.json",
     "tsup": "tsup lib --format cjs,esm -d core --target es2017 --clean  --tsconfig tsconfig.pkg.json",
     "test:proxy": "ts-node-dev lib/web/proxy/TarsusRequest.ts --dts-resolve",
     "servant": "ts-node-dev lib/util/servant.ts",

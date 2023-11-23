@@ -1,9 +1,8 @@
 import _ from "lodash";
 import { pool } from "../database";
 import { DecoratorError } from "../decorator/http/error";
-import knex, { Knex } from "knex";
+import { Knex } from "knex";
 import { IocContainer } from "../decorator/ioc";
-import { uid } from "uid";
 
 (Symbol as { metadata: symbol }).metadata ??= Symbol("Symbol.metadata");
 
