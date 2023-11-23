@@ -227,14 +227,14 @@ function Entity (table: string) {
                 return knex(table).insert(record,[key])
             }
 
-            private useFields():[string,string,string[],Array<{field:string;column:string;defaultValue:Function}>]{
+            useFields():[string,string,string[],Array<{field:string;column:string;defaultValue:Function}>]{
                 const key = (context.metadata.__primaryKey__ as column_type).field_name as string;
                 const fields = (context.metadata.__columns__ as column_type[]).map(item=>item.field_name)
                 const fieldsMap = (context.metadata.__columns__ as column_type[]).map(item=>({field:item.field_name,column:item.column_name,defaultValue:item.defaultValue}))
                 return [table,key,fields,fieldsMap]
             }
 
-            private setData2Column(data:any[]){
+            setData2Column(data:any[]){
                 // column to field map
                 const c2f = context.metadata.__columnMap2field__;
                 const thisTableC2F = _.get(c2f,table);
@@ -308,6 +308,7 @@ function PrimaryGenerateColumn(config: ColumnType) {
 
 
 function LeftJoin(table: new (...args:any[])=>any, cause: string) {
+    // @ts-ignore
     const metadata = table[Symbol.metadata]
     if(!metadata.__isEntity__){
         throw DecoratorError(`NotFound DecoratorError: ${table.name} is not a entity`)
@@ -342,6 +343,7 @@ function LeftJoin(table: new (...args:any[])=>any, cause: string) {
 }
 
 function Join(table: new (...args:any[])=>any, cause: string) {
+    // @ts-ignore
     const metadata = table[Symbol.metadata]
     if(!metadata.__isEntity__){
         throw DecoratorError(`NotFound DecoratorError: ${table.name} is not a entity`)
@@ -376,6 +378,7 @@ function Join(table: new (...args:any[])=>any, cause: string) {
 }
 
 function RightJoin(table: new (...args:any[])=>any, cause: string) {
+    // @ts-ignore
     const metadata = table[Symbol.metadata]
     if(!metadata.__isEntity__){
         throw DecoratorError(`NotFound DecoratorError: ${table.name} is not a entity`)
