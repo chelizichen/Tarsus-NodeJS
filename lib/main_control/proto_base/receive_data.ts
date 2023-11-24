@@ -123,11 +123,9 @@ class Receive_Data {
             load_ms_app.interface_events.emit(head, ...requestParams),
         ])
             .then((res: any) => {
-                console.log(res);
-                console.log('1');
+                console.log('response',response);
+                console.log('response data',res);
                 let toJson = FastStringify(response,res);
-                console.log('2');
-                
                 let len = Buffer.from(toJson).byteLength;
                 let buf = Buffer.alloc(len + 8);
 
