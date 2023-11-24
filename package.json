@@ -1,6 +1,6 @@
 {
   "name": "tarsus",
-  "version": "1.5.01",
+  "version": "1.5.02",
   "description": "new ts-decorator for express server",
   "types": "./types",
   "repository": {
@@ -56,13 +56,12 @@
     "http": "ts-node-dev test/__test_web__/index.ts",
     "server": "ts-node-dev test/__test_ms__/index.ts",
     "rx": "ts-node-dev test/__test_rx__/index.ts",
-    "pkg": "tsc --project tsconfig.pkg.json",
-    "build": "tsc --project tsconfig.build.json",
-    "tsup": "tsup lib --format cjs,esm -d core --target es2017 --clean  --tsconfig tsconfig.pkg.json",
     "test:proxy": "ts-node-dev lib/web/proxy/TarsusRequest.ts --dts-resolve",
     "servant": "ts-node-dev lib/util/servant.ts",
     "orm": "ts-node-dev lib/orm/Entity.ts",
-    "validate": "ts-node-dev lib/decorator/interceptor/__test__validate__.ts"
+    "validate": "ts-node-dev lib/decorator/interceptor/__test__validate__.ts",
+    "dts": "tsc --project tsconfig.dts.json",
+    "build": "tsup lib --format cjs,esm -d core --target es2017 --clean  --tsconfig tsconfig.build.json"
   },
   "author": "",
   "license": "ISC",

@@ -58,7 +58,7 @@ function LoadTaro(url?: string) {
         
         const schemaMaps = generateSchemaFromMap(structMaps)
         load_schema.dtoMaps = schemaMaps;
-
+        console.log('schemaMaps',schemaMaps);
         console.log("********** 加载完成 json::Schema ************");
 
     })

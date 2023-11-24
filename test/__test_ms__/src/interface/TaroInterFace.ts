@@ -5,7 +5,7 @@ import {
     GetUserListRes,
     User,
 } from "../struct/TaroUser";
-import {Stream, TarsusInterFace, TarsusMethod} from "../../../../lib/decorator/ms/interface";
+import {Stream, TarsusInterFace, TarsusMethod} from "../../../../core/decorator/ms/interface";
 
 interface TaroInterFace {
     getUserById(

@@ -5,8 +5,9 @@
     "noEmit": false,
     "esModuleInterop":true,
     "types": ["node"],
+    "lib": ["es2022", "ESNext","ES2015"],
     "declaration":true,
-    "declarationDir": "./types",
+    "declarationDir": "types",
     "target": "ES5"
   },
   "include": [

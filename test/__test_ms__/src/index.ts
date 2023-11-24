@@ -1,5 +1,4 @@
-import TarsusMsApplication from '../../../lib/decorator/app/microservice'
-import {LoadInterface, LoadServer, LoadStruct, LoadTaro} from "../../../lib/main_control/load_server/load_ms_app";
+import {LoadInterface, LoadServer, LoadStruct, LoadTaro,TarsusMsApplication} from "../../../core/microservice";
 import TaroInterFaceImpl from "./interface/TaroInterFace";
 
 @TarsusMsApplication
