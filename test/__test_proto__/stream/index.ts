@@ -61,10 +61,19 @@ class T_WStream {
     }
 
     WriteString(tag:number,value:string){
+        // Fristly, We should get target string's bytelength
         let encoded = new TextEncoder().encode(value);
+        this.position += 4;
+        this.allocate(4);
+        this.positionMap.set(tag,this.position - 4);
+        this.originView.setInt32(this.position - 4,encoded.byteLength);
+
+        // Then, We should allocate our buffer
+        this.allocate(encoded.byteLength);
         for (let i = 0; i < encoded.length; i++) {  
-            this.originView.setInt8(tag + i, encoded[i]);  
-        }  
+            this.originView.setInt8(this.position + i, encoded[i]);  
+        }
+        this.position += encoded.byteLength;
     }
 
     toBuf(){
@@ -106,6 +115,17 @@ class T_RStream{
         return this.readStreamToObj[tag]
     }
 
+    ReadString(tag:number){
+        this.position += 4;
+        const byteLength = this.originView.getInt32(this.position-4);
+        let stringArray = [];
+        for (let i = 0; i < byteLength; i++) {  
+            stringArray.push(this.originView.getInt8(this.position + i));  
+        }
+        this.readStreamToObj[tag] = String.fromCharCode(...stringArray)
+        return this.readStreamToObj[tag];
+    }
+
 }
 
 class TST_WSTREAM extends T_WStream{
@@ -120,6 +140,7 @@ class TST_WSTREAM extends T_WStream{
         this.WriteInt16   (1,22)
         this.WriteInt32   (2,33)
         this.WriteInt64   (3,BigInt(64))
+        this.WriteString  (4,"测试1231231")
     }
 }
 class TST_RSTREAM extends T_RStream{
@@ -127,6 +148,7 @@ class TST_RSTREAM extends T_RStream{
     public b;
     public c;
     public d;
+    public e;
 
     constructor(buf:Buffer){
         super(buf)
@@ -134,6 +156,7 @@ class TST_RSTREAM extends T_RStream{
         this.b = this.ReadInt16   (1)
         this.c = this.ReadInt32   (2)
         this.d = this.ReadInt64   (3)
+        this.e = this.ReadString  (4)
     }
 }
 
