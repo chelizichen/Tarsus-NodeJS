@@ -1,6 +1,8 @@
 import { T_RStream, T_WStream } from "../stream";
 
 
+
+
 class T_Vector{
     static _t_className = 'Vector'
     _t_value = ''
@@ -49,9 +51,9 @@ class T_Map{
     }
     // default key Type is string;
     // value type is any
-    constructor(T_Key:string,T_Value:any){
-        this._t_key = T_Key;
-        this._t_value = T_Value;
+    constructor(T_Key:{_t_className:string},T_Value:{_t_className:string}){
+        this._t_key = T_Key._t_className;
+        this._t_value = T_Value._t_className;
     }
     set(key,value){
         this.Value[key] = value;
@@ -79,18 +81,15 @@ class T_Map{
         return ws
     }
     
-    static streamToObj(buf:Buffer,T_Key:any,T_Value:any,ByteLength:number){
-        console.log('buf.length',buf.length);
-        console.log('buf.length',JSON.stringify(buf));
-        
+    static streamToObj(buf:Buffer,T_Key:{_t_className:string},T_Value:{_t_className:string},ByteLength:number){
         const rs = new T_RStream(buf);
         const TMap = new T_Map(T_Key,T_Value);
         let tag = 0
         
         while(true){
             debugger;
-            const key   = rs.ReadAny(tag++,T_Key)
-            const value = rs.ReadAny(tag++,T_Value)
+            const key   = rs.ReadAny(tag++,T_Key._t_className)
+            const value = rs.ReadAny(tag++,T_Value._t_className)
             console.log('key | ',key, ' | value | ',value);
             TMap.set(key,value)
             if(rs.getPosition() >= ByteLength){
@@ -101,11 +100,16 @@ class T_Map{
     }
 }
 
-const TARSUS:Record<string,any> = {}
-TARSUS.T_Vector = T_Vector;
-TARSUS.T_Map = T_Map;
+class T_String extends String{
+    static _t_className = 'string'
+}
+
+
+
+
 
 export{
     T_Vector,
+    T_String,
     T_Map
 }

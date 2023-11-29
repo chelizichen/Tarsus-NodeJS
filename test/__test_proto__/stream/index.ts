@@ -4,7 +4,7 @@
 // <Tag<int8>,Length<Optional<int32>>,Value<any>> as TLV
 // This protocol uses TLV for decoding and encoding of underlying protocols
 
-import { T_Map, T_Vector } from "../category";
+import { T_String,T_Vector,T_Map } from "../category";
 
 function Logger(log:string,ignoreResult:boolean){
     return function(originalMethod: any, _context: any){
@@ -134,7 +134,6 @@ class T_WStream {
         this.allocate(4);
         this.positionMap.set(tag,this.position - 4);
         this.originView!.setInt32(this.position - 4, position);
-        console.log('Write Position',position);
         this.allocate(position)
         this.WriteBuf(-1, ws.toBuf())
         this.position += position;

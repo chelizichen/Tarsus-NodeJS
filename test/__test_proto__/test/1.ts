@@ -1,5 +1,5 @@
 import { T_WStream,T_RStream } from '../stream/index'
-import { T_Map } from '../category/index'
+import { T_Map, T_String } from '../category/index'
 
 class TST_WSTREAM extends T_WStream{
     writeStruct(){
@@ -7,8 +7,8 @@ class TST_WSTREAM extends T_WStream{
         this.WriteInt16   (1,22)
         this.WriteInt32   (2,33)
         this.WriteInt64   (3,BigInt(64))
-        this.WriteString  (4,"测试1231231")
-        const testMap = new T_Map('string','string');
+        this.WriteString  (4,"chelizichen")
+        const testMap = new T_Map(T_String,T_String);
         testMap.set('a','1')
         testMap.set('b','2')
         testMap.set('c','3')
@@ -34,8 +34,7 @@ class TST_RSTREAM extends T_RStream{
         this.c = this.ReadInt32   (2)
         this.d = this.ReadInt64   (3)
         this.e = this.ReadString  (4)
-        debugger;
-        this.f = this.ReadMap     (5,"string","string")
+        this.f = this.ReadMap     (5,T_String,T_String)
     }
 
     constructor(buf:Buffer){
@@ -56,13 +55,13 @@ main()
 
 
 function main2(){
-    const testMap = new T_Map('string','string');
+    const testMap = new T_Map(T_String,T_String);
     testMap.set('a','1')
     testMap.set('b','2')
     testMap.set('c','3')
     testMap.set('d','4')
     const stream = T_Map.objToStream(testMap)
-    const obj = T_Map.streamToObj(stream.toBuf()!,"string","string",40)
+    const obj = T_Map.streamToObj(stream.toBuf()!,T_String,T_String,40)
     console.log(obj.toObj());
 }
 
