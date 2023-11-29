@@ -134,6 +134,7 @@ class T_WStream {
         this.allocate(4);
         this.positionMap.set(tag,this.position - 4);
         this.originView!.setInt32(this.position - 4, position);
+        console.log('Write Position',position);
         this.allocate(position)
         this.WriteBuf(-1, ws.toBuf())
         this.position += position;
@@ -161,6 +162,9 @@ class T_RStream{
     public getPosition(){
         return this.position;
     }
+    createBuffer(size:number){
+        return Buffer.alloc(size);
+    }
     constructor(buf:Buffer){
         this.originView = new DataView(buf.buffer);
         this.originBuf = buf;
@@ -180,7 +184,7 @@ class T_RStream{
                 return this.ReadInt64(tag)
             }
             case "string":{
-                return this.ReadString(tag,position)
+                return this.ReadString(tag)
             }
         }
     }
@@ -209,13 +213,12 @@ class T_RStream{
     }
 
     @Logger("ReadString |",false)
-    ReadString(tag:number,position = 0){
+    ReadString(tag:number){
         this.position += 4;
-        const tempPosition = position + this.position;
-        const byteLength = this.originView.getInt32(tempPosition - 4);
+        const byteLength = this.originView.getInt32( this.position - 4);
         let stringArray:number[] = [];
         for (let i = 0; i < byteLength; i++) {  
-            stringArray.push(this.originView.getInt8(tempPosition + i));  
+            stringArray.push(this.originView.getInt8( this.position + i));  
         }
         this.readStreamToObj[tag] = String.fromCharCode(...stringArray)
         this.position += byteLength;
@@ -223,10 +226,12 @@ class T_RStream{
     }
 
     ReadMap(tag:number,T_Key:any,T_Value:any){
+        debugger;
         this.position += 4;
         const ByteLength = this.originView.getInt32(this.position - 4);
-        const MapBuf = this.originBuf.subarray(this.position, this.position + ByteLength);
-        const Obj = T_Map.streamToObj(MapBuf,T_Key,T_Value,ByteLength,this.position);
+        const temp = this.createBuffer(ByteLength);
+        this.originBuf.copy(temp,0, this.position, this.position + ByteLength)
+        const Obj = T_Map.streamToObj(temp,T_Key,T_Value,ByteLength);
         this.readStreamToObj[tag] = Obj.toObj();
         this.position += ByteLength;
         return this.readStreamToObj[tag];

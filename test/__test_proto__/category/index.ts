@@ -79,15 +79,18 @@ class T_Map{
         return ws
     }
     
-    static streamToObj(buf:Buffer,T_Key:any,T_Value:any,ByteLength:number,position?:number){
+    static streamToObj(buf:Buffer,T_Key:any,T_Value:any,ByteLength:number){
+        console.log('buf.length',buf.length);
+        console.log('buf.length',JSON.stringify(buf));
+        
         const rs = new T_RStream(buf);
         const TMap = new T_Map(T_Key,T_Value);
         let tag = 0
         
         while(true){
             debugger;
-            const key   = rs.ReadAny(tag++,T_Key,position)
-            const value = rs.ReadAny(tag++,T_Value,position)
+            const key   = rs.ReadAny(tag++,T_Key)
+            const value = rs.ReadAny(tag++,T_Value)
             console.log('key | ',key, ' | value | ',value);
             TMap.set(key,value)
             if(rs.getPosition() >= ByteLength){
