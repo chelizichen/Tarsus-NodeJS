@@ -4,19 +4,8 @@
 // <Tag<int8>,Length<Optional<int32>>,Value<any>> as TLV
 // This protocol uses TLV for decoding and encoding of underlying protocols
 
-import { T_String,T_Vector,T_Map } from "../category";
-
-function Logger(log:string,ignoreResult:boolean){
-    return function(originalMethod: any, _context: any){
-        function replacementMethod(this: any, ...args: any[]) {
-            console.log(log,' | arguments |  ',args)
-            const result = originalMethod.call(this, ...args);
-            !ignoreResult && console.log(log,' | result | ',result)
-            return result;
-        }
-        return replacementMethod;
-    }
-}
+import { T_String,T_Vector,T_Map, T_BASE } from "../category";
+import {Logger} from '../decorator/index'
 
 class T_WStream {
     private originView :   DataView | undefined;
@@ -124,7 +113,16 @@ class T_WStream {
     }
 
     WriteStruct(tag:number, value:T_WStream){
-
+        debugger
+        value.Serialize()
+        const position = value.position;
+        this.position += 4
+        this.allocate(4)
+        this.originView.setInt32(this.position - 4,position)
+        this.positionMap.set(tag,this.position - 4);
+        this.allocate(position)
+        this.WriteBuf(-1, value.toBuf())
+        this.position += position;
     }
 
     WriteMap(tag:number, value:T_Map){
@@ -139,9 +137,19 @@ class T_WStream {
         this.position += position;
     }
 
-    WriteVector(tag,value:T_Vector){
-
+    WriteVector(tag:number,value:T_Vector){
+        const ws = T_Vector.objToStream(value);
+        const position = ws.position;
+        this.position += 4;
+        this.allocate(4);
+        this.positionMap.set(tag,this.position - 4);
+        this.originView!.setInt32(this.position - 4, position);
+        this.allocate(position)
+        this.WriteBuf(-1, ws.toBuf())
+        this.position += position;
     }
+
+    Serialize(){}
 
     toBuf(){
         return this.originBuf
@@ -235,6 +243,31 @@ class T_RStream{
         this.position += ByteLength;
         return this.readStreamToObj[tag];
     }
+
+    ReadVector(tag:number,T_Value:any){
+        debugger;
+        this.position += 4;
+        const ByteLength = this.originView.getInt32(this.position -  4);
+        const temp = this.createBuffer(ByteLength);
+        this.originBuf.copy(temp,0, this.position, this.position + ByteLength)
+        const Obj = T_Vector.streamToObj(temp,T_Value,ByteLength)
+        this.readStreamToObj[tag] = Obj.toObj();
+        this.position += ByteLength;
+        return this.readStreamToObj[tag];
+    }
+
+    ReadStruct<T extends new (...args:any[]) => T_RStream>(tag:number,Struct: T){
+        this.position += 4;
+        const ByteLength = this.originView.getInt32(this.position -  4);
+        const temp = this.createBuffer(ByteLength);
+        this.originBuf.copy(temp,0, this.position, this.position + ByteLength)
+        const struct = new Struct(temp)
+        const Obj = struct.Deserialize();
+        this.readStreamToObj[tag] = Obj.toObj();
+        return this.readStreamToObj[tag];
+    }
+
+    Deserialize(){return this}
 
 }
 
