@@ -1,5 +1,5 @@
 import { T_RStream, T_WStream } from "../stream";
-
+(Symbol as { metadata: symbol }).metadata ??= Symbol("Symbol.metadata");
 
 type T_BASE = {
     _t_className : string;
@@ -11,7 +11,7 @@ class T_Vector{
     _keys = []
     _values = []
     Value = new Array();
-    getClass(){
+    __getClass__(){
         return {
             className:`${T_Vector._t_className}<${this._t_value}>`,
             valueType:this._t_value,
@@ -60,7 +60,7 @@ class T_Map{
     _t_value = ''
     Value = new Object();
 
-    getClass(){
+    __getClass__(){
         return{
             className: `${T_Map._t_className}<${this._t_key},${this._t_value}>`,
             valueType:this._t_value,
@@ -73,6 +73,9 @@ class T_Map{
         this._t_key = T_Key._t_className;
         this._t_value = T_Value._t_className;
     }
+    pack(val){
+        this.Value = val;
+    }
     set(key,value){
         this.Value[key] = value;
     }
@@ -82,19 +85,16 @@ class T_Map{
     delete(key){
         this.Value[key] = null;
     }
-    getSize(){
-
-    }
     toObj(){
         return this.Value
     }
-    static objToStream(T_Map:T_Map){
+    static objToStream(T_MapVal:T_Map){
         const ws = new T_WStream();
         let tag = 0;
-        const obj = T_Map.toObj()
+        const obj = T_MapVal.toObj()
         for(let v in obj){
-            ws.WriteAny(tag++,  v     , T_Map._t_key)
-            ws.WriteAny(tag++,  obj[v], T_Map._t_value) 
+            ws.WriteAny(tag++,  v     , T_MapVal._t_key)
+            ws.WriteAny(tag++,  obj[v], T_MapVal._t_value) 
         }
         return ws
     }
@@ -121,7 +121,21 @@ class T_String extends String{
     static _t_className = 'string'
 }
 
+class T_INT8 extends Number{
+    static _t_className = 'int8'
+}
 
+class T_INT16 extends Number{
+    static _t_className = 'int16'
+}
+
+class T_INT32 extends Number{
+    static _t_className = 'int32'
+}
+
+class T_INT64 extends Number{
+    static _t_className = 'int64'
+}
 
 
 
@@ -129,5 +143,9 @@ export{
     T_Vector,
     T_String,
     T_Map,
-    T_BASE
+    T_BASE,
+    T_INT8,
+    T_INT16,
+    T_INT32,
+    T_INT64
 }

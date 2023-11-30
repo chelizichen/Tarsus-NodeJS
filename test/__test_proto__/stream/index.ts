@@ -4,8 +4,9 @@
 // <Tag<int8>,Length<Optional<int32>>,Value<any>> as TLV
 // This protocol uses TLV for decoding and encoding of underlying protocols
 
-import { T_String,T_Vector,T_Map, T_BASE } from "../category";
-import {Logger} from '../decorator/index'
+import _ from "lodash";
+import { T_String,T_Vector,T_Map, T_BASE, T_INT8, T_INT16, T_INT32, T_INT64 } from "../category";
+import {Logger, WillOverride} from '../decorator/index'
 
 class T_WStream {
     private originView :   DataView | undefined;
@@ -109,23 +110,32 @@ class T_WStream {
         if(tag == -1){
             value.copy(this.originBuf,this.position,0,this.originBuf.byteLength)
             this.originView = new DataView(this.originBuf.buffer)
+            return;
         }
     }
 
-    WriteStruct(tag:number, value:T_WStream){
-        debugger
-        value.Serialize()
-        const position = value.position;
+    WriteStruct<T extends new ()=>T_WStream>(tag:number, value:any, T_WStream:T){
+        const ws = new T_WStream()
+        ws.Serialize(value)
+        const position = ws.position;
         this.position += 4
         this.allocate(4)
         this.originView.setInt32(this.position - 4,position)
         this.positionMap.set(tag,this.position - 4);
         this.allocate(position)
-        this.WriteBuf(-1, value.toBuf())
+        this.WriteBuf(-1, ws.toBuf())
         this.position += position;
     }
 
-    WriteMap(tag:number, value:T_Map){
+    WriteMap(tag:number, value:T_Map,T_Key?:T_BASE,T_Value?:T_BASE){
+        const isTarsCategory = Reflect.has(value,"__getClass__") || (value instanceof T_Map);
+        if(!isTarsCategory){
+            const tempVal = _.cloneDeep(value);
+            const tempT_Map = new T_Map(T_Key,T_Value)
+            tempT_Map.pack(tempVal)
+            value = tempT_Map;
+        }
+
         const ws = T_Map.objToStream(value)
         const position = ws.position;
         this.position += 4;
@@ -148,8 +158,8 @@ class T_WStream {
         this.WriteBuf(-1, ws.toBuf())
         this.position += position;
     }
-
-    Serialize(){}
+    @WillOverride
+    Serialize(obj?:any){ return this;}
 
     toBuf(){
         return this.originBuf
@@ -176,22 +186,25 @@ class T_RStream{
         this.originView = new DataView(buf.buffer);
         this.originBuf = buf;
     }
-    ReadAny(tag:number,type:any,position?:number){
+    ReadAny(tag:number,type:any,T_KEY?:string,T_VALUE?:string){
         switch(type){
-            case "int8":{
+            case T_INT8._t_className:{
                 return this.ReadInt8(tag)
             }
-            case "int16":{
+            case T_INT16._t_className:{
                 return this.ReadInt16(tag)
             }
-            case "int32":{
+            case T_INT32._t_className:{
                 return this.ReadInt32(tag)
             }
-            case "int64":{
+            case T_INT64._t_className:{
                 return this.ReadInt64(tag)
             }
-            case "string":{
+            case T_String._t_className:{
                 return this.ReadString(tag)
+            }
+            case T_Map._t_className:{
+                return this.ReadMap(tag,T_KEY,T_VALUE)
             }
         }
     }
@@ -264,9 +277,11 @@ class T_RStream{
         const struct = new Struct(temp)
         const Obj = struct.Deserialize();
         this.readStreamToObj[tag] = Obj.toObj();
+        this.position += ByteLength;
         return this.readStreamToObj[tag];
     }
 
+    @WillOverride
     Deserialize(){return this}
 
 }
