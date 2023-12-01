@@ -1,7 +1,8 @@
 {
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node-dev --project tsconfig.json  test/ample.ts"
+    "dev": "ts-node-dev --project tsconfig.json  test/ample.ts",
+    "script": "ts-node-dev --project tsconfig.json bin/lemon2node.ts"
   },
   "author": "",
   "license": "ISC",
@@ -10,6 +11,7 @@
     "typescript": "^5.3.0"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.191"
+    "@types/lodash": "^4.14.191",
+    "prettier": "^3.1.0"
   }
 }

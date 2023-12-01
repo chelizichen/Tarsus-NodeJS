@@ -9,7 +9,8 @@
     "include": [
       "category/*",
       "stream/*",
-      "test/*"
+      "test/*",
+      "bin/*"
     ],
     "exclude": ["node_modules"]
 }

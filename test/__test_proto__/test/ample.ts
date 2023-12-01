@@ -22,8 +22,8 @@ BasicInfo.Write = @DefineStruct(BasicInfo._t_className) class extends T_WStream{
 }
 
 BasicInfo.Read = @DefineStruct(BasicInfo._t_className) class extends T_RStream{
-    public token:T_String;
-    public detail:T_Map
+    @DefineField(0) public token:T_String;
+    @DefineField(1) public detail:T_Map
 
     @Override
     public Deserialize(){
@@ -52,9 +52,9 @@ Pagination.Write = @DefineStruct(Pagination._t_className) class extends T_WStrea
 }
 
 Pagination.Read = @DefineStruct(Pagination._t_className) class extends T_RStream{
-    public offset:T_INT16;
-    public size:T_INT16
-    public keyword:T_String
+    @DefineField(0) public offset:T_INT16;
+    @DefineField(1) public size:T_INT16
+    @DefineField(2) public keyword:T_String
 
     @Override
     public Deserialize(){
@@ -117,8 +117,8 @@ getUserListReq.Write = @DefineStruct(getUserListReq._t_className) class extends 
 }
 
 getUserListReq.Read = @DefineStruct(getUserListReq._t_className) class extends T_RStream{
-    public basicInfo : typeof BasicInfo.Read
-    public page      : typeof Pagination.Read
+    @DefineField(0) public basicInfo : typeof BasicInfo.Read
+    @DefineField(1) public page      : typeof Pagination.Read
 
     @Override
     public Deserialize(){
@@ -160,54 +160,54 @@ getUserListRes.Read = @DefineStruct(getUserListRes._t_className) class extends T
 }
 
 function main(){
-    // const write_basicInfo = new BasicInfo.Write();
-    // const wbf = write_basicInfo.Serialize(
-    //     {
-    //         token:'1234',
-    //         detail:{'a':'1','b':'2'}
-    //     }
-    // ).toBuf()!;
-    // const read_basicInfo = new BasicInfo.Read(wbf).Deserialize().toObj()
-    // console.log(read_basicInfo);
+    const write_basicInfo = new BasicInfo.Write();
+    const wbf = write_basicInfo.Serialize(
+        {
+            token:'1234',
+            detail:{'a':'1','b':'2'}
+        }
+    ).toBuf()!;
+    const read_basicInfo = new BasicInfo.Read(wbf).Deserialize().toObj()
+    console.log(read_basicInfo);
 
-    // const write_pagination = new Pagination.Write();
-    // const wpg =  write_pagination.Serialize({
-    //     offset:0,
-    //     size:10,
-    //     keyword:"hello world"
-    // }).toBuf()!;
-    // const read_pagination = new Pagination.Read(wpg).Deserialize().toObj()
-    // console.log(read_pagination);
+    const write_pagination = new Pagination.Write();
+    const wpg =  write_pagination.Serialize({
+        offset:0,
+        size:10,
+        keyword:"hello world"
+    }).toBuf()!;
+    const read_pagination = new Pagination.Read(wpg).Deserialize().toObj()
+    console.log(read_pagination);
 
-    // const write_user = new User.Write();
-    // const wus =  write_user.Serialize({
-    //     id:0,
-    //     name:'leemulus',
-    //     age:12,
-    //     phone:'12321412321',
-    //     address:'wuhan'
-    // }).toBuf()!;
-    // const read_user = new User.Read(wus).Deserialize().toObj()
-    // console.log(read_user);
+    const write_user = new User.Write();
+    const wus =  write_user.Serialize({
+        id:0,
+        name:'leemulus',
+        age:12,
+        phone:'12321412321',
+        address:'wuhan'
+    }).toBuf()!;
+    const read_user = new User.Read(wus).Deserialize().toObj()
+    console.log(read_user);
     
 
-    // const write_getuserreq = new getUserListReq.Write();
-    // const wgreq =  write_getuserreq.Serialize({
-    //     basicInfo:{
-    //         token:"qwe123asd123",
-    //         detail:{
-    //             a:"1",
-    //             b:"2"
-    //         }
-    //     },
-    //     page:{
-    //         offset:0,
-    //         size:10,
-    //         keyword:"hello world"
-    //     }
-    // }).toBuf()!;
-    // const rgreq = new getUserListReq.Read(wgreq).Deserialize().toObj()
-    // console.log(rgreq);
+    const write_getuserreq = new getUserListReq.Write();
+    const wgreq =  write_getuserreq.Serialize({
+        basicInfo:{
+            token:"qwe123asd123",
+            detail:{
+                a:"1",
+                b:"2"
+            }
+        },
+        page:{
+            offset:0,
+            size:10,
+            keyword:"hello world"
+        }
+    }).toBuf()!;
+    const rgreq = new getUserListReq.Read(wgreq).Deserialize().toObj()
+    console.log(rgreq);
 
     const write_getuserres = new getUserListRes.Write();
     debugger;
