@@ -1,16 +1,16 @@
 import { T_RStream, T_WStream } from "../stream";
+import { JceStruct, T_BASE } from '../type/index'
+
 (Symbol as { metadata: symbol }).metadata ??= Symbol("Symbol.metadata");
 
-type T_BASE = {
-    _t_className : string;
-}
 
-class T_Vector{
-    static _t_className = 'Vector'
-    _t_value = ''
-    _keys = []
-    _values = []
-    Value = new Array();
+class T_Vector<T = any>{
+    static _t_className = 'Vector';
+    public _t_value :   string = '';
+    public _keys    :   Array<any> = [];
+    public _values  :   Array<any> = [];
+    public Value    :   Array<T> = new Array();
+    public isJceStruct  :   boolean;
     __getClass__(){
         return {
             className:`${T_Vector._t_className}<${this._t_value}>`,
@@ -19,6 +19,7 @@ class T_Vector{
     }
     constructor(T_Value:T_BASE){
         this._t_value = T_Value._t_className;
+        this.isJceStruct = T_Container.Has(T_Value._t_className)
     }
     push(value){
         this.Value.push(value);
@@ -30,12 +31,23 @@ class T_Vector{
         return this.Value
     }
 
+    pack(val){
+        this.Value = val;
+    }
+
     static objToStream(T_Vector:T_Vector){
         const ws = new T_WStream();
         let tag = 0;
         const obj = T_Vector.toObj();
+        debugger;
         for(const value of obj){
-            ws.WriteAny(tag,value,T_Vector._t_value);
+            if(T_Vector.isJceStruct){
+                const Write = T_Container.Get(T_Vector._t_value).Write;
+                debugger;
+                ws.WriteStruct(tag,value,Write);
+            }else{
+                ws.WriteAny(tag,value,T_Vector._t_value);
+            }
         }
         return ws;
     }
@@ -45,8 +57,15 @@ class T_Vector{
         const TVector = new T_Vector(T_Value)
         let tag = 0;
         while(true){
-            const value = rs.ReadAny(tag++, T_Value._t_className)
-            TVector.push(value);
+            // debugger;
+            if(TVector.isJceStruct){
+                const Read = T_Container.Get(TVector._t_value).Read;
+                rs.ReadStruct(tag++,Read)
+                TVector.push(rs.toObj(T_Vector))
+            }else{
+                const value = rs.ReadAny(tag++, T_Value._t_className)
+                TVector.push(value);
+            }
             if(rs.getPosition()>= ByteLength){
                 break;
             }
@@ -137,15 +156,26 @@ class T_INT64 extends Number{
     static _t_className = 'int64'
 }
 
-
+class T_Container {
+    static Value = new Map();
+    static Set(struct:JceStruct):void{
+        T_Container.Value.set(struct._t_className,struct)
+    }
+    static Get(className):JceStruct{
+        return T_Container.Value.get(className)
+    }
+    static Has(className):boolean{
+        return T_Container.Value.has(className);
+    }
+}
 
 export{
     T_Vector,
     T_String,
     T_Map,
-    T_BASE,
     T_INT8,
     T_INT16,
     T_INT32,
-    T_INT64
+    T_INT64,
+    T_Container
 }

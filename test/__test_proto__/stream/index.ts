@@ -5,8 +5,12 @@
 // This protocol uses TLV for decoding and encoding of underlying protocols
 
 import _ from "lodash";
-import { T_String,T_Vector,T_Map, T_BASE, T_INT8, T_INT16, T_INT32, T_INT64 } from "../category";
+import { T_String,T_Vector,T_Map, T_INT8, T_INT16, T_INT32, T_INT64 } from "../category";
 import {Logger, WillOverride} from '../decorator/index'
+import { T_BASE } from '../type/index'
+
+(Symbol as { metadata: symbol }).metadata ??= Symbol("Symbol.metadata");
+
 
 class T_WStream {
     private originView :   DataView | undefined;
@@ -89,7 +93,7 @@ class T_WStream {
         this.originView!.setBigInt64(this.position - 8,value)
     }
 
-    @Logger("WriteString |",true)
+    // @Logger("WriteString |",true)
     WriteString(tag:number,value:string){
         // Fristly, We should get target string's bytelength
         let encoded = new TextEncoder().encode(value);
@@ -112,6 +116,16 @@ class T_WStream {
             this.originView = new DataView(this.originBuf.buffer)
             return;
         }
+        debugger;
+        const position = value.byteLength;
+        this.position += 4;
+        this.allocate(4);
+        this.originView.setInt32(this.position - 4 ,position);
+        this.positionMap.set(tag,this.position - 4);
+        this.allocate(position);
+        this.WriteBuf(-1,value);
+        this.position += position;
+        return
     }
 
     WriteStruct<T extends new ()=>T_WStream>(tag:number, value:any, T_WStream:T){
@@ -147,7 +161,14 @@ class T_WStream {
         this.position += position;
     }
 
-    WriteVector(tag:number,value:T_Vector){
+    WriteVector(tag:number,value:T_Vector,T_Value:any){
+        const isTarsCategory = Reflect.has(value,"__getClass__") || (value instanceof T_Vector);
+        if(!isTarsCategory){
+            const tempVal = _.cloneDeep(value);
+            const tempT_Map = new T_Vector(T_Value)
+            tempT_Map.pack(tempVal)
+            value = tempT_Map;
+        }
         const ws = T_Vector.objToStream(value);
         const position = ws.position;
         this.position += 4;
@@ -158,6 +179,7 @@ class T_WStream {
         this.WriteBuf(-1, ws.toBuf())
         this.position += position;
     }
+
     @WillOverride
     Serialize(obj?:any){ return this;}
 
@@ -171,9 +193,19 @@ class T_RStream{
     private originView :   DataView;
     private originBuf  :   Buffer;
     private position   :   number = 0;
-    private readStreamToObj = new Object();
+    private readStreamToObj:{ [key: string]: any } = new Object();
 
-    public toObj(){
+    public getMetaData(key){
+        const metadata = _.get(this,'__proto__.constructor')[Symbol.metadata]
+        return _.get(metadata,key);
+    }
+
+    public toObj(T_TYPE?:T_BASE){
+        if(T_TYPE && T_TYPE._t_className === T_Vector._t_className){
+            // 如果 nestedObject 存在，则返回其值，否则返回一个空对象
+            const result = this.readStreamToObj.undefined
+            return result;
+        }
         return this.readStreamToObj;
     }
     public getPosition(){
@@ -210,39 +242,56 @@ class T_RStream{
     }
     ReadInt8(tag:number){
         this.position += 1;
-        this.readStreamToObj[tag] =  this.originView.getInt8(this.position - 1)
-        return this.readStreamToObj[tag]
+        const tagField = this.getMetaData(`Tag.${tag}`)
+        this.readStreamToObj[tagField] =  this.originView.getInt8(this.position - 1)
+        return this.readStreamToObj[tagField]
     }
 
     ReadInt16(tag:number){
         this.position += 2;
-        this.readStreamToObj[tag] = this.originView.getInt16(this.position - 2)
-        return this.readStreamToObj[tag];
+        const tagField = this.getMetaData(`Tag.${tag}`)
+        this.readStreamToObj[tagField] = this.originView.getInt16(this.position - 2)
+        return this.readStreamToObj[tagField];
     }
 
     ReadInt32(tag:number){
         this.position += 4;
-        this.readStreamToObj[tag] = this.originView.getInt32(this.position - 4)
-        return this.readStreamToObj[tag];
+        const tagField = this.getMetaData(`Tag.${tag}`)
+        this.readStreamToObj[tagField] = this.originView.getInt32(this.position - 4)
+        return this.readStreamToObj[tagField];
     }
 
     ReadInt64(tag:number){
         this.position += 8;
-        this.readStreamToObj[tag] =  this.originView.getBigInt64(this.position - 8)
-        return this.readStreamToObj[tag]
+        const tagField = this.getMetaData(`Tag.${tag}`)
+        this.readStreamToObj[tagField] =  this.originView.getBigInt64(this.position - 8)
+        return this.readStreamToObj[tagField]
     }
 
-    @Logger("ReadString |",false)
+    // @Logger("ReadString |",false)
     ReadString(tag:number){
         this.position += 4;
-        const byteLength = this.originView.getInt32( this.position - 4);
+        const byteLength = this.originView.getInt32(this.position - 4);
         let stringArray:number[] = [];
         for (let i = 0; i < byteLength; i++) {  
-            stringArray.push(this.originView.getInt8( this.position + i));  
+            stringArray.push(this.originView.getInt8(this.position + i));  
         }
-        this.readStreamToObj[tag] = String.fromCharCode(...stringArray)
+        const tagField = this.getMetaData(`Tag.${tag}`)
+        this.readStreamToObj[tagField] = String.fromCharCode(...stringArray)
         this.position += byteLength;
-        return this.readStreamToObj[tag];
+        return this.readStreamToObj[tagField];
+    }
+
+    ReadBuf(tag:number):Buffer{
+        debugger;
+        this.position += 4;
+        const ByteLength = this.originView.getInt32(this.position - 4)
+        const buf = this.createBuffer(ByteLength);
+        this.originBuf.copy(buf,0, this.position, this.position + ByteLength)
+        this.position += ByteLength;
+        const tagField = this.getMetaData(`Tag.${tag}`)
+        this.readStreamToObj[tagField] = buf;
+        return this.readStreamToObj[tagField];
     }
 
     ReadMap(tag:number,T_Key:any,T_Value:any){
@@ -252,9 +301,10 @@ class T_RStream{
         const temp = this.createBuffer(ByteLength);
         this.originBuf.copy(temp,0, this.position, this.position + ByteLength)
         const Obj = T_Map.streamToObj(temp,T_Key,T_Value,ByteLength);
-        this.readStreamToObj[tag] = Obj.toObj();
+        const tagField = this.getMetaData(`Tag.${tag}`)
+        this.readStreamToObj[tagField] = Obj.toObj();
         this.position += ByteLength;
-        return this.readStreamToObj[tag];
+        return this.readStreamToObj[tagField];
     }
 
     ReadVector(tag:number,T_Value:any){
@@ -264,9 +314,10 @@ class T_RStream{
         const temp = this.createBuffer(ByteLength);
         this.originBuf.copy(temp,0, this.position, this.position + ByteLength)
         const Obj = T_Vector.streamToObj(temp,T_Value,ByteLength)
-        this.readStreamToObj[tag] = Obj.toObj();
+        const tagField = this.getMetaData(`Tag.${tag}`)
+        this.readStreamToObj[tagField] = Obj.toObj();
         this.position += ByteLength;
-        return this.readStreamToObj[tag];
+        return this.readStreamToObj[tagField];
     }
 
     ReadStruct<T extends new (...args:any[]) => T_RStream>(tag:number,Struct: T){
@@ -276,9 +327,10 @@ class T_RStream{
         this.originBuf.copy(temp,0, this.position, this.position + ByteLength)
         const struct = new Struct(temp)
         const Obj = struct.Deserialize();
-        this.readStreamToObj[tag] = Obj.toObj();
         this.position += ByteLength;
-        return this.readStreamToObj[tag];
+        const tagField = this.getMetaData(`Tag.${tag}`)
+        this.readStreamToObj[tagField] = Obj.toObj();
+        return this.readStreamToObj[tagField];
     }
 
     @WillOverride

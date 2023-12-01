@@ -27,7 +27,7 @@ class TST_WSTREAM extends T_WStream{
         this.WriteInt64   (3,BigInt(64))
         this.WriteString  (4,"chelizichen")
         this.WriteMap     (5,testMap)
-        this.WriteVector  (6,testVector)
+        this.WriteVector  (6,testVector,T_String)
         this.WriteMap     (7,testObjMap)
         return this;
     }   

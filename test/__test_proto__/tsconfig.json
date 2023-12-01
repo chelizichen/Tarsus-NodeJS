@@ -8,7 +8,8 @@
     },
     "include": [
       "category/*",
-      "stream/*"
+      "stream/*",
+      "test/*"
     ],
     "exclude": ["node_modules"]
 }

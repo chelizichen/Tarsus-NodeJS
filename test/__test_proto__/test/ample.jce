@@ -30,4 +30,5 @@ struct getUserListRes  {
     0   int8    code;
     1   string  message;
     2   vector<User>  data;
+    3   User    user;
 }

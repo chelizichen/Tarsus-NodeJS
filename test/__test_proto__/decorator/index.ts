@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 (Symbol as { metadata: symbol }).metadata ??= Symbol("Symbol.metadata");
 
 export function Logger(log:string,ignoreResult:boolean){
@@ -30,5 +32,11 @@ export function WillOverride(originalMethod: any, _context: ClassMethodDecorator
 export function DefineStruct(_t_className:string){
     return function(clazz: any, _context: ClassDecoratorContext){
         clazz._t_className = _t_className
+    }
+}
+
+export function DefineField(tag:number){
+    return function(clazz:any,_context:ClassFieldDecoratorContext){
+        _.set(_context.metadata,`Tag.${tag}`,_context.name as string);
     }
 }

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { T_WStream,T_RStream } from '../stream/index'
 import { T_Map, T_String, T_Vector } from '../category/index'
 

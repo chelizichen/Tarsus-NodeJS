@@ -1,18 +1,15 @@
-import { T_INT16, T_INT8, T_Map, T_String } from '../category';
-import { DefineStruct, Override } from '../decorator'
+import { T_Container, T_INT16, T_INT8, T_Map, T_String, T_Vector } from '../category';
+import { DefineField, DefineStruct, Override } from '../decorator'
 import { T_WStream,T_RStream } from '../stream/index'
+import { JceStruct } from '../type';
 
-type Constructor<T> = new (...args:any[])=>T
+(Symbol as { metadata: symbol }).metadata ??= Symbol("Symbol.metadata");
 
-type JceStruct = {
-    Write:Constructor<T_WStream>,
-    Read:Constructor<T_RStream>,
-    _t_className:string;
-}
 
 const BasicInfo = {
     _t_className: "Struct<BasicInfo>",
 } as JceStruct
+T_Container.Set(BasicInfo)
 
 BasicInfo.Write = @DefineStruct(BasicInfo._t_className) class extends T_WStream{
 
@@ -40,6 +37,7 @@ BasicInfo.Read = @DefineStruct(BasicInfo._t_className) class extends T_RStream{
 const Pagination = {
     _t_className: "Struct<Pagination>",
 } as JceStruct
+T_Container.Set(Pagination)
 
 
 Pagination.Write = @DefineStruct(Pagination._t_className) class extends T_WStream{
@@ -70,6 +68,7 @@ Pagination.Read = @DefineStruct(Pagination._t_className) class extends T_RStream
 const User = {
     _t_className: "Struct<User>",
 } as JceStruct
+T_Container.Set(User)
 
 User.Write = @DefineStruct(User._t_className) class extends T_WStream{
 
@@ -85,19 +84,19 @@ User.Write = @DefineStruct(User._t_className) class extends T_WStream{
 }
 
 User.Read = @DefineStruct(User._t_className) class extends T_RStream{
-    public id:T_INT8;
-    public name:T_String;
-    public age:T_INT8;
-    public phone:T_String;
-    public address:T_String;
+    @DefineField(0) public id:T_INT8;
+    @DefineField(1) public name:T_String;
+    @DefineField(2) public age:T_INT8;
+    @DefineField(3) public phone:T_String;
+    @DefineField(4) public address:T_String;
 
     @Override
     public Deserialize(){
         this.id = this.ReadInt8      (0);
         this.name = this.ReadString    (1,);
-        this.age = this.ReadInt8      (3,);
-        this.phone = this.ReadString    (4,);
-        this.address = this.ReadString    (5,);
+        this.age = this.ReadInt8      (2,);
+        this.phone = this.ReadString    (3,);
+        this.address = this.ReadString    (4,);
         return this
     }
 }
@@ -105,6 +104,7 @@ User.Read = @DefineStruct(User._t_className) class extends T_RStream{
 const getUserListReq = {
     _t_className: "Struct<getUserListReq>",
 } as JceStruct
+T_Container.Set(getUserListReq)
 
 getUserListReq.Write = @DefineStruct(getUserListReq._t_className) class extends T_WStream{
     @Override
@@ -123,61 +123,132 @@ getUserListReq.Read = @DefineStruct(getUserListReq._t_className) class extends T
     @Override
     public Deserialize(){
         this.basicInfo  = this.ReadStruct    (0,BasicInfo.Read);
-        debugger;
         this.page       = this.ReadStruct    (1,Pagination.Read);
         return this
     }
 }
 
+const getUserListRes = {
+    _t_className: "Struct<getUserListRes>",
+} as JceStruct
+T_Container.Set(getUserListRes)
+
+getUserListRes.Write = @DefineStruct(getUserListRes._t_className) class extends T_WStream{
+    @Override
+    public Serialize(obj){
+        this.WriteInt8  (0,obj.code);
+        this.WriteString(1,obj.message);
+        this.WriteVector(2,obj.data,User.Write);
+        this.WriteStruct(3,obj.user,User.Write);
+        return this;
+    }
+}
+
+getUserListRes.Read = @DefineStruct(getUserListRes._t_className) class extends T_RStream{
+    
+    @DefineField(0) public code     : T_INT8
+    @DefineField(1) public message  : T_String
+    @DefineField(2) public data     : T_Vector<typeof User.Read>
+    @DefineField(3) public user     : typeof User.Read
+    @Override public Deserialize(){
+        this.code       = this.ReadInt8    (0);
+        this.message    = this.ReadString  (1);
+        this.data       = this.ReadVector  (2,User.Read);
+        this.user       = this.ReadStruct  (3,User.Read);
+        return this
+    }
+}
+
 function main(){
-    const write_basicInfo = new BasicInfo.Write();
-    const wbf = write_basicInfo.Serialize(
-        {
-            token:'1234',
-            detail:{'a':'1','b':'2'}
-        }
-    ).toBuf()!;
-    const read_basicInfo = new BasicInfo.Read(wbf).Deserialize().toObj()
-    console.log(read_basicInfo);
+    // const write_basicInfo = new BasicInfo.Write();
+    // const wbf = write_basicInfo.Serialize(
+    //     {
+    //         token:'1234',
+    //         detail:{'a':'1','b':'2'}
+    //     }
+    // ).toBuf()!;
+    // const read_basicInfo = new BasicInfo.Read(wbf).Deserialize().toObj()
+    // console.log(read_basicInfo);
 
-    const write_pagination = new Pagination.Write();
-    const wpg =  write_pagination.Serialize({
-        offset:0,
-        size:10,
-        keyword:"hello world"
-    }).toBuf()!;
-    const read_pagination = new Pagination.Read(wpg).Deserialize().toObj()
-    console.log(read_pagination);
+    // const write_pagination = new Pagination.Write();
+    // const wpg =  write_pagination.Serialize({
+    //     offset:0,
+    //     size:10,
+    //     keyword:"hello world"
+    // }).toBuf()!;
+    // const read_pagination = new Pagination.Read(wpg).Deserialize().toObj()
+    // console.log(read_pagination);
 
-    const write_user = new User.Write();
-    const wus =  write_user.Serialize({
-        id:0,
-        name:'leemulus',
-        age:12,
-        phone:'12321412321',
-        address:'wuhan'
-    }).toBuf()!;
-    const read_user = new User.Read(wus).Deserialize().toObj()
-    console.log(read_user);
+    // const write_user = new User.Write();
+    // const wus =  write_user.Serialize({
+    //     id:0,
+    //     name:'leemulus',
+    //     age:12,
+    //     phone:'12321412321',
+    //     address:'wuhan'
+    // }).toBuf()!;
+    // const read_user = new User.Read(wus).Deserialize().toObj()
+    // console.log(read_user);
     
 
-    const write_getuserreq = new getUserListReq.Write();
-    const wgreq =  write_getuserreq.Serialize({
-        basicInfo:{
-            token:"qwe123asd123",
-            detail:{
-                a:"1",
-                b:"2"
+    // const write_getuserreq = new getUserListReq.Write();
+    // const wgreq =  write_getuserreq.Serialize({
+    //     basicInfo:{
+    //         token:"qwe123asd123",
+    //         detail:{
+    //             a:"1",
+    //             b:"2"
+    //         }
+    //     },
+    //     page:{
+    //         offset:0,
+    //         size:10,
+    //         keyword:"hello world"
+    //     }
+    // }).toBuf()!;
+    // const rgreq = new getUserListReq.Read(wgreq).Deserialize().toObj()
+    // console.log(rgreq);
+
+    const write_getuserres = new getUserListRes.Write();
+    debugger;
+    const wgres =  write_getuserres.Serialize({
+        code:0,
+        message:'ok',
+        data:[
+            {
+                id:0,
+                name:'leemulus',
+                age:13,
+                phone:'12321412321',
+                address:'wuhan'
+            },
+            {
+                id:1,
+                name:'leemulus',
+                age:14,
+                phone:'12321412321',
+                address:'wuhan'
+            },
+            {
+                id:2,
+                name:'leemulus',
+                age:15,
+                phone:'12321412321',
+                address:'wuhan'
             }
+        ],
+        user: {
+            id:0,
+            name:'leemulus',
+            age:13,
+            phone:'12321412321',
+            address:'wuhan'
         },
-        page:{
-            offset:0,
-            size:10,
-            keyword:"hello world"
-        }
+        
     }).toBuf()!;
-    const rgreq = new getUserListReq.Read(wgreq).Deserialize().toObj()
-    console.log(rgreq);
+    debugger;
+    const rgres = new getUserListRes.Read(wgres).Deserialize().toObj()
+    console.log(rgres);
 }
 
 main();
