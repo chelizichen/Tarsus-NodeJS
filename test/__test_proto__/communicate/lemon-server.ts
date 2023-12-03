@@ -1,7 +1,7 @@
 import { EventEmitter } from "events";
 import * as net from 'net'
-
-class LemonServer extends EventEmitter {
+import { $WriteHead } from './utils';
+class LemonServer {
 
     public localData:Buffer | undefined; // 本地缓冲区
     public Position:number;
@@ -10,17 +10,22 @@ class LemonServer extends EventEmitter {
     public Connection;
     public Socket   :   net.Socket;
 
-    constructor(Servant:net.SocketConnectOpts){
-        super()
+    constructor(conn:net.NetConnectOpts){
+        // super()
         this.Reset();
-        this.Socket = new net.Socket();
-        this.Socket.connect(Servant)
-        this.Registration(this.Socket)
+        const Server = net.createServer((socket)=>{
+            this.Socket = socket;
+            this.Registration(this.Socket)
+        })
+        Server.listen(conn)
+        console.log('server listen at localhost:',conn);
+        
     }
 
     // 拿到包以后需要先判断包是否完整
     // 如果不完整，则存入localData中
     $OnData(buf:Buffer){
+        console.log('接收buffer',buf.byteLength);
         const View = new DataView(buf.buffer)
         const exist = this.Position === 0;
         // 当前缓冲区是正常的
@@ -57,7 +62,11 @@ class LemonServer extends EventEmitter {
     }
 
     $WriteToClient(data:Buffer){
-        this.Socket.write(data)
+        const _buf = $WriteHead(data)
+        if(!this.Socket){
+            return;
+        }
+        this.Socket.write(_buf)
     }
 
     Registration(Socket:net.Socket){
@@ -71,3 +80,11 @@ class LemonServer extends EventEmitter {
         this.BufferLength = 0;
     }
 }
+
+
+export default LemonServer
+
+const server = new LemonServer({
+    'port':24001
+})
+

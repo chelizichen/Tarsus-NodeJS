@@ -11,7 +11,7 @@ import {
 import { DefineField, DefineStruct, Override } from "../decorator";
 import { T_WStream, T_RStream } from "../stream/index";
 import { JceStruct } from "../type";
-
+import LemonServer from '../communicate/lemon-server'
 (Symbol as { metadata: symbol }).metadata ??= Symbol("Symbol.metadata");
 
 const BasicInfo = {
@@ -138,7 +138,7 @@ getUserListReq.Write =
     }
   };
 
-const getUserListRes = {
+export const getUserListRes = {
   _t_className: "Struct<getUserListRes>",
 } as JceStruct;
 T_Container.Set(getUserListRes);
@@ -172,102 +172,103 @@ getUserListRes.Write =
     }
   };
 
-function main() {
-  const write_basicInfo = new BasicInfo.Write();
-  const wbf = write_basicInfo
-    .Serialize({
-      token: "1234",
-      detail: { a: "1", b: "2" },
-    })
-    .toBuf()!;
-  const read_basicInfo = new BasicInfo.Read(wbf).Deserialize().toObj();
-  console.log(read_basicInfo);
+// function main() {
+//   const write_basicInfo = new BasicInfo.Write();
+//   const wbf = write_basicInfo
+//     .Serialize({
+//       token: "1234",
+//       detail: { a: "1", b: "2" },
+//     })
+//     .toBuf()!;
+//   const read_basicInfo = new BasicInfo.Read(wbf).Deserialize().toObj();
+//   console.log(read_basicInfo);
 
-  const write_pagination = new Pagination.Write();
-  const wpg = write_pagination
-    .Serialize({
-      offset: 0,
-      size: 10,
-      keyword: "hello world",
-    })
-    .toBuf()!;
-  const read_pagination = new Pagination.Read(wpg).Deserialize().toObj();
-  console.log(read_pagination);
+//   const write_pagination = new Pagination.Write();
+//   const wpg = write_pagination
+//     .Serialize({
+//       offset: 0,
+//       size: 10,
+//       keyword: "hello world",
+//     })
+//     .toBuf()!;
+//   const read_pagination = new Pagination.Read(wpg).Deserialize().toObj();
+//   console.log(read_pagination);
 
-  const write_user = new User.Write();
-  const wus = write_user
-    .Serialize({
-      id: 0,
-      name: "leemulus",
-      age: 12,
-      phone: "12321412321",
-      address: "wuhan",
-    })
-    .toBuf()!;
-  const read_user = new User.Read(wus).Deserialize().toObj();
-  console.log(read_user);
+//   const write_user = new User.Write();
+//   const wus = write_user
+//     .Serialize({
+//       id: 0,
+//       name: "leemulus",
+//       age: 12,
+//       phone: "12321412321",
+//       address: "wuhan",
+//     })
+//     .toBuf()!;
+//   const read_user = new User.Read(wus).Deserialize().toObj();
+//   console.log(read_user);
 
-  const write_getuserreq = new getUserListReq.Write();
-  const wgreq = write_getuserreq
-    .Serialize({
-      basicInfo: {
-        token: "qwe123asd123",
-        detail: {
-          a: "1",
-          b: "2",
-        },
-      },
-      page: {
-        offset: 0,
-        size: 10,
-        keyword: "hello world",
-      },
-    })
-    .toBuf()!;
-  const rgreq = new getUserListReq.Read(wgreq).Deserialize().toObj();
-  console.log(rgreq);
+//   const write_getuserreq = new getUserListReq.Write();
+//   const wgreq = write_getuserreq
+//     .Serialize({
+//       basicInfo: {
+//         token: "qwe123asd123",
+//         detail: {
+//           a: "1",
+//           b: "2",
+//         },
+//       },
+//       page: {
+//         offset: 0,
+//         size: 10,
+//         keyword: "hello world",
+//       },
+//     })
+//     .toBuf()!;
+//   const rgreq = new getUserListReq.Read(wgreq).Deserialize().toObj();
+//   console.log(rgreq);
 
-  const write_getuserres = new getUserListRes.Write();
-  debugger;
-  const wgres = write_getuserres
-    .Serialize({
-      code: 0,
-      message: "ok",
-      data: [
-        {
-          id: 0,
-          name: "leemulus",
-          age: 13,
-          phone: "12321412321",
-          address: "wuhan",
-        },
-        {
-          id: 1,
-          name: "leemulus",
-          age: 14,
-          phone: "12321412321",
-          address: "wuhan",
-        },
-        {
-          id: 2,
-          name: "leemulus",
-          age: 15,
-          phone: "12321412321",
-          address: "wuhan",
-        },
-      ],
-      user: {
-        id: 0,
-        name: "leemulus",
-        age: 13,
-        phone: "12321412321",
-        address: "wuhan",
-      },
-    })
-    .toBuf()!;
-  debugger;
-  const rgres = new getUserListRes.Read(wgres).Deserialize().toObj();
-  console.log(rgres);
-}
+//   const write_getuserres = new getUserListRes.Write();
+//   debugger;
+//   const wgres = write_getuserres
+//     .Serialize({
+//       code: 0,
+//       message: "ok",
+//       data: [
+//         {
+//           id: 0,
+//           name: "leemulus",
+//           age: 13,
+//           phone: "12321412321",
+//           address: "wuhan",
+//         },
+//         {
+//           id: 1,
+//           name: "leemulus",
+//           age: 14,
+//           phone: "12321412321",
+//           address: "wuhan",
+//         },
+//         {
+//           id: 2,
+//           name: "leemulus",
+//           age: 15,
+//           phone: "12321412321",
+//           address: "wuhan",
+//         },
+//       ],
+//       user: {
+//         id: 0,
+//         name: "leemulus",
+//         age: 13,
+//         phone: "12321412321",
+//         address: "wuhan",
+//       },
+//     })
+//     .toBuf()!;
+//   debugger;
+//   const rgres = new getUserListRes.Read(wgres).Deserialize().toObj();
+//   console.log(rgres);
+// }
 
-main();
+// main();
+
