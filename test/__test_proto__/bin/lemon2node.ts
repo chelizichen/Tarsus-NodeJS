@@ -14,7 +14,7 @@ class Lemon2Node {
   public module = "";
   public structs = {};
 
-  static Compile(target = '../test/ample.jce') {
+  static Compile(target = '../test/ample.jce',type:"client"|"server" = "client") {
     const lemon2node = new Lemon2Node();
     const tlvProtocol = fs.readFileSync(path.resolve(__dirname, target), "utf-8");
     let match;

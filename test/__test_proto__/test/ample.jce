@@ -2,6 +2,11 @@ include Sertest;
 
 module Ample;
 
+struct QueryId      {
+    0   int8    id;
+    1   BasicInfo basicInfo;
+}
+
 struct BasicInfo    {
     0   string  token;
     1   map<string,string>  detail;
@@ -32,3 +37,13 @@ struct getUserListRes  {
     2   vector<User>  data;
     3   User    user;
 }
+
+struct getUserRes  {
+    0   int8    code;
+    1   string  message;
+    2   User    data;
+}
+
+rpc getUserList(getUserListReq req, getUserListRes res);
+
+rpc getUser(QueryId req, getUserRes res);
