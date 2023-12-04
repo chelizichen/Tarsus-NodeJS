@@ -240,28 +240,28 @@ class T_RStream{
             }
         }
     }
-    ReadInt8(tag:number){
+    ReadInt8(tag:number):string{
         this.position += 1;
         const tagField = this.getMetaData(`Tag.${tag}`)
         this.readStreamToObj[tagField] =  this.originView.getInt8(this.position - 1)
         return this.readStreamToObj[tagField]
     }
 
-    ReadInt16(tag:number){
+    ReadInt16(tag:number):string{
         this.position += 2;
         const tagField = this.getMetaData(`Tag.${tag}`)
         this.readStreamToObj[tagField] = this.originView.getInt16(this.position - 2)
         return this.readStreamToObj[tagField];
     }
 
-    ReadInt32(tag:number){
+    ReadInt32(tag:number):string{
         this.position += 4;
         const tagField = this.getMetaData(`Tag.${tag}`)
         this.readStreamToObj[tagField] = this.originView.getInt32(this.position - 4)
         return this.readStreamToObj[tagField];
     }
 
-    ReadInt64(tag:number){
+    ReadInt64(tag:number):bigint{
         this.position += 8;
         const tagField = this.getMetaData(`Tag.${tag}`)
         this.readStreamToObj[tagField] =  this.originView.getBigInt64(this.position - 8)
@@ -269,7 +269,7 @@ class T_RStream{
     }
 
     // @Logger("ReadString |",false)
-    ReadString(tag:number){
+    ReadString(tag:number):string{
         this.position += 4;
         const byteLength = this.originView.getInt32(this.position - 4);
         let stringArray:number[] = [];
@@ -307,7 +307,7 @@ class T_RStream{
         return this.readStreamToObj[tagField];
     }
 
-    ReadVector(tag:number,T_Value:any){
+    ReadVector(tag:number,T_Value:any):any[]{
         debugger;
         this.position += 4;
         const ByteLength = this.originView.getInt32(this.position -  4);

@@ -57,46 +57,50 @@ class LemonClient {
         }
     }
     $OnConncet(){
-        const write_getuserres = new getUserListRes.Write();
-        debugger;
-        const wgres = write_getuserres
-          .Serialize({
-            code: 0,
-            message: "ok",
-            data: [
-              {
-                id: 0,
-                name: "leemulus",
-                age: 13,
-                phone: "12321412321",
-                address: "wuhan",
-              },
-              {
-                id: 1,
-                name: "leemulus",
-                age: 14,
-                phone: "12321412321",
-                address: "wuhan",
-              },
-              {
-                id: 2,
-                name: "leemulus",
-                age: 15,
-                phone: "12321412321",
-                address: "wuhan",
-              },
-            ],
-            user: {
+      this.Test()
+      console.log("已连接至24001");
+    }
+
+    Test(){
+      const write_getuserres = new getUserListRes.Write();
+      debugger;
+      const wgres = write_getuserres
+        .Serialize({
+          code: 0,
+          message: "ok",
+          data: [
+            {
               id: 0,
               name: "leemulus",
               age: 13,
               phone: "12321412321",
               address: "wuhan",
             },
-          })
-          .toBuf()!;
-        this.$WriteToServer(wgres)
-        console.log("已连接至24001");
+            {
+              id: 1,
+              name: "leemulus",
+              age: 14,
+              phone: "12321412321",
+              address: "wuhan",
+            },
+            {
+              id: 2,
+              name: "leemulus",
+              age: 15,
+              phone: "12321412321",
+              address: "wuhan",
+            },
+          ],
+          user: {
+            id: 0,
+            name: "leemulus",
+            age: 13,
+            phone: "12321412321",
+            address: "wuhan",
+          },
+        })
+        .toBuf()!;
+      this.$WriteToServer(wgres)
     }
 
     $WriteToServer(data:Buffer){

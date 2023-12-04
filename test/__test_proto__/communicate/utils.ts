@@ -10,3 +10,11 @@ export function $WriteHead(taget:Buffer){
     return head;
 }
 
+export function $ReadHead(target:Buffer):number{
+    const byteLength = target.readInt32BE(4)
+    return byteLength;
+}
+
+export const CONSTANT = {
+    TarsInovke:"tarsinvoke"
+}

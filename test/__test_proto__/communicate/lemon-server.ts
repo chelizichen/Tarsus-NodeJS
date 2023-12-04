@@ -1,7 +1,18 @@
 import { EventEmitter } from "events";
 import * as net from 'net'
-import { $WriteHead } from './utils';
-class LemonServer {
+import { $WriteHead, CONSTANT } from './utils';
+import { T_RStream } from "../stream";
+import { JceStruct } from "../type";
+import { T_Container, T_String } from "../category";
+
+type InvokeContext = {
+    byteLength: string;
+    interFace: string;
+    invokeRequest: string;
+    requestUid: any[];
+}
+
+class LemonServer extends EventEmitter{
 
     public localData:Buffer | undefined; // 本地缓冲区
     public Position:number;
@@ -11,8 +22,9 @@ class LemonServer {
     public Socket   :   net.Socket;
 
     constructor(conn:net.NetConnectOpts){
-        // super()
+        super()
         this.Reset();
+        this.InitService('');
         const Server = net.createServer((socket)=>{
             this.Socket = socket;
             this.Registration(this.Socket)
@@ -33,7 +45,8 @@ class LemonServer {
             const BufferLength = View.getInt32(0)
             // 完整包
             if(View.byteLength == BufferLength){
-                this.$WriteToClient(buf);
+                // this.$WriteToClient(buf);
+                this.readBuffer(buf);
                 this.Reset()
                 return;
             }
@@ -51,7 +64,8 @@ class LemonServer {
             const canWrite = this.Position + BufferLength === this.BufferLength;
             if(canWrite){
                 const feedBuf = Buffer.concat([this.localData!,buf])
-                this.$WriteToClient(feedBuf);
+                // this.$WriteToClient(feedBuf);
+                this.readBuffer(feedBuf)
                 this.Reset()
             }
             if(!canWrite){
@@ -61,6 +75,39 @@ class LemonServer {
         }
     }
 
+    readBuffer(buf:Buffer){
+        const rs = new T_RStream(buf)
+        const byteLength = rs.ReadInt32(0);
+        const interFace = rs.ReadString(1);
+        const invokeRequest = rs.ReadString(2);
+        const requestUid = rs.ReadVector(3,T_String);
+        const invokeRequestBody = rs.ReadStruct(4,this.$ReflectGetClass(invokeRequest).Read);
+        const context = {
+            byteLength,
+            interFace,
+            invokeRequest,
+            requestUid
+        }
+        this.HandleEmit(context,invokeRequestBody)
+    }
+
+    HandleEmit(context:InvokeContext,invokeRequestBody:any){
+        this.emit(CONSTANT.TarsInovke,)
+    }
+
+    addRecord(){
+
+    }
+
+    InitService(TarsModule:any){
+
+    }
+
+    $ReflectGetClass(clazz:string):JceStruct{
+        return T_Container.Get(clazz)
+    }
+
+    
     $WriteToClient(data:Buffer){
         const _buf = $WriteHead(data)
         if(!this.Socket){

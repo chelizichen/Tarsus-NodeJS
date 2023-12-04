@@ -11,8 +11,15 @@ type JceStruct = {
 type T_BASE = {
     _t_className : string;
 }
+
+type module = string;
+type interFace = string;
+
+
 export {
     Constructor,
     JceStruct,
-    T_BASE
+    T_BASE,
+    module,
+    interFace
 }

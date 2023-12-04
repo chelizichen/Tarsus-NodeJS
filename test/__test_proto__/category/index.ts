@@ -1,5 +1,5 @@
 import { T_RStream, T_WStream } from "../stream";
-import { JceStruct, T_BASE } from '../type/index'
+import { JceStruct, T_BASE, interFace, module } from '../type/index'
 
 (Symbol as { metadata: symbol }).metadata ??= Symbol("Symbol.metadata");
 
@@ -156,6 +156,7 @@ class T_INT64 extends Number{
     static _t_className = 'int64'
 }
 
+
 class T_Container {
     static Value = new Map();
     static Set(struct:JceStruct):void{
@@ -167,6 +168,21 @@ class T_Container {
     static Has(className):boolean{
         return T_Container.Value.has(className);
     }
+
+    static Methods = new Map<module,Map<interFace,Function>>();
+    
+    static GetMethod(moduleName:module,interFace:interFace){
+        return T_Container.Methods.get(moduleName).get(interFace)
+    }
+
+    static SetMethod(module:module,interFace:interFace,CallBack:Function){
+        if(!T_Container.Methods.has(module)){
+            T_Container.Methods.set(module,new Map())
+        }
+        const Module = T_Container.Methods.get(module)
+        Module.set(interFace,CallBack)
+    }
+    
 }
 
 export{
