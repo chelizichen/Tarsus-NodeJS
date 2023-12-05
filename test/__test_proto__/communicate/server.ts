@@ -1,18 +1,24 @@
 import { EventEmitter } from "events";
 import * as net from 'net'
-import { $WriteHead, CONSTANT } from './utils';
-import { T_RStream } from "../stream";
+import { $WriteHead, CONSTANT, CommunicateBase } from './utils';
+import { T_RStream, T_WStream } from "../stream";
 import { JceStruct } from "../type";
 import { T_Container, T_String } from "../category";
+import {uid} from 'uid';
+import _ from 'lodash';
 
 type InvokeContext = {
     byteLength: string;
-    interFace: string;
+    moduleName: string;
+    invokeMethod:string;
     invokeRequest: string;
-    requestUid: any[];
+    traceId: any;
+    sendResponse ?:Function;
+    responseUid?:string;
+    invokeResponse?:string;
 }
 
-class LemonServer extends EventEmitter{
+class LemonServer extends CommunicateBase{
 
     public localData:Buffer | undefined; // 本地缓冲区
     public Position:number;
@@ -24,7 +30,7 @@ class LemonServer extends EventEmitter{
     constructor(conn:net.NetConnectOpts){
         super()
         this.Reset();
-        this.InitService('');
+        this.InitService();
         const Server = net.createServer((socket)=>{
             this.Socket = socket;
             this.Registration(this.Socket)
@@ -75,37 +81,48 @@ class LemonServer extends EventEmitter{
         }
     }
 
-    readBuffer(buf:Buffer){
+    async readBuffer(buf:Buffer){
+        const that = this;
         const rs = new T_RStream(buf)
         const byteLength = rs.ReadInt32(0);
-        const interFace = rs.ReadString(1);
-        const invokeRequest = rs.ReadString(2);
-        const requestUid = rs.ReadVector(3,T_String);
-        const invokeRequestBody = rs.ReadStruct(4,this.$ReflectGetClass(invokeRequest).Read);
-        const context = {
+        const moduleName = rs.ReadString(1);
+        const invokeMethod = rs.ReadString(2);
+        const invokeRequest = rs.ReadString(3);
+        const traceId = rs.ReadVector(4,T_String);
+        const invokeRequestBody = rs.ReadStruct(5,that.$ReflectGetClass(invokeRequest).Read);
+        const invokeResponse = that.$ReflectGetResponse(invokeMethod);
+        const context:InvokeContext = {
             byteLength,
-            interFace,
+            moduleName,
+            invokeMethod,
             invokeRequest,
-            requestUid
+            traceId,
+            invokeResponse
         }
-        this.HandleEmit(context,invokeRequestBody)
-    }
-
-    HandleEmit(context:InvokeContext,invokeRequestBody:any){
-        this.emit(CONSTANT.TarsInovke,)
+        const responseUid = uid();
+        context.responseUid = responseUid;
+        context.sendResponse = function(data){
+            context.traceId.push(context.responseUid);
+            const ws = new T_WStream();
+            ws.WriteString(0,context.moduleName);
+            ws.WriteString(1,context.invokeMethod);
+            ws.WriteString(2,context.invokeRequest);
+            ws.WriteVector(3,context.traceId,T_String);
+            ws.WriteStruct(4,data,that.$ReflectGetClass(context.invokeResponse).Write);
+            that.$WriteToClient(ws.toBuf())
+        }
+        const resp = await (T_Container.GetMethod(context.moduleName,context.invokeMethod))(context,invokeRequestBody)
+        context.sendResponse(resp);
     }
 
     addRecord(){
 
     }
 
-    InitService(TarsModule:any){
-
+    InitService(module = TarsService){
+        new module().InitMetaData();
     }
 
-    $ReflectGetClass(clazz:string):JceStruct{
-        return T_Container.Get(clazz)
-    }
 
     
     $WriteToClient(data:Buffer){
@@ -135,3 +152,13 @@ const server = new LemonServer({
     'port':24001
 })
 
+
+class TarsService{
+    hello(ctx,req){
+
+    }
+
+    InitMetaData(){
+        T_Container.SetMethod("TarsService",this.hello.name,this.hello)
+    }
+}

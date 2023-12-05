@@ -1,3 +1,6 @@
+import { T_Container } from "../category";
+import { JceStruct } from "../type";
+
 /**
  * @desc
  * 为Buffer 写入4位大小的值
@@ -17,4 +20,14 @@ export function $ReadHead(target:Buffer):number{
 
 export const CONSTANT = {
     TarsInovke:"tarsinvoke"
+}
+
+export class CommunicateBase{
+    $ReflectGetClass(clazz:string):JceStruct{
+        return T_Container.Get(clazz)
+    }
+
+    $ReflectGetResponse(invokeMethod):string{
+        return T_Container.GetRpcMethod(invokeMethod)[1]
+    }
 }

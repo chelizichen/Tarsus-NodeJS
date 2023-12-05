@@ -1,5 +1,5 @@
 import { T_RStream, T_WStream } from "../stream";
-import { JceStruct, T_BASE, interFace, module } from '../type/index'
+import { JceStruct, T_BASE, invokeMethod, invokeRequest, invokeResponse, module } from '../type/index'
 
 (Symbol as { metadata: symbol }).metadata ??= Symbol("Symbol.metadata");
 
@@ -169,19 +169,28 @@ class T_Container {
         return T_Container.Value.has(className);
     }
 
-    static Methods = new Map<module,Map<interFace,Function>>();
+    static Methods = new Map<module,Map<invokeMethod,Function>>();
     
-    static GetMethod(moduleName:module,interFace:interFace){
-        return T_Container.Methods.get(moduleName).get(interFace)
+    static GetMethod(moduleName:module,invokeMethod:invokeMethod){
+        return T_Container.Methods.get(moduleName).get(invokeMethod)
     }
 
-    static SetMethod(module:module,interFace:interFace,CallBack:Function){
+    static SetMethod(module:module,invokeMethod:invokeMethod,CallBack:Function){
         if(!T_Container.Methods.has(module)){
             T_Container.Methods.set(module,new Map())
         }
         const Module = T_Container.Methods.get(module)
-        Module.set(interFace,CallBack)
+        Module.set(invokeMethod,CallBack)
     }
+
+    static RpcMethods = new Map<invokeMethod,[invokeRequest,invokeResponse]>();
+    static SetRpcMethod(invokeMethod:invokeMethod,invokeRequest:invokeRequest,invokeResponse){
+        T_Container.RpcMethods.set(invokeMethod,[invokeRequest,invokeResponse])
+    }
+    static GetRpcMethod(invokeMethod:invokeMethod){
+        return T_Container.RpcMethods.get(invokeMethod)
+    }
+
     
 }
 

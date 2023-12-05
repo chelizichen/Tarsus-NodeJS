@@ -13,13 +13,18 @@ type T_BASE = {
 }
 
 type module = string;
-type interFace = string;
-
+type invokeMethod = string;
+type invokeRequest = string;
+type invokeResponse =  string;
+type plain = Record<string,any>
 
 export {
     Constructor,
     JceStruct,
     T_BASE,
     module,
-    interFace
+    invokeMethod,
+    invokeRequest,
+    invokeResponse,
+    plain
 }

@@ -3,14 +3,15 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev --project tsconfig.json  bin/ample.ts",
     "script": "ts-node-dev --project tsconfig.json bin/lemon2node.ts",
-    "client":"ts-node-dev --project tsconfig.json communicate/lemon-client.ts",
-    "server":"ts-node-dev --project tsconfig.json communicate/lemon-server.ts"
+    "client": "ts-node-dev --project tsconfig.json communicate/lemon-client.ts",
+    "server": "ts-node-dev --project tsconfig.json communicate/lemon-server.ts"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "lodash": "^4.17.21",
-    "typescript": "^5.3.0"
+    "typescript": "^5.3.0",
+    "uid": "^2.0.2"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.191",
