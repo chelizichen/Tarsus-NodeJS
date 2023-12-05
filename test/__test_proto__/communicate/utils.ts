@@ -24,6 +24,9 @@ export const CONSTANT = {
 
 export class CommunicateBase{
     $ReflectGetClass(clazz:string):JceStruct{
+        console.log(clazz);
+        console.log(T_Container.Value.keys());
+        
         return T_Container.Get(clazz)
     }
 

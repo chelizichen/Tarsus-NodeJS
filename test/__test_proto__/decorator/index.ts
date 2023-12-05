@@ -40,3 +40,9 @@ export function DefineField(tag:number){
         _.set(_context.metadata,`Tag.${tag}`,_context.name as string);
     }
 }
+
+export function Module(moduleName:string){
+    return function(clazz: any, _context: ClassDecoratorContext){
+        clazz.moduleName = moduleName
+    }
+}

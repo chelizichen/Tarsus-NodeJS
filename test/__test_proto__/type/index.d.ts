@@ -17,7 +17,16 @@ type invokeMethod = string;
 type invokeRequest = string;
 type invokeResponse =  string;
 type plain = Record<string,any>
-
+type InvokeContext = {
+    byteLength: string;
+    moduleName: string;
+    invokeMethod:string;
+    invokeRequest: string;
+    traceId: any;
+    sendResponse ?:Function;
+    responseUid?:string;
+    invokeResponse?:string;
+}
 export {
     Constructor,
     JceStruct,
@@ -26,5 +35,6 @@ export {
     invokeMethod,
     invokeRequest,
     invokeResponse,
-    plain
+    plain,
+    InvokeContext
 }

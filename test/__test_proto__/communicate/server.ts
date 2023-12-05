@@ -6,17 +6,57 @@ import { JceStruct } from "../type";
 import { T_Container, T_String } from "../category";
 import {uid} from 'uid';
 import _ from 'lodash';
+import { InvokeContext } from '../type/index'
+import Ample from "../bin/ample";
 
-type InvokeContext = {
-    byteLength: string;
-    moduleName: string;
-    invokeMethod:string;
-    invokeRequest: string;
-    traceId: any;
-    sendResponse ?:Function;
-    responseUid?:string;
-    invokeResponse?:string;
+class TarsService{
+    async getUserList(ctx:InvokeContext,req){
+        console.log('ctx',ctx);
+        console.log('req',req);
+        return {
+            code:0,
+            message:'ok',
+            data:[
+                {
+                    id:0,
+                    name:'leemulus',
+                    age:13,
+                    phone:'12321412321',
+                    address:'wuhan'
+                },
+                {
+                    id:1,
+                    name:'leemulus',
+                    age:14,
+                    phone:'12321412321',
+                    address:'wuhan'
+                },
+                {
+                    id:2,
+                    name:'leemulus',
+                    age:15,
+                    phone:'12321412321',
+                    address:'wuhan'
+                }
+            ],
+            user: {
+                id:0,
+                name:'leemulus',
+                age:13,
+                phone:'12321412321',
+                address:'wuhan'
+            },
+        }
+    }
+
+    InitMetaData(){
+
+        T_Container.SetMethod("Ample","getUserList",this.getUserList)
+        T_Container.SetRpcMethod("getUserList",'Struct<getUserListReq>','Struct<getUserListRes>')
+        T_Container.Set(Ample.getUserListReq)
+    }
 }
+
 
 class LemonServer extends CommunicateBase{
 
@@ -43,12 +83,16 @@ class LemonServer extends CommunicateBase{
     // 拿到包以后需要先判断包是否完整
     // 如果不完整，则存入localData中
     $OnData(buf:Buffer){
-        console.log('接收buffer',buf.byteLength);
+        debugger;
+        console.log('recieved buffer ',buf.byteLength);
         const View = new DataView(buf.buffer)
-        const exist = this.Position === 0;
+        const NonExistent = this.Position === 0;
         // 当前缓冲区是正常的
-        if(!exist){
-            const BufferLength = View.getInt32(0)
+        if(NonExistent){
+            // 4 是 byteLength头
+            const BufferLength = View.getInt32(0) + 4;
+            console.log('readBufferLength',BufferLength);
+            
             // 完整包
             if(View.byteLength == BufferLength){
                 // this.$WriteToClient(buf);
@@ -65,7 +109,7 @@ class LemonServer extends CommunicateBase{
             }
         }
 
-        if(exist){
+        if(!NonExistent){
             const BufferLength = buf.byteLength;
             const canWrite = this.Position + BufferLength === this.BufferLength;
             if(canWrite){
@@ -89,6 +133,7 @@ class LemonServer extends CommunicateBase{
         const invokeMethod = rs.ReadString(2);
         const invokeRequest = rs.ReadString(3);
         const traceId = rs.ReadVector(4,T_String);
+        console.log('that.$ReflectGetClass(invokeRequest)',invokeRequest,that.$ReflectGetClass(invokeRequest));
         const invokeRequestBody = rs.ReadStruct(5,that.$ReflectGetClass(invokeRequest).Read);
         const invokeResponse = that.$ReflectGetResponse(invokeMethod);
         const context:InvokeContext = {
@@ -106,13 +151,16 @@ class LemonServer extends CommunicateBase{
             const ws = new T_WStream();
             ws.WriteString(0,context.moduleName);
             ws.WriteString(1,context.invokeMethod);
-            ws.WriteString(2,context.invokeRequest);
+            ws.WriteString(2,context.invokeResponse);
+            console.log('context.traceId',context.traceId);
             ws.WriteVector(3,context.traceId,T_String);
             ws.WriteStruct(4,data,that.$ReflectGetClass(context.invokeResponse).Write);
             that.$WriteToClient(ws.toBuf())
-        }
-        const resp = await (T_Container.GetMethod(context.moduleName,context.invokeMethod))(context,invokeRequestBody)
-        context.sendResponse(resp);
+        };
+        console.log(context.moduleName,context.invokeMethod);
+        (T_Container.GetMethod(context.moduleName,context.invokeMethod))(context,invokeRequestBody).then(resp=>{
+            context.sendResponse(resp);
+        })
     }
 
     addRecord(){
@@ -134,7 +182,7 @@ class LemonServer extends CommunicateBase{
     }
 
     Registration(Socket:net.Socket){
-        Socket.on('data',this.$OnData);
+        Socket.on('data',this.$OnData.bind(this));
     }
 
     Reset(){
@@ -152,13 +200,3 @@ const server = new LemonServer({
     'port':24001
 })
 
-
-class TarsService{
-    hello(ctx,req){
-
-    }
-
-    InitMetaData(){
-        T_Container.SetMethod("TarsService",this.hello.name,this.hello)
-    }
-}

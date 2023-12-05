@@ -64,6 +64,8 @@ class T_Vector<T = any>{
                 TVector.push(rs.toObj(T_Vector))
             }else{
                 const value = rs.ReadAny(tag++, T_Value._t_className)
+                console.log(value);
+                
                 TVector.push(value);
             }
             if(rs.getPosition()>= ByteLength){

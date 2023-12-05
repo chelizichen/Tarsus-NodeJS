@@ -10,7 +10,8 @@
       "category/*",
       "stream/*",
       "test/*",
-      "bin/*"
+      "bin/*",
+      "communicate/*"
     ],
     "exclude": ["node_modules"]
 }

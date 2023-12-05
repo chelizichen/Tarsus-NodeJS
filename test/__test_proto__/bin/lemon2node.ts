@@ -13,6 +13,7 @@ class Lemon2Node {
   public include = [];
   public module = "";
   public structs = {};
+  public rpcs = [];
 
   static Compile(target = '../test/ample.jce',type:"client"|"server" = "client") {
     const lemon2node = new Lemon2Node();
@@ -53,6 +54,20 @@ class Lemon2Node {
       lemon2node.structs[structName] = structFields;
     }
 
+    // 使用正则表达式匹配方法名和参数请求  
+    const regex = /rpc\s+(\w+)\s*\(([^()]+)\)\s*;+/g;  
+    const matches = tlvProtocol.match(regex);  
+      
+    // 解析匹配结果并构建对象数组  
+    const rpcMethods = matches.map(match => {  
+        const [rpcName, argRequest] = match.split(/\s*\(([^()]+)\)\s*/);  
+        const [, req, reqName, res, resName] = argRequest.match(/(\w+)\s+(\w+),\s*(\w+)\s+(\w+)/);
+
+        return { rpcName, req,reqName,res,resName };  
+    });  
+    
+    lemon2node.rpcs = rpcMethods;
+
     lemon2node.CreateRender()
   }
 
@@ -68,16 +83,17 @@ class Lemon2Node {
     const formattedContent = await prettier.format(
       `
     // ${include}
-    // module ${module};
+    // module ${this.module};
 import { T_Container, T_INT16, T_INT8, T_Map, T_String, T_Vector } from '../category';
 import { DefineField, DefineStruct, Override } from '../decorator'
 import { T_WStream,T_RStream } from '../stream/index'
 import { JceStruct } from '../type';
 
 (Symbol as { metadata: symbol }).metadata ??= Symbol("Symbol.metadata");
+const ${this.module}:Record<string,JceStruct> = {};
     ${arrays.join('\n')}
 
-
+export default ${this.module};
     ${Lemon2Node.Test}
 
     
@@ -130,9 +146,10 @@ import { JceStruct } from '../type';
     return `
 const ${structName} = {
   _t_className : "Struct<${structName}>"
-} as JceStruct
-T_Container.Set(${structName});
+} as JceStruct;
 
+T_Container.Set(${structName});
+${this.module}.${structName} = ${structName};
 `
   }
 

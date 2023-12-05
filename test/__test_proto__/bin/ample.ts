@@ -1,5 +1,5 @@
 // include Sertest;
-// module [object Object];
+// module Ample;
 import {
   T_Container,
   T_INT16,
@@ -11,13 +11,46 @@ import {
 import { DefineField, DefineStruct, Override } from "../decorator";
 import { T_WStream, T_RStream } from "../stream/index";
 import { JceStruct } from "../type";
-import LemonServer from '../communicate/lemon-server'
+
 (Symbol as { metadata: symbol }).metadata ??= Symbol("Symbol.metadata");
+const Ample: Record<string, JceStruct> = {};
+
+const QueryId = {
+  _t_className: "Struct<QueryId>",
+} as JceStruct;
+
+T_Container.Set(QueryId);
+Ample.QueryId = QueryId;
+
+QueryId.Read =
+  @DefineStruct(QueryId._t_className)
+  class extends T_RStream {
+    @DefineField(0) public id;
+    @DefineField(1) public basicInfo;
+
+    @Override public Deserialize() {
+      this.id = this.ReadInt8(0);
+      this.basicInfo = this.ReadStruct(1, BasicInfo.Read);
+      return this;
+    }
+  };
+
+QueryId.Write =
+  @DefineStruct(QueryId._t_className)
+  class extends T_WStream {
+    @Override public Serialize(obj) {
+      this.WriteInt8(0, obj.id);
+      this.WriteStruct(1, obj.basicInfo, BasicInfo.Write);
+      return this;
+    }
+  };
 
 const BasicInfo = {
   _t_className: "Struct<BasicInfo>",
 } as JceStruct;
+
 T_Container.Set(BasicInfo);
+Ample.BasicInfo = BasicInfo;
 
 BasicInfo.Read =
   @DefineStruct(BasicInfo._t_className)
@@ -45,7 +78,9 @@ BasicInfo.Write =
 const Pagination = {
   _t_className: "Struct<Pagination>",
 } as JceStruct;
+
 T_Container.Set(Pagination);
+Ample.Pagination = Pagination;
 
 Pagination.Read =
   @DefineStruct(Pagination._t_className)
@@ -76,7 +111,9 @@ Pagination.Write =
 const User = {
   _t_className: "Struct<User>",
 } as JceStruct;
+
 T_Container.Set(User);
+Ample.User = User;
 
 User.Read =
   @DefineStruct(User._t_className)
@@ -113,7 +150,9 @@ User.Write =
 const getUserListReq = {
   _t_className: "Struct<getUserListReq>",
 } as JceStruct;
+
 T_Container.Set(getUserListReq);
+Ample.getUserListReq = getUserListReq;
 
 getUserListReq.Read =
   @DefineStruct(getUserListReq._t_className)
@@ -138,10 +177,12 @@ getUserListReq.Write =
     }
   };
 
-export const getUserListRes = {
+const getUserListRes = {
   _t_className: "Struct<getUserListRes>",
 } as JceStruct;
+
 T_Container.Set(getUserListRes);
+Ample.getUserListRes = getUserListRes;
 
 getUserListRes.Read =
   @DefineStruct(getUserListRes._t_className)
@@ -171,6 +212,41 @@ getUserListRes.Write =
       return this;
     }
   };
+
+const getUserRes = {
+  _t_className: "Struct<getUserRes>",
+} as JceStruct;
+
+T_Container.Set(getUserRes);
+Ample.getUserRes = getUserRes;
+
+getUserRes.Read =
+  @DefineStruct(getUserRes._t_className)
+  class extends T_RStream {
+    @DefineField(0) public code;
+    @DefineField(1) public message;
+    @DefineField(2) public data;
+
+    @Override public Deserialize() {
+      this.code = this.ReadInt8(0);
+      this.message = this.ReadString(1);
+      this.data = this.ReadStruct(2, User.Read);
+      return this;
+    }
+  };
+
+getUserRes.Write =
+  @DefineStruct(getUserRes._t_className)
+  class extends T_WStream {
+    @Override public Serialize(obj) {
+      this.WriteInt8(0, obj.code);
+      this.WriteString(1, obj.message);
+      this.WriteStruct(2, obj.data, User.Write);
+      return this;
+    }
+  };
+
+export default Ample;
 
 // function main() {
 //   const write_basicInfo = new BasicInfo.Write();
@@ -271,4 +347,3 @@ getUserListRes.Write =
 // }
 
 // main();
-

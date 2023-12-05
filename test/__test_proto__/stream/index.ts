@@ -104,7 +104,7 @@ class T_WStream {
 
         // Then, We should allocate our buffer
         this.allocate(encoded.byteLength);
-        for (let i = 0; i < encoded.length; i++) {  
+        for (let i = 0; i < encoded.byteLength; i++) {  
             this.originView!.setInt8(this.position + i, encoded[i]);  
         }
         this.position += encoded.byteLength;
@@ -273,7 +273,7 @@ class T_RStream{
         this.position += 4;
         const byteLength = this.originView.getInt32(this.position - 4);
         let stringArray:number[] = [];
-        for (let i = 0; i < byteLength; i++) {  
+        for (let i = 0; i < byteLength; i++) {
             stringArray.push(this.originView.getInt8(this.position + i));  
         }
         const tagField = this.getMetaData(`Tag.${tag}`)
