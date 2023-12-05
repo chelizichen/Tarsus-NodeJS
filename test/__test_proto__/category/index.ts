@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { T_RStream, T_WStream } from "../stream";
 import { JceStruct, T_BASE, invokeMethod, invokeRequest, invokeResponse, module } from '../type/index'
 
@@ -196,6 +197,21 @@ class T_Container {
     
 }
 
+class T_Utils{
+    static Read2Object(target,path){
+        return _.get(target,path) || {};
+    }
+    static Read2Number(target,path){
+        return _.get(target,path) || 0;
+    }
+    static Read2String(target,path){
+        return _.get(target,path) || '';
+    }
+    static Read2Vector(target,path){
+        return _.get(target,path) || [];
+    }
+}
+
 export{
     T_Vector,
     T_String,
@@ -204,5 +220,6 @@ export{
     T_INT16,
     T_INT32,
     T_INT64,
-    T_Container
+    T_Container,
+    T_Utils
 }

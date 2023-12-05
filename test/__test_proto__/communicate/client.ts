@@ -97,7 +97,7 @@ class LemonClient extends CommunicateBase{
         this.BufferLength = 0;
     }
 
-    $InvokeRpc(module,method,request,body){
+    $InvokeRpc(module:string,method:string,request:string,body){
         return new Promise((resolve)=>{
             const ws = new T_WStream();
             const traceIds = new T_Vector(T_String)
@@ -122,6 +122,19 @@ const client = new LemonClient({
 
 T_Container.Set(Ample.getUserListReq)
 T_Container.Set(Ample.getUserListRes)
+
+const LoadClient = function(client:LemonClient){
+    this.client = client;
+    this.module = "Ample"
+}
+
+LoadClient.prototype.getUserList = function(data){
+    return new Promise(resolve=>{
+        (this.client as LemonClient).$InvokeRpc(this.module,'getUserList','Struct<getUserListReq>',data).then(resp=>{
+            resolve(resp)
+        })
+    })
+}
 
 client.$InvokeRpc("Ample","getUserList","Struct<getUserListReq>",{
     basicInfo:{

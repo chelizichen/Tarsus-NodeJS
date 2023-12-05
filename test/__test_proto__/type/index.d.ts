@@ -27,6 +27,10 @@ type InvokeContext = {
     responseUid?:string;
     invokeResponse?:string;
 }
+
+type ClinetProxy = {
+    $InvokeRpc(module:string,method:string,request:string,body):any;
+}
 export {
     Constructor,
     JceStruct,
@@ -36,5 +40,6 @@ export {
     invokeRequest,
     invokeResponse,
     plain,
-    InvokeContext
+    InvokeContext,
+    ClinetProxy
 }

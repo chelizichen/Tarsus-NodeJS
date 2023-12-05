@@ -40,11 +40,11 @@ class TarsService{
                 }
             ],
             user: {
-                id:0,
-                name:'leemulus',
-                age:13,
-                phone:'12321412321',
-                address:'wuhan'
+                // id:0,
+                // name:'leemulus',
+                // age:13,
+                // phone:'12321412321',
+                // address:'wuhan'
             },
         }
     }

@@ -13,7 +13,7 @@ class Lemon2Node {
   public include = [];
   public module = "";
   public structs = {};
-  public rpcs = [];
+  public rpcs:Array<{ rpcName:string, req:string,reqName:string,res:string,resName:string }> = [];
 
   static Compile(target = '../test/ample.jce',type:"client"|"server" = "client") {
     const lemon2node = new Lemon2Node();
@@ -80,21 +80,23 @@ class Lemon2Node {
     }
     arrays.join('\n');
     const include = this.include.map(v=>`include ${v};`).join('\n')
+    console.log(this.createClient());
+    
     const formattedContent = await prettier.format(
       `
     // ${include}
     // module ${this.module};
-import { T_Container, T_INT16, T_INT8, T_Map, T_String, T_Vector } from '../category';
+import { T_Container, T_INT16, T_INT8, T_Map, T_String, T_Vector,T_Utils } from '../category';
 import { DefineField, DefineStruct, Override } from '../decorator'
 import { T_WStream,T_RStream } from '../stream/index'
-import { JceStruct } from '../type';
+import { JceStruct,ClinetProxy } from '../type';
 
 (Symbol as { metadata: symbol }).metadata ??= Symbol("Symbol.metadata");
 const ${this.module}:Record<string,JceStruct> = {};
     ${arrays.join('\n')}
 
+    ${this.createClient()}
 export default ${this.module};
-    ${Lemon2Node.Test}
 
     
     `,
@@ -157,28 +159,28 @@ ${this.module}.${structName} = ${structName};
     const obj2Sentences = obj.map(v=>{
       if(v.type.startsWith('map<')){
         const [key,value] = this.getMapType(v.type)
-        return `this.WriteMap(${v.tag},obj.${v.name},${key},${value});        `
+        return `this.WriteMap(${v.tag}, T_Utils.Read2Object(obj,'${v.name}'),${key},${value});        `
       }
       if(v.type.startsWith('vector<')){
         const vectorType = this.getVectorType(v.type)
-        return `this.WriteVector(${v.tag}, obj.${v.name}, ${vectorType}.Write);`
+        return `this.WriteVector(${v.tag}, T_Utils.Read2Vector(obj,'${v.name}'), ${vectorType}.Write);`
       }
       if(v.type == "int8"){
-        return `this.WriteInt8(${v.tag}, obj.${v.name});`
+        return `this.WriteInt8(${v.tag}, T_Utils.Read2Number(obj,'${v.name}'));`
       }
       if(v.type == "int16"){
-        return `this.WriteInt16(${v.tag}, obj.${v.name});`
+        return `this.WriteInt16(${v.tag}, T_Utils.Read2Number(obj,'${v.name}'));`
       }
       if(v.type == "int32"){
-        return `this.WriteInt32(${v.tag}, obj.${v.name});`
+        return `this.WriteInt32(${v.tag}, T_Utils.Read2Number(obj,'${v.name}'));`
       }
       if(v.type == "int64"){
-        return `this.WriteInt64(${v.tag}, obj.${v.name});`
+        return `this.WriteInt64(${v.tag}, T_Utils.Read2Number(obj,'${v.name}'));`
       }
       if(v.type == "string"){
-        return `this.WriteString(${v.tag}, obj.${v.name});`;
+        return `this.WriteString(${v.tag}, T_Utils.Read2String(obj,'${v.name}'));`;
       }
-      return `this.WriteStruct(${v.tag}, obj.${v.name}, ${v.type}.Write);`
+      return `this.WriteStruct(${v.tag}, T_Utils.Read2Object(obj,'${v.name}'), ${v.type}.Write);`
     })
     const sentences = obj2Sentences.join('\n')
     return `
@@ -238,6 +240,33 @@ ${structName}.Read = @DefineStruct(${structName}._t_className) class extends T_R
   }
 
 }
+    `
+  }
+
+  private createClient(){
+    const ModuleProxy = `Load${this.module}Proxy`
+    const clientProxy = this.rpcs.map(v=>{
+      const rpcMethodName = v.rpcName.replaceAll(' ','').substring(3);
+      console.log('rpcMethodName',rpcMethodName);
+      
+      return `
+      ${ModuleProxy}.prototype.${rpcMethodName} = function(data){
+        return new Promise(resolve=>{
+          (this.client as ClinetProxy).$InvokeRpc(this.module,'${rpcMethodName}','Struct<${v.req}>',data).then(resp=>{
+              resolve(resp)
+          })
+        })
+      }
+      `
+    }).join('\n')
+    console.log(clientProxy);
+    
+    return `
+const ${ModuleProxy} = function(client:ClinetProxy){
+  this.client = client;
+  this.module = '${this.module}';
+};
+${clientProxy}
     `
   }
 
