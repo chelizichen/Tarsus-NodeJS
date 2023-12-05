@@ -107,6 +107,16 @@ class LemonServer extends CommunicateBase{
                 this.localData = Buffer.concat([this.localData!,buf])
                 return;
             }
+            // 一次发了多个包过来
+            if(View.byteLength > BufferLength){
+                const spliceBuf = buf.subarray(0,BufferLength);
+                this.readBuffer(spliceBuf);
+                const otherBuf = buf.subarray(BufferLength)
+                if(otherBuf.byteLength != 0){
+                    this.$OnData(otherBuf);
+                }
+                return;
+            }
         }
 
         if(!NonExistent){

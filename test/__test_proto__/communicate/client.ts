@@ -140,6 +140,42 @@ client.$InvokeRpc("Ample","getUserList","Struct<getUserListReq>",{
     console.log('resp::debug::',res);
 })
 
+client.$InvokeRpc("Ample","getUserList","Struct<getUserListReq>",{
+    basicInfo:{
+        token:"qwe123asd123",
+        detail:{
+            a:"1",
+            b:"2"
+        }
+    },
+    page:{
+        offset:0,
+        size:10,
+        keyword:"hello world"
+    }
+}).then(res=>{
+    console.log('resp::debug::',res);
+})
+// setInterval(()=>{
+//     client.$InvokeRpc("Ample","getUserList","Struct<getUserListReq>",{
+//         basicInfo:{
+//             token:"qwe123asd123",
+//             detail:{
+//                 a:"1",
+//                 b:"2"
+//             }
+//         },
+//         page:{
+//             offset:0,
+//             size:10,
+//             keyword:"hello world"
+//         }
+//     }).then(res=>{
+//         console.log('resp::debug::',res);
+//     })
+// },0)
+
+
     // Test(){
     //   const write_getuserres = new getUserListRes.Write();
     //   debugger;
