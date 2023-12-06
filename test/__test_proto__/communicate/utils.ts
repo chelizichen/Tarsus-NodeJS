@@ -24,13 +24,23 @@ export const CONSTANT = {
 
 export class CommunicateBase{
     $ReflectGetClass(clazz:string):JceStruct{
-        console.log(clazz);
-        console.log(T_Container.Value.keys());
-        
         return T_Container.Get(clazz)
     }
 
     $ReflectGetResponse(invokeMethod):string{
         return T_Container.GetRpcMethod(invokeMethod)[1]
+    }
+}
+
+// 检查函数是否是异步函数
+export function isAsyncFunction(func) {
+    return func.constructor === async function(){}.constructor;
+}
+
+export function TimesCall(cb,times){
+    let i = 0;
+    while(i <= times){
+        cb();
+        i++;
     }
 }

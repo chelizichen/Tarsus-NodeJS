@@ -21,6 +21,7 @@ const QueryId = {
 } as JceStruct;
 
 T_Container.Set(QueryId);
+
 Ample.QueryId = QueryId;
 
 QueryId.Read =
@@ -55,6 +56,7 @@ const BasicInfo = {
 } as JceStruct;
 
 T_Container.Set(BasicInfo);
+
 Ample.BasicInfo = BasicInfo;
 
 BasicInfo.Read =
@@ -85,6 +87,7 @@ const Pagination = {
 } as JceStruct;
 
 T_Container.Set(Pagination);
+
 Ample.Pagination = Pagination;
 
 Pagination.Read =
@@ -118,6 +121,7 @@ const User = {
 } as JceStruct;
 
 T_Container.Set(User);
+
 Ample.User = User;
 
 User.Read =
@@ -157,6 +161,7 @@ const getUserListReq = {
 } as JceStruct;
 
 T_Container.Set(getUserListReq);
+
 Ample.getUserListReq = getUserListReq;
 
 getUserListReq.Read =
@@ -191,6 +196,7 @@ const getUserListRes = {
 } as JceStruct;
 
 T_Container.Set(getUserListRes);
+
 Ample.getUserListRes = getUserListRes;
 
 getUserListRes.Read =
@@ -227,6 +233,7 @@ const getUserRes = {
 } as JceStruct;
 
 T_Container.Set(getUserRes);
+
 Ample.getUserRes = getUserRes;
 
 getUserRes.Read =
@@ -255,7 +262,7 @@ getUserRes.Write =
     }
   };
 
-const LoadAmpleProxy = function (client: ClinetProxy) {
+export const LoadAmpleProxy = function (client: ClinetProxy) {
   this.client = client;
   this.module = "Ample";
 };
@@ -263,7 +270,12 @@ const LoadAmpleProxy = function (client: ClinetProxy) {
 LoadAmpleProxy.prototype.getUserList = function (data) {
   return new Promise((resolve) => {
     (this.client as ClinetProxy)
-      .$InvokeRpc(this.module, "getUserList", "Struct<getUserListReq>", data)
+      .$InvokeRpc(
+        this.module,
+        "getUserList",
+        Ample.getUserListReq._t_className,
+        data,
+      )
       .then((resp) => {
         resolve(resp);
       });
@@ -273,11 +285,45 @@ LoadAmpleProxy.prototype.getUserList = function (data) {
 LoadAmpleProxy.prototype.getUser = function (data) {
   return new Promise((resolve) => {
     (this.client as ClinetProxy)
-      .$InvokeRpc(this.module, "getUser", "Struct<QueryId>", data)
+      .$InvokeRpc(this.module, "getUser", Ample.QueryId._t_className, data)
       .then((resp) => {
         resolve(resp);
       });
   });
+};
+
+export const LoadAmpleServer = function (server) {
+  this.server = server;
+  this.module = "Ample";
+  this.TarsInitialize();
+};
+
+LoadAmpleServer.prototype.TarsInitialize = function () {
+  T_Container.SetMethod(
+    this.module,
+    "getUserList",
+    this.getUserList.bind(this),
+  );
+  T_Container.SetRpcMethod(
+    "getUserList",
+    Ample.getUserListReq._t_className,
+    Ample.getUserListRes._t_className,
+  );
+
+  T_Container.SetMethod(this.module, "getUser", this.getUser.bind(this));
+  T_Container.SetRpcMethod(
+    "getUser",
+    Ample.QueryId._t_className,
+    Ample.getUserRes._t_className,
+  );
+};
+
+LoadAmpleServer.prototype.getUserList = async function (ctx, req) {
+  throw new Error("Module Method has not implyment");
+};
+
+LoadAmpleServer.prototype.getUser = async function (ctx, req) {
+  throw new Error("Module Method has not implyment");
 };
 
 export default Ample;

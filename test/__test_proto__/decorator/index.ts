@@ -41,8 +41,10 @@ export function DefineField(tag:number){
     }
 }
 
-export function Module(moduleName:string){
+export function Module(moduleServer:any){
     return function(clazz: any, _context: ClassDecoratorContext){
-        clazz.moduleName = moduleName
+        _context.addInitializer(function(){
+            
+        })
     }
 }

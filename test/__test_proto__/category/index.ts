@@ -1,7 +1,6 @@
 import _ from "lodash";
 import { T_RStream, T_WStream } from "../stream";
 import { JceStruct, T_BASE, invokeMethod, invokeRequest, invokeResponse, module } from '../type/index'
-
 (Symbol as { metadata: symbol }).metadata ??= Symbol("Symbol.metadata");
 
 
@@ -40,11 +39,11 @@ class T_Vector<T = any>{
         const ws = new T_WStream();
         let tag = 0;
         const obj = T_Vector.toObj();
-        debugger;
+        // debugger;
         for(const value of obj){
             if(T_Vector.isJceStruct){
                 const Write = T_Container.Get(T_Vector._t_value).Write;
-                debugger;
+                // debugger;
                 ws.WriteStruct(tag,value,Write);
             }else{
                 ws.WriteAny(tag,value,T_Vector._t_value);
@@ -65,8 +64,6 @@ class T_Vector<T = any>{
                 TVector.push(rs.toObj(T_Vector))
             }else{
                 const value = rs.ReadAny(tag++, T_Value._t_className)
-                console.log(value);
-                
                 TVector.push(value);
             }
             if(rs.getPosition()>= ByteLength){

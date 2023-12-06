@@ -96,6 +96,7 @@ const ${this.module}:Record<string,JceStruct> = {};
     ${arrays.join('\n')}
 
     ${this.createClient()}
+    ${this.createServer()}
 export default ${this.module};
 
     
@@ -151,6 +152,7 @@ const ${structName} = {
 } as JceStruct;
 
 T_Container.Set(${structName});
+
 ${this.module}.${structName} = ${structName};
 `
   }
@@ -252,7 +254,7 @@ ${structName}.Read = @DefineStruct(${structName}._t_className) class extends T_R
       return `
       ${ModuleProxy}.prototype.${rpcMethodName} = function(data){
         return new Promise(resolve=>{
-          (this.client as ClinetProxy).$InvokeRpc(this.module,'${rpcMethodName}','Struct<${v.req}>',data).then(resp=>{
+          (this.client as ClinetProxy).$InvokeRpc(this.module,'${rpcMethodName}',Ample.${v.req}._t_className,data).then(resp=>{
               resolve(resp)
           })
         })
@@ -262,11 +264,44 @@ ${structName}.Read = @DefineStruct(${structName}._t_className) class extends T_R
     console.log(clientProxy);
     
     return `
-const ${ModuleProxy} = function(client:ClinetProxy){
+export const ${ModuleProxy} = function(client:ClinetProxy){
   this.client = client;
   this.module = '${this.module}';
 };
+
 ${clientProxy}
+    `
+  };
+
+  public createServer(){
+    const ModuleServer = `Load${this.module}Server`;
+    const ServerMethods = this.rpcs.map(v=>{
+      const rpcMethodName = v.rpcName.replaceAll(' ','').substring(3);
+      return `
+      ${ModuleServer}.prototype.${rpcMethodName} = async function(ctx,req){
+        throw new Error("Module Method has not implyment");        
+      };
+      `
+    }).join('\n');
+    const InitializeServer = this.rpcs.map(v=>{
+      const rpcMethodName = v.rpcName.replaceAll(' ','').substring(3);
+      return `
+        T_Container.SetMethod(this.module,'${rpcMethodName}',this.${rpcMethodName}.bind(this));
+        T_Container.SetRpcMethod('${rpcMethodName}',Ample.${v.req}._t_className,Ample.${v.res}._t_className);
+        `
+    }).join('\n')
+
+    return `
+    export const ${ModuleServer} = function(server){
+      this.server = server;
+      this.module = '${this.module}';
+      this.TarsInitialize();
+    }
+
+    LoadAmpleServer.prototype.TarsInitialize = function(){
+      ${InitializeServer}
+    }
+    ${ServerMethods}
     `
   }
 

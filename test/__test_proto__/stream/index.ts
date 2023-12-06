@@ -283,7 +283,6 @@ class T_RStream{
     }
 
     ReadBuf(tag:number):Buffer{
-        debugger;
         this.position += 4;
         const ByteLength = this.originView.getInt32(this.position - 4)
         const buf = this.createBuffer(ByteLength);
@@ -295,7 +294,6 @@ class T_RStream{
     }
 
     ReadMap(tag:number,T_Key:any,T_Value:any){
-        debugger;
         this.position += 4;
         const ByteLength = this.originView.getInt32(this.position - 4);
         const temp = this.createBuffer(ByteLength);
@@ -308,9 +306,13 @@ class T_RStream{
     }
 
     ReadVector(tag:number,T_Value:any):any[]{
-        debugger;
         this.position += 4;
         const ByteLength = this.originView.getInt32(this.position -  4);
+        if(!ByteLength){
+            const tagField = this.getMetaData(`Tag.${tag}`)
+            this.readStreamToObj[tagField] = [];
+            return this.readStreamToObj[tagField];
+        }
         const temp = this.createBuffer(ByteLength);
         this.originBuf.copy(temp,0, this.position, this.position + ByteLength)
         const Obj = T_Vector.streamToObj(temp,T_Value,ByteLength)

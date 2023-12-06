@@ -1,11 +1,10 @@
 import { EventEmitter } from "events";
 import * as net from 'net'
-import { $WriteHead, CommunicateBase } from "./utils";
+import { $WriteHead, CommunicateBase, TimesCall } from "./utils";
 import { T_RStream, T_WStream } from "../stream";
 import { T_Container, T_String, T_Vector } from "../category";
-import { JceStruct } from "../type";
 import { uid } from "uid";
-import Ample from "../bin/ample";
+import Ample, { LoadAmpleProxy } from "../bin/ample";
 
 
 class LemonClient extends CommunicateBase{
@@ -33,7 +32,10 @@ class LemonClient extends CommunicateBase{
         const NonExistent = this.Position === 0;
         // 当前缓冲区是正常的
         if(NonExistent){
-            const BufferLength = View.getInt32(0) + 4
+            const BufferLength = View.getInt32(0) + 4;
+            console.log('BufferLength',BufferLength);
+            console.log('buf.byteLength',buf.byteLength);
+            
             // 完整包
             if(View.byteLength == BufferLength){
                 this.$ResponseToGateWay(buf)
@@ -47,6 +49,17 @@ class LemonClient extends CommunicateBase{
                 this.localData = Buffer.concat([this.localData!,buf])
                 return;
             }
+            // 一次发了多个包过来
+            if(View.byteLength > BufferLength){
+                const spliceBuf = buf.subarray(0,BufferLength);
+                this.$ResponseToGateWay(spliceBuf)
+                const otherBuf = buf.subarray(BufferLength)
+                if(otherBuf.byteLength != 0){
+                    this.$OnData(otherBuf);
+                }
+                return;
+            }
+
         }
 
         if(!NonExistent){
@@ -82,6 +95,7 @@ class LemonClient extends CommunicateBase{
 
     $WriteToServer(data:Buffer){
         const _buf = $WriteHead(data)
+        console.log('$WriteToServer',_buf.byteLength);
         this.Socket.write(_buf)
     }
 
@@ -123,110 +137,41 @@ const client = new LemonClient({
 T_Container.Set(Ample.getUserListReq)
 T_Container.Set(Ample.getUserListRes)
 
-const LoadClient = function(client:LemonClient){
-    this.client = client;
-    this.module = "Ample"
-}
 
-LoadClient.prototype.getUserList = function(data){
-    return new Promise(resolve=>{
-        (this.client as LemonClient).$InvokeRpc(this.module,'getUserList','Struct<getUserListReq>',data).then(resp=>{
-            resolve(resp)
-        })
+const ClientProxy = new LoadAmpleProxy(client);
+
+TimesCall(()=>
+    ClientProxy.getUserList({
+        basicInfo:{
+            token:"qwe123asd123",
+            detail:{
+                a:"1",
+                b:"2"
+            }
+        },
+        page:{
+            offset:0,
+            size:10,
+            keyword:"hello world"
+        }
+    }).then(res=>{
+        console.log('getUserList',res);
     })
-}
+,5)
 
-client.$InvokeRpc("Ample","getUserList","Struct<getUserListReq>",{
-    basicInfo:{
-        token:"qwe123asd123",
-        detail:{
-            a:"1",
-            b:"2"
-        }
-    },
-    page:{
-        offset:0,
-        size:10,
-        keyword:"hello world"
-    }
-}).then(res=>{
-    console.log('resp::debug::',res);
-})
-
-client.$InvokeRpc("Ample","getUserList","Struct<getUserListReq>",{
-    basicInfo:{
-        token:"qwe123asd123",
-        detail:{
-            a:"1",
-            b:"2"
-        }
-    },
-    page:{
-        offset:0,
-        size:10,
-        keyword:"hello world"
-    }
-}).then(res=>{
-    console.log('resp::debug::',res);
-})
-// setInterval(()=>{
-//     client.$InvokeRpc("Ample","getUserList","Struct<getUserListReq>",{
-//         basicInfo:{
-//             token:"qwe123asd123",
-//             detail:{
-//                 a:"1",
-//                 b:"2"
-//             }
-//         },
-//         page:{
-//             offset:0,
-//             size:10,
-//             keyword:"hello world"
-//         }
-//     }).then(res=>{
-//         console.log('resp::debug::',res);
-//     })
-// },0)
+TimesCall(()=>
+    ClientProxy.getUser({
+        id:1,
+        basicInfo:{
+            token:"qwe123asd123",
+            detail:{
+                a:"1",
+                b:"2"
+            }
+        },
+    }).then(res=>{
+        console.log('getUser',res);
+    })
+,5)
 
 
-    // Test(){
-    //   const write_getuserres = new getUserListRes.Write();
-    //   debugger;
-    //   const wgres = write_getuserres
-    //     .Serialize({
-    //       code: 0,
-    //       message: "ok",
-    //       data: [
-    //         {
-    //           id: 0,
-    //           name: "leemulus",
-    //           age: 13,
-    //           phone: "12321412321",
-    //           address: "wuhan",
-    //         },
-    //         {
-    //           id: 1,
-    //           name: "leemulus",
-    //           age: 14,
-    //           phone: "12321412321",
-    //           address: "wuhan",
-    //         },
-    //         {
-    //           id: 2,
-    //           name: "leemulus",
-    //           age: 15,
-    //           phone: "12321412321",
-    //           address: "wuhan",
-    //         },
-    //       ],
-    //       user: {
-    //         id: 0,
-    //         name: "leemulus",
-    //         age: 13,
-    //         phone: "12321412321",
-    //         address: "wuhan",
-    //       },
-    //     })
-    //     .toBuf()!;
-    //   this.$WriteToServer(wgres)
-    // }
