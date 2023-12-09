@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import prettier from 'prettier';
 
-type structFields = Array<{tag:number,type:string,name:string;}>
+type structFields = Array<{tag:number,type:string,name:string;_type:string}>
 type struct = Record<string,structFields>
 
 
@@ -12,7 +12,7 @@ class Lemon2Node {
   static structRegex = /struct\s+(\w+)\s*{([^}]+)}/g;
   public include = [];
   public module = "";
-  public structs = {};
+  public structs:struct = {};
   public rpcs:Array<{ rpcName:string, req:string,reqName:string,res:string,resName:string }> = [];
 
   static Compile(target = '../test/ample.jce',type:"client"|"server" = "client") {
@@ -68,7 +68,8 @@ class Lemon2Node {
     
     lemon2node.rpcs = rpcMethods;
 
-    lemon2node.CreateRender()
+    // lemon2node.CreateRender();
+    lemon2node.CreateJavaProtocol()
   }
 
   public async CreateRender(){
@@ -107,11 +108,11 @@ export default ${this.module};
   }
 
   private typeMap(type:string){
-    if(type == ('map')){
+    if(type.startsWith('map')){
       type = type.replace('map','T_Map')
       return type
     }
-    if(type == ('vector')){
+    if(type.startsWith('vector')){
       type = type.replace('vector','T_Vector')
       return type
     }
@@ -119,6 +120,23 @@ export default ${this.module};
       type = "T_String";
       return type
     }
+    if(type == ("int8")){
+      type = "T_INT8";
+      return type
+    }
+    if(type == ("int16")){
+      type = "T_INT16";
+      return type
+    }
+    if(type == ("int32")){
+      type = "T_INT32";
+      return type
+    }
+    if(type == ("int64")){
+      type = "T_INT64";
+      return type
+    }
+    return type;
   }
 
   private getMapType(type:string):[string,string]{
@@ -400,6 +418,143 @@ ${clientProxy}
 
 main();
 `
+
+  public async CreateJavaProtocol(){
+    for(let v in this.structs){
+      let ClassName = v;
+      let values = this.structs[ClassName];
+      let PublicFields = values.map(v=>{
+        v._type = this.typeMap(v.type)
+        return `public ${v._type} ${v.name};`;
+      })
+      let Constructor = values.map(v=>{
+        return `this.${v.name} = (${v._type}) readStreamToObj.get("${v.name}");`
+      })
+      let Tag2Fields = values.map(v=>{
+        return `this.Tag2Field.put(${v.tag}, "${v.name}");`
+      })
+      let Read = values.map(v=>{
+          if(v.type.startsWith('map<')){
+            const [key,value] = this.getMapType(v.type)
+            return `this.${v.name} = this.ReadMap(${v.tag},${key},${value});        `
+          }
+          if(v.type.startsWith('vector<')){
+            const vectorType = this.getVectorType(v.type)
+            return `this.${v.name} = this.ReadVector(${v.tag}, ${vectorType}.Read);`
+          }
+          if(v.type == "int8"){
+            return `this.${v.name} = this.ReadInt8(${v.tag});`
+          }
+          if(v.type == "int16"){
+            return `this.${v.name} = this.ReadInt16(${v.tag});`
+          }
+          if(v.type == "int32"){
+            return `this.${v.name} = this.ReadInt32(${v.tag});`
+          }
+          if(v.type == "int64"){
+            return `this.${v.name} = this.ReadInt64(${v.tag});`
+          }
+          if(v.type == "string"){
+            return `this.${v.name} = this.ReadString(${v.tag});`;
+          }
+          return `this.${v.name} = this.ReadStruct(${v.tag}, ${v.type}.class,T_Container.JCE_STRUCT.get(${v.type}._t_className).Read);`
+      })
+      let Write = values.map(v=>{
+          if(v.type.startsWith('map<')){
+            const [key,value] = this.getMapType(v.type)
+            return `this.WriteMap(${v.tag}, obj.${v.name},${key},${value});        `
+          }
+          if(v.type.startsWith('vector<')){
+            const vectorType = this.getVectorType(v.type)
+            return `this.WriteVector(${v.tag}, obj.${v.name}, ${vectorType}.Write);`
+          }
+          if(v.type == "int8"){
+            return `this.WriteInt8(${v.tag}, obj.${v.name}.GetValue());`
+          }
+          if(v.type == "int16"){
+            return `this.WriteInt16(${v.tag}, obj.${v.name}.GetValue());`
+          }
+          if(v.type == "int32"){
+            return `this.WriteInt32(${v.tag}, obj.${v.name}.GetValue());`
+          }
+          if(v.type == "int64"){
+            return `this.WriteInt64(${v.tag}, obj.${v.name}.GetValue());`
+          }
+          if(v.type == "string"){
+            return `this.WriteString(${v.tag}, obj.${v.name}.GetValue());`;
+          }
+          return `this.WriteStruct(${v.tag},  obj.${v.name}.GetValue(), T_Container.JCE_STRUCT.get(${v.type}._t_className).Write);`
+      })
+      const fileContent = (`
+package dev_v3_0.protocol;
+import dev_v3_0.protocol.*;
+import dev_v3_0.category.*;
+import dev_v3_0.stream.T_RStream;
+import dev_v3_0.stream.T_WStream;
+
+import java.lang.reflect.InvocationTargetException;
+import java.nio.ByteBuffer;
+
+public class ${ClassName} implements T_Base{
+  public static String _t_className = "Struct<${ClassName}>";
+  static {
+    T_Container.JCE_STRUCT.put(${ClassName}._t_className, new T_JceStruct<${ClassName}.Read, ${ClassName}.Write,${ClassName}>(${ClassName}.Read.class, ${ClassName}.Write.class, ${ClassName}.class,${ClassName}._t_className));
+  }
+    ${PublicFields.join('\n    ')};
+
+  public <T extends T_Base> ${ClassName}(T_Map<T> readStreamToObj){
+    ${Constructor.join('\n    ')}
+  }
+
+  public ${ClassName}() {
+    // NoArgsConstructor
+  }
+
+  @Override
+  public T_Class __getClass__() {
+    T_Class tc = new T_Class();
+    tc.className = "Struct<${ClassName}>";
+    tc.valueType = "${ClassName}";
+    return tc;
+  }
+
+
+  @Override
+  public ${ClassName} GetValue() {
+      return this;
+  }
+
+  public static class Read extends T_RStream {
+    ${PublicFields.join('\n    ')};
+
+    public void ScanFields2Tag() {
+      ${Tag2Fields.join('\n      ')};
+    }
+
+    public Read(ByteBuffer originBuf) {
+        super(originBuf);
+        this.ScanFields2Tag();
+    }
+
+    public Read DeSerialize() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+      ${Read.join('\n      ')}  
+      return this;
+    }
+  }
+
+  public static class Write extends T_WStream {
+    public Write Serialize(${ClassName} obj) throws Exception {
+      ${Write.join('\n      ')}
+      return this;
+    }
+  }
+}
+
+      
+      `)
+      fs.writeFileSync(`./bin/java/${ClassName}.java`,fileContent,'utf-8')
+    }
+  }
 
 
 }
