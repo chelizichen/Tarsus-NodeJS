@@ -7,7 +7,7 @@ import { uid } from "uid";
 import Ample, { LoadAmpleProxy } from "../bin/ample";
 
 
-class LemonClient extends CommunicateBase{
+class T_Client extends CommunicateBase{
 
     public localData : Buffer | undefined; // 本地缓冲区
     public Position:number;
@@ -130,7 +130,7 @@ class LemonClient extends CommunicateBase{
 }
 
 
-const client = new LemonClient({
+const client = new T_Client({
     'port':24001
 })
 
@@ -173,5 +173,7 @@ TimesCall(()=>
         console.log('getUser',res);
     })
 ,5)
+
+export default T_Client;
 
 

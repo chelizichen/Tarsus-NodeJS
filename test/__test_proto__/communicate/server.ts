@@ -10,7 +10,7 @@ import { InvokeContext } from '../type/index'
 import Ample, { LoadAmpleServer } from "../bin/ample";
 
 
-class LemonServer extends CommunicateBase{
+class T_Server extends CommunicateBase{
 
     public localData:Buffer | undefined; // 本地缓冲区
     public Position:number;
@@ -157,9 +157,8 @@ class LemonServer extends CommunicateBase{
 }
 
 
-export default LemonServer
 
-const server = new LemonServer({
+const server = new T_Server({
     'port':24001
 })
 
@@ -224,3 +223,4 @@ server.BindModule(LoadAmpleServer)
 
 // server.$OnData(Buf);
 
+export default T_Server;

@@ -1,3 +1,4 @@
+import T_Client from "../communicate/client";
 import { T_WStream, T_RStream } from "../stream";
 
 type Constructor<T> = new (...args:any[])=>T
@@ -31,6 +32,12 @@ type InvokeContext = {
 type ClinetProxy = {
     $InvokeRpc(module:string,method:string,request:string,body):any;
 }
+
+type T_GateWayClient = {
+    Module:string; // 模块
+    client:T_Client;
+}
+
 export {
     Constructor,
     JceStruct,
@@ -41,5 +48,6 @@ export {
     invokeResponse,
     plain,
     InvokeContext,
-    ClinetProxy
+    ClinetProxy,
+    T_GateWayClient
 }

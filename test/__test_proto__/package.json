@@ -2,7 +2,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev --project tsconfig.json  bin/ample.ts",
-    "script": "ts-node-dev --project tsconfig.json bin/lemon2node.ts",
+    "script": "ts-node-dev --project tsconfig.json bin/t2node.ts",
     "client": "ts-node-dev --project tsconfig.json communicate/client.ts",
     "server": "ts-node-dev --project tsconfig.json communicate/server.ts"
   },
