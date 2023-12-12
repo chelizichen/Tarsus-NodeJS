@@ -13,7 +13,7 @@ class T_Client extends CommunicateBase{
     public localData : Buffer | undefined; // 本地缓冲区
     public Position:number;
     public BufferLength:number;
-    public Servant;
+    public Servant  :   net.SocketConnectOpts;
     public Connection;
     public Socket   :   net.Socket;
     public Events   :   EventEmitter;
@@ -92,15 +92,15 @@ class T_Client extends CommunicateBase{
 
     $OnConncet(){
     //   this.Test()
-      console.log("已连接至24001");
+        // @ts-ignore
+        console.log(`已连接至${this.Servant.port}`);
     }
 
     $WriteToServer(data:Buffer){
         const _buf = $WriteHead(data)
-        console.log('$WriteToServer',_buf.join(','));
         this.Socket.write(_buf)
         // this.Socket.write("\n")
-        this.Socket.end()
+        // this.Socket.end()
     }
 
     $OnClose(){
@@ -136,7 +136,6 @@ class T_Client extends CommunicateBase{
             ws.WriteVector(3,traceIds,T_String);
             ws.WriteStruct(4,body,this.$ReflectGetClass(request).Write)
             this.$WriteToServer(ws.toBuf())
-            console.log("ws.toBuf()"+ws.toBuf());
             this.Events.on(traceReqId,resp=>resolve(resp));
         })
     }
@@ -193,24 +192,24 @@ class T_Client extends CommunicateBase{
 //     'port':24001
 // })
 
-const client = new T_Client({
-    'port':24511
-})
+// const client = new T_Client({
+//     'port':24511
+// })
 
-const ClientProxy = new LoadSampleProxy(client);
+// const ClientProxy = new LoadSampleProxy(client);
 
-// TimesCall(()=>
-setTimeout(()=>{
-    ClientProxy.getUserById({
-        id:77,
-        basicInfo:{
-         token:'asd123',
-         traceId:5411
-        }
-     }).then(res=>{
-         console.log('getUserById',res);
-     })
-},2000)
+// // TimesCall(()=>
+// setTimeout(()=>{
+//     ClientProxy.getUserById({
+//         id:77,
+//         basicInfo:{
+//          token:'asd123',
+//          traceId:5411
+//         }
+//      }).then(res=>{
+//          console.log('getUserById',res);
+//      })
+// },2000)
 
 // ,5)
 

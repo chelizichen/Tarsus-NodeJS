@@ -15,7 +15,7 @@ class Lemon2Node {
   public structs:struct = {};
   public rpcs:Array<{ rpcName:string, req:string,reqName:string,res:string,resName:string }> = [];
 
-  static Compile(target = '../test/sample.jce',type:"client"|"server" = "client") {
+  static Compile(target = '../test/ample.jce',type:"client"|"server" = "client") {
     const lemon2node = new Lemon2Node();
     const tlvProtocol = fs.readFileSync(path.resolve(__dirname, target), "utf-8");
     let match;
@@ -61,8 +61,7 @@ class Lemon2Node {
     // 解析匹配结果并构建对象数组  
     const rpcMethods = matches.map(match => {  
         const [rpcName, argRequest] = match.split(/\s*\(([^()]+)\)\s*/);  
-        const [, req, reqName, res, resName] = argRequest.match(/(\w+)\s+(\w+),\s*(\w+)\s+(\w+)/);
-
+        const [, req, reqName, res, resName] = argRequest.match(/(\w+)\s+(\w+),\s*(\w.+)\s+(\w+)/);
         return { rpcName, req,reqName,res,resName };  
     });  
     
@@ -82,7 +81,9 @@ class Lemon2Node {
     arrays.join('\n');
     const include = this.include.map(v=>`include ${v};`).join('\n')
     console.log(this.createClient());
-    
+    console.log('this.include',this.include);
+    const includeSentence = include?this.include.map(v=>`import ${v} from './${v}'`).join('\n'):''
+    const SetModule = include?this.include.map(v=>`${this.module}.${v} = ${v} as Record<string,JceStruct>`).join('\n'):''
     const formattedContent = await prettier.format(
       `
     // ${include}
@@ -90,10 +91,14 @@ class Lemon2Node {
 import { T_Container, T_INT16, T_INT8, T_Map, T_String, T_Vector,T_Utils } from '../category';
 import { DefineField, DefineStruct, Override } from '../decorator'
 import { T_WStream,T_RStream } from '../stream/index'
-import { JceStruct,ClinetProxy } from '../type';
+import { JceStruct, ClinetProxy, Module } from "../type";
+${includeSentence}
 
 (Symbol as { metadata: symbol }).metadata ??= Symbol("Symbol.metadata");
-const ${this.module}:Record<string,JceStruct> = {};
+const ${this.module}:Module = {};
+
+${SetModule}
+
     ${arrays.join('\n')}
 
     ${this.createClient()}
@@ -166,7 +171,7 @@ export default ${this.module};
 
     return `
 const ${structName} = {
-  _t_className : "Struct<${structName}>"
+  _t_className : "${this.module}.Struct<${structName}>"
 } as JceStruct;
 
 T_Container.Set(${structName});
@@ -272,7 +277,7 @@ ${structName}.Read = @DefineStruct(${structName}._t_className) class extends T_R
       return `
       ${ModuleProxy}.prototype.${rpcMethodName} = function(data){
         return new Promise(resolve=>{
-          (this.client as ClinetProxy).$InvokeRpc(this.module,'${rpcMethodName}',${this.module}.${v.req}._t_className,data).then(resp=>{
+          (this.client as ClinetProxy).$InvokeRpc(this.module,'${rpcMethodName}',${this.module}.${v.req}._t_className as string,data).then(resp=>{
               resolve(resp)
           })
         })
@@ -286,6 +291,8 @@ export const ${ModuleProxy} = function(client:ClinetProxy){
   this.client = client;
   this.module = '${this.module}';
 };
+
+${ModuleProxy}.module = '${this.module}';
 
 ${clientProxy}
     `
@@ -305,7 +312,7 @@ ${clientProxy}
       const rpcMethodName = v.rpcName.replaceAll(' ','').substring(3);
       return `
         T_Container.SetMethod(this.module,'${rpcMethodName}',this.${rpcMethodName}.bind(this));
-        T_Container.SetRpcMethod('${rpcMethodName}',${this.module}.${v.req}._t_className,${this.module}.${v.res}._t_className);
+        T_Container.SetRpcMethod('${rpcMethodName}',(${this.module} as any).${v.req}._t_className as string,(${this.module} as any).${v.res}._t_className as string);
         `
     }).join('\n')
 

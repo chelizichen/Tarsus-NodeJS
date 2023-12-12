@@ -32,6 +32,7 @@ type InvokeContext = {
 type ClinetProxy = {
     $InvokeRpc(module:string,method:string,request:string,body):any;
 }
+type Module<T = JceStruct> = Record<string, Record<string, T> | T>;
 
 type T_GateWayClient = {
     Module:string; // 模块
@@ -49,5 +50,6 @@ export {
     plain,
     InvokeContext,
     ClinetProxy,
-    T_GateWayClient
+    T_GateWayClient,
+    Module
 }

@@ -4,7 +4,8 @@
     "dev": "ts-node-dev --project tsconfig.json  bin/ample.ts",
     "script": "ts-node-dev --project tsconfig.json bin/t2node.ts",
     "client": "ts-node-dev --project tsconfig.json communicate/client.ts",
-    "server": "ts-node-dev --project tsconfig.json communicate/server.ts"
+    "server": "ts-node-dev --project tsconfig.json communicate/server.ts",
+    "gateway":"ts-node-dev --project tsconfig.json gateway/T_Test.ts"
   },
   "author": "",
   "license": "ISC",

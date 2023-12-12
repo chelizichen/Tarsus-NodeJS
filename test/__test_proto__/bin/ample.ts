@@ -1,4 +1,4 @@
-// include Sertest;
+// include Sample;
 // module Ample;
 import {
   T_Container,
@@ -11,13 +11,16 @@ import {
 } from "../category";
 import { DefineField, DefineStruct, Override } from "../decorator";
 import { T_WStream, T_RStream } from "../stream/index";
-import { JceStruct, ClinetProxy } from "../type";
+import { JceStruct, ClinetProxy, Module } from "../type";
+import Sample from "./Sample";
 
 (Symbol as { metadata: symbol }).metadata ??= Symbol("Symbol.metadata");
-const Ample: Record<string, JceStruct> = {};
+const Ample: Module = {};
+
+Ample.Sample = Sample as Record<string, JceStruct>;
 
 const QueryId = {
-  _t_className: "Struct<QueryId>",
+  _t_className: "Ample.Struct<QueryId>",
 } as JceStruct;
 
 T_Container.Set(QueryId);
@@ -52,7 +55,7 @@ QueryId.Write =
   };
 
 const BasicInfo = {
-  _t_className: "Struct<BasicInfo>",
+  _t_className: "Ample.Struct<BasicInfo>",
 } as JceStruct;
 
 T_Container.Set(BasicInfo);
@@ -83,7 +86,7 @@ BasicInfo.Write =
   };
 
 const Pagination = {
-  _t_className: "Struct<Pagination>",
+  _t_className: "Ample.Struct<Pagination>",
 } as JceStruct;
 
 T_Container.Set(Pagination);
@@ -117,7 +120,7 @@ Pagination.Write =
   };
 
 const User = {
-  _t_className: "Struct<User>",
+  _t_className: "Ample.Struct<User>",
 } as JceStruct;
 
 T_Container.Set(User);
@@ -132,6 +135,7 @@ User.Read =
     @DefineField(2) public age;
     @DefineField(3) public phone;
     @DefineField(4) public address;
+    @DefineField(5) public status;
 
     @Override public Deserialize() {
       this.id = this.ReadInt8(0);
@@ -139,6 +143,7 @@ User.Read =
       this.age = this.ReadInt8(2);
       this.phone = this.ReadString(3);
       this.address = this.ReadString(4);
+      this.status = this.ReadInt8(5);
       return this;
     }
   };
@@ -152,12 +157,13 @@ User.Write =
       this.WriteInt8(2, T_Utils.Read2Number(obj, "age"));
       this.WriteString(3, T_Utils.Read2String(obj, "phone"));
       this.WriteString(4, T_Utils.Read2String(obj, "address"));
+      this.WriteInt8(5, T_Utils.Read2Number(obj, "status"));
       return this;
     }
   };
 
 const getUserListReq = {
-  _t_className: "Struct<getUserListReq>",
+  _t_className: "Ample.Struct<getUserListReq>",
 } as JceStruct;
 
 T_Container.Set(getUserListReq);
@@ -192,7 +198,7 @@ getUserListReq.Write =
   };
 
 const getUserListRes = {
-  _t_className: "Struct<getUserListRes>",
+  _t_className: "Ample.Struct<getUserListRes>",
 } as JceStruct;
 
 T_Container.Set(getUserListRes);
@@ -229,7 +235,7 @@ getUserListRes.Write =
   };
 
 const getUserRes = {
-  _t_className: "Struct<getUserRes>",
+  _t_className: "Ample.Struct<getUserRes>",
 } as JceStruct;
 
 T_Container.Set(getUserRes);
@@ -267,13 +273,15 @@ export const LoadAmpleProxy = function (client: ClinetProxy) {
   this.module = "Ample";
 };
 
+LoadAmpleProxy.module = "Ample";
+
 LoadAmpleProxy.prototype.getUserList = function (data) {
   return new Promise((resolve) => {
     (this.client as ClinetProxy)
       .$InvokeRpc(
         this.module,
         "getUserList",
-        Ample.getUserListReq._t_className,
+        Ample.getUserListReq._t_className as string,
         data,
       )
       .then((resp) => {
@@ -285,7 +293,27 @@ LoadAmpleProxy.prototype.getUserList = function (data) {
 LoadAmpleProxy.prototype.getUser = function (data) {
   return new Promise((resolve) => {
     (this.client as ClinetProxy)
-      .$InvokeRpc(this.module, "getUser", Ample.QueryId._t_className, data)
+      .$InvokeRpc(
+        this.module,
+        "getUser",
+        Ample.QueryId._t_className as string,
+        data,
+      )
+      .then((resp) => {
+        resolve(resp);
+      });
+  });
+};
+
+LoadAmpleProxy.prototype.setUser = function (data) {
+  return new Promise((resolve) => {
+    (this.client as ClinetProxy)
+      .$InvokeRpc(
+        this.module,
+        "setUser",
+        Ample.User._t_className as string,
+        data,
+      )
       .then((resp) => {
         resolve(resp);
       });
@@ -306,15 +334,22 @@ LoadAmpleServer.prototype.TarsInitialize = function () {
   );
   T_Container.SetRpcMethod(
     "getUserList",
-    Ample.getUserListReq._t_className,
-    Ample.getUserListRes._t_className,
+    (Ample as any).getUserListReq._t_className as string,
+    (Ample as any).getUserListRes._t_className as string,
   );
 
   T_Container.SetMethod(this.module, "getUser", this.getUser.bind(this));
   T_Container.SetRpcMethod(
     "getUser",
-    Ample.QueryId._t_className,
-    Ample.getUserRes._t_className,
+    (Ample as any).QueryId._t_className as string,
+    (Ample as any).getUserRes._t_className as string,
+  );
+
+  T_Container.SetMethod(this.module, "setUser", this.setUser.bind(this));
+  T_Container.SetRpcMethod(
+    "setUser",
+    (Ample as any).User._t_className as string,
+    (Ample as any).Sample.BasicResp._t_className as string,
   );
 };
 
@@ -323,6 +358,10 @@ LoadAmpleServer.prototype.getUserList = async function (ctx, req) {
 };
 
 LoadAmpleServer.prototype.getUser = async function (ctx, req) {
+  throw new Error("Module Method has not implyment");
+};
+
+LoadAmpleServer.prototype.setUser = async function (ctx, req) {
   throw new Error("Module Method has not implyment");
 };
 

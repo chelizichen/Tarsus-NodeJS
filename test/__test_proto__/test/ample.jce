@@ -1,4 +1,4 @@
-include Sertest;
+include Sample;
 
 module Ample;
 
@@ -24,6 +24,7 @@ struct User   {
     2   int8    age;
     3   string  phone;
     4   string  address;  
+    5   int8    status;
 }
 
 struct getUserListReq  {
@@ -44,6 +45,9 @@ struct getUserRes  {
     2   User    data;
 }
 
+
 rpc getUserList(getUserListReq req, getUserListRes res);
 
 rpc getUser(QueryId req, getUserRes res);
+
+rpc setUser(User req, Sample.BasicResp res);

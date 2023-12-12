@@ -11,7 +11,8 @@
       "stream/*",
       "test/*",
       "bin/*",
-      "communicate/*"
+      "communicate/*",
+      "gateway/*"
     ],
     "exclude": ["node_modules"]
 }

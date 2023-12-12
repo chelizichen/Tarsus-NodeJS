@@ -1,4 +1,5 @@
-// include Sertest;
+// @ts-nocheck
+//
 // module Sample;
 import {
   T_Container,
@@ -11,13 +12,13 @@ import {
 } from "../category";
 import { DefineField, DefineStruct, Override } from "../decorator";
 import { T_WStream, T_RStream } from "../stream/index";
-import { JceStruct, ClinetProxy } from "../type";
+import { JceStruct, ClinetProxy, Module } from "../type";
 
 (Symbol as { metadata: symbol }).metadata ??= Symbol("Symbol.metadata");
-const Sample: Record<string, JceStruct> = {};
+const Sample: Module = {};
 
 const QueryId = {
-  _t_className: "Struct<QueryId>",
+  _t_className: "Sample.Struct<QueryId>",
 } as JceStruct;
 
 T_Container.Set(QueryId);
@@ -52,7 +53,7 @@ QueryId.Write =
   };
 
 const BasicInfo = {
-  _t_className: "Struct<BasicInfo>",
+  _t_className: "Sample.Struct<BasicInfo>",
 } as JceStruct;
 
 T_Container.Set(BasicInfo);
@@ -83,7 +84,7 @@ BasicInfo.Write =
   };
 
 const User = {
-  _t_className: "Struct<User>",
+  _t_className: "Sample.Struct<User>",
 } as JceStruct;
 
 T_Container.Set(User);
@@ -125,15 +126,53 @@ User.Write =
     }
   };
 
+const BasicResp = {
+  _t_className: "Sample.Struct<BasicResp>",
+} as JceStruct;
+
+T_Container.Set(BasicResp);
+
+Sample.BasicResp = BasicResp;
+
+BasicResp.Read =
+  @DefineStruct(BasicResp._t_className)
+  class extends T_RStream {
+    @DefineField(0) public code;
+    @DefineField(1) public message;
+
+    @Override public Deserialize() {
+      this.code = this.ReadInt32(0);
+      this.message = this.ReadString(1);
+      return this;
+    }
+  };
+
+BasicResp.Write =
+  @DefineStruct(BasicResp._t_className)
+  class extends T_WStream {
+    @Override public Serialize(obj) {
+      this.WriteInt32(0, T_Utils.Read2Number(obj, "code"));
+      this.WriteString(1, T_Utils.Read2String(obj, "message"));
+      return this;
+    }
+  };
+
 export const LoadSampleProxy = function (client: ClinetProxy) {
   this.client = client;
   this.module = "Sample";
 };
 
+LoadSampleProxy.module = Sample;
+
 LoadSampleProxy.prototype.getUserById = function (data) {
   return new Promise((resolve) => {
     (this.client as ClinetProxy)
-      .$InvokeRpc(this.module, "getUserById", Sample.QueryId._t_className, data)
+      .$InvokeRpc(
+        this.module,
+        "getUserById",
+        Sample.QueryId._t_className as string,
+        data,
+      )
       .then((resp) => {
         resolve(resp);
       });
@@ -154,8 +193,8 @@ LoadSampleServer.prototype.TarsInitialize = function () {
   );
   T_Container.SetRpcMethod(
     "getUserById",
-    Sample.QueryId._t_className,
-    Sample.User._t_className,
+    Sample.QueryId._t_className as string,
+    Sample.User._t_className as string,
   );
 };
 

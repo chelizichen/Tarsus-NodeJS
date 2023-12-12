@@ -1,5 +1,3 @@
-include Sertest;
-
 module Sample;
 
 struct QueryId      {
@@ -19,6 +17,11 @@ struct User   {
     3   string      userAddress;
     4   string      createTime;  
     5   int8      status;  
+}
+
+struct BasicResp    {
+    0   int32   code;
+    1   string  message;
 }
 
 
