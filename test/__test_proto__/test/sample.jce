@@ -1,0 +1,25 @@
+include Sertest;
+
+module Sample;
+
+struct QueryId      {
+    0   int32    id;
+    1   BasicInfo basicInfo;
+}
+
+struct BasicInfo    {
+    0   string  token;
+    1   int32   traceId;
+}
+
+struct User   {
+    0   int32       userId;
+    1   string      userName;
+    2   string      phoneNumber;
+    3   string      userAddress;
+    4   string      createTime;  
+    5   int8      status;  
+}
+
+
+rpc getUserById(QueryId req, User res);

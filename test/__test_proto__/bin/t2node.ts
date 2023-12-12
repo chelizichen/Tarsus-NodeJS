@@ -15,7 +15,7 @@ class Lemon2Node {
   public structs:struct = {};
   public rpcs:Array<{ rpcName:string, req:string,reqName:string,res:string,resName:string }> = [];
 
-  static Compile(target = '../test/ample.jce',type:"client"|"server" = "client") {
+  static Compile(target = '../test/sample.jce',type:"client"|"server" = "client") {
     const lemon2node = new Lemon2Node();
     const tlvProtocol = fs.readFileSync(path.resolve(__dirname, target), "utf-8");
     let match;
@@ -68,8 +68,8 @@ class Lemon2Node {
     
     lemon2node.rpcs = rpcMethods;
 
-    // lemon2node.CreateRender();
-    lemon2node.CreateJavaProtocol()
+    lemon2node.CreateRender();
+    // lemon2node.CreateJavaProtocol()
   }
 
   public async CreateRender(){
@@ -104,7 +104,7 @@ export default ${this.module};
     `,
       { parser: 'typescript' }
     );
-    fs.writeFileSync('./bin/ample.ts',formattedContent,'utf-8')
+    fs.writeFileSync(`./bin/${this.module}.ts`,formattedContent,'utf-8')
   }
 
   private typeMap(type:string){
@@ -272,7 +272,7 @@ ${structName}.Read = @DefineStruct(${structName}._t_className) class extends T_R
       return `
       ${ModuleProxy}.prototype.${rpcMethodName} = function(data){
         return new Promise(resolve=>{
-          (this.client as ClinetProxy).$InvokeRpc(this.module,'${rpcMethodName}',Ample.${v.req}._t_className,data).then(resp=>{
+          (this.client as ClinetProxy).$InvokeRpc(this.module,'${rpcMethodName}',${this.module}.${v.req}._t_className,data).then(resp=>{
               resolve(resp)
           })
         })
@@ -305,7 +305,7 @@ ${clientProxy}
       const rpcMethodName = v.rpcName.replaceAll(' ','').substring(3);
       return `
         T_Container.SetMethod(this.module,'${rpcMethodName}',this.${rpcMethodName}.bind(this));
-        T_Container.SetRpcMethod('${rpcMethodName}',Ample.${v.req}._t_className,Ample.${v.res}._t_className);
+        T_Container.SetRpcMethod('${rpcMethodName}',${this.module}.${v.req}._t_className,${this.module}.${v.res}._t_className);
         `
     }).join('\n')
 
@@ -316,7 +316,7 @@ ${clientProxy}
       this.TarsInitialize();
     }
 
-    LoadAmpleServer.prototype.TarsInitialize = function(){
+    ${ModuleServer}.prototype.TarsInitialize = function(){
       ${InitializeServer}
     }
     ${ServerMethods}

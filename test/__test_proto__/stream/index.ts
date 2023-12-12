@@ -128,8 +128,8 @@ class T_WStream {
         return
     }
 
-    WriteStruct<T extends new ()=>T_WStream>(tag:number, value:any, T_WStream:T){
-        const ws = new T_WStream()
+    WriteStruct<T extends new ()=>T_WStream>(tag:number, value:any, WriteStream:T){
+        const ws = new WriteStream()
         ws.Serialize(value)
         const position = ws.position;
         this.position += 4
@@ -137,6 +137,7 @@ class T_WStream {
         this.originView.setInt32(this.position - 4,position)
         this.positionMap.set(tag,this.position - 4);
         this.allocate(position)
+        console.log('position',position);
         this.WriteBuf(-1, ws.toBuf())
         this.position += position;
     }
@@ -325,6 +326,7 @@ class T_RStream{
     ReadStruct<T extends new (...args:any[]) => T_RStream>(tag:number,Struct: T){
         this.position += 4;
         const ByteLength = this.originView.getInt32(this.position -  4);
+        console.log('ByteLength',ByteLength);
         const temp = this.createBuffer(ByteLength);
         this.originBuf.copy(temp,0, this.position, this.position + ByteLength)
         const struct = new Struct(temp)

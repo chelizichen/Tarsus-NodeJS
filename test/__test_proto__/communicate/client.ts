@@ -5,6 +5,7 @@ import { T_RStream, T_WStream } from "../stream";
 import { T_Container, T_String, T_Vector } from "../category";
 import { uid } from "uid";
 import Ample, { LoadAmpleProxy } from "../bin/ample";
+import { LoadSampleProxy } from "../bin/Sample";
 
 
 class T_Client extends CommunicateBase{
@@ -22,20 +23,21 @@ class T_Client extends CommunicateBase{
         this.Reset();
         this.Socket = new net.Socket();
         this.Socket.connect(Servant)
+        this.Servant = Servant;
         this.Registration(this.Socket)
     }
 
     // 拿到包以后需要先判断包是否完整
     // 如果不完整，则存入localData中
     $OnData(buf:Buffer){
+        console.log("获取到数据");
+        console.log(buf.toString());
+        
         const View = new DataView(buf.buffer)
         const NonExistent = this.Position === 0;
         // 当前缓冲区是正常的
         if(NonExistent){
             const BufferLength = View.getInt32(0) + 4;
-            console.log('BufferLength',BufferLength);
-            console.log('buf.byteLength',buf.byteLength);
-            
             // 完整包
             if(View.byteLength == BufferLength){
                 this.$ResponseToGateWay(buf)
@@ -54,7 +56,7 @@ class T_Client extends CommunicateBase{
                 const spliceBuf = buf.subarray(0,BufferLength);
                 this.$ResponseToGateWay(spliceBuf)
                 const otherBuf = buf.subarray(BufferLength)
-                if(otherBuf.byteLength != 0){
+                if(otherBuf.byteLength != 0 && (otherBuf.every(v=>v !== 0))){
                     this.$OnData(otherBuf);
                 }
                 return;
@@ -95,13 +97,24 @@ class T_Client extends CommunicateBase{
 
     $WriteToServer(data:Buffer){
         const _buf = $WriteHead(data)
-        console.log('$WriteToServer',_buf.byteLength);
+        console.log('$WriteToServer',_buf.join(','));
         this.Socket.write(_buf)
+        // this.Socket.write("\n")
+        this.Socket.end()
+    }
+
+    $OnClose(){
+        console.log("链接已断开");
+        // setInterval(()=>{
+        //     console.log("是否链接成功",this.Socket.connecting);
+        //     this.Socket.connect(this.Servant)
+        // },1000)
     }
 
     Registration(Socket:net.Socket){
         Socket.on('data',this.$OnData.bind(this));
         Socket.on('connect',this.$OnConncet.bind(this))
+        Socket.on('close',this.$OnClose.bind(this))
     }
     
     Reset(){
@@ -123,6 +136,7 @@ class T_Client extends CommunicateBase{
             ws.WriteVector(3,traceIds,T_String);
             ws.WriteStruct(4,body,this.$ReflectGetClass(request).Write)
             this.$WriteToServer(ws.toBuf())
+            console.log("ws.toBuf()"+ws.toBuf());
             this.Events.on(traceReqId,resp=>resolve(resp));
         })
     }
@@ -130,49 +144,75 @@ class T_Client extends CommunicateBase{
 }
 
 
+// const client = new T_Client({
+//     'port':24001
+// })
+
+// T_Container.Set(Ample.getUserListReq)
+// T_Container.Set(Ample.getUserListRes)
+
+
+// const ClientProxy = new LoadAmpleProxy(client);
+
+// TimesCall(()=>
+//     ClientProxy.getUserList({
+//         basicInfo:{
+//             token:"qwe123asd123",
+//             detail:{
+//                 a:"1",
+//                 b:"2"
+//             }
+//         },
+//         page:{
+//             offset:0,
+//             size:10,
+//             keyword:"hello world"
+//         }
+//     }).then(res=>{
+//         console.log('getUserList',res);
+//     })
+// ,5)
+
+// TimesCall(()=>
+//     ClientProxy.getUser({
+//         id:1,
+//         basicInfo:{
+//             token:"qwe123asd123",
+//             detail:{
+//                 a:"1",
+//                 b:"2"
+//             }
+//         },
+//     }).then(res=>{
+//         console.log('getUser',res);
+//     })
+// ,5)
+
+
+// const client = new T_Client({
+//     'port':24001
+// })
+
 const client = new T_Client({
-    'port':24001
+    'port':24511
 })
 
-T_Container.Set(Ample.getUserListReq)
-T_Container.Set(Ample.getUserListRes)
+const ClientProxy = new LoadSampleProxy(client);
 
-
-const ClientProxy = new LoadAmpleProxy(client);
-
-TimesCall(()=>
-    ClientProxy.getUserList({
+// TimesCall(()=>
+setTimeout(()=>{
+    ClientProxy.getUserById({
+        id:77,
         basicInfo:{
-            token:"qwe123asd123",
-            detail:{
-                a:"1",
-                b:"2"
-            }
-        },
-        page:{
-            offset:0,
-            size:10,
-            keyword:"hello world"
+         token:'asd123',
+         traceId:5411
         }
-    }).then(res=>{
-        console.log('getUserList',res);
-    })
-,5)
+     }).then(res=>{
+         console.log('getUserById',res);
+     })
+},2000)
 
-TimesCall(()=>
-    ClientProxy.getUser({
-        id:1,
-        basicInfo:{
-            token:"qwe123asd123",
-            detail:{
-                a:"1",
-                b:"2"
-            }
-        },
-    }).then(res=>{
-        console.log('getUser',res);
-    })
-,5)
+// ,5)
 
 export default T_Client;
 
