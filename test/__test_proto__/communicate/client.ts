@@ -97,8 +97,8 @@ class T_Client extends CommunicateBase{
     }
 
     $WriteToServer(data:Buffer){
-        const _buf = $WriteHead(data)
-        this.Socket.write(_buf)
+        const TransmitBuf = $WriteHead(data)
+        this.Socket.write(Buffer.concat([TransmitBuf, Buffer.from('\n')]));
         // this.Socket.write("\n")
         // this.Socket.end()
     }

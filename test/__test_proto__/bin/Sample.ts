@@ -162,7 +162,7 @@ export const LoadSampleProxy = function (client: ClinetProxy) {
   this.module = "Sample";
 };
 
-LoadSampleProxy.module = Sample;
+LoadSampleProxy.module = "Sample";
 
 LoadSampleProxy.prototype.getUserById = function (data) {
   return new Promise((resolve) => {
