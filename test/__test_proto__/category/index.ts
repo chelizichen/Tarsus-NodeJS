@@ -207,6 +207,19 @@ class T_Utils{
     static Read2Vector(target,path){
         return _.get(target,path) || [];
     }
+    static HideProperties(target){
+        Object.defineProperty(target, 'client', {  
+            enumerable: false,  
+            writable: true,  
+            configurable: true  
+        });  
+          
+        Object.defineProperty(target, 'module', {  
+            enumerable: false,  
+            writable: true,  
+            configurable: true  
+        });  
+    }
 }
 
 export{

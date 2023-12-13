@@ -1,4 +1,3 @@
-// @ts-nocheck
 //
 // module Sample;
 import {
@@ -160,6 +159,8 @@ BasicResp.Write =
 export const LoadSampleProxy = function (client: ClinetProxy) {
   this.client = client;
   this.module = "Sample";
+  T_Utils.HideProperties(this); // HideProperties
+  this.getUserById = LoadSampleProxy.prototype.getUserById.bind(this);
 };
 
 LoadSampleProxy.module = "Sample";
@@ -193,8 +194,8 @@ LoadSampleServer.prototype.TarsInitialize = function () {
   );
   T_Container.SetRpcMethod(
     "getUserById",
-    Sample.QueryId._t_className as string,
-    Sample.User._t_className as string,
+    (Sample as any).QueryId._t_className as string,
+    (Sample as any).User._t_className as string,
   );
 };
 

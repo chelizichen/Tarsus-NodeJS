@@ -155,18 +155,18 @@ class T_Client extends CommunicateBase{
 
 // TimesCall(()=>
 //     ClientProxy.getUserList({
-//         basicInfo:{
-//             token:"qwe123asd123",
-//             detail:{
-//                 a:"1",
-//                 b:"2"
-//             }
-//         },
-//         page:{
-//             offset:0,
-//             size:10,
-//             keyword:"hello world"
-//         }
+        // basicInfo:{
+        //     token:"qwe123asd123",
+        //     detail:{
+        //         a:"1",
+        //         b:"2"
+        //     }
+        // },
+        // page:{
+        //     offset:0,
+        //     size:10,
+        //     keyword:"hello world"
+        // }
 //     }).then(res=>{
 //         console.log('getUserList',res);
 //     })

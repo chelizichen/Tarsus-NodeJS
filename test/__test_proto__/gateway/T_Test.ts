@@ -4,24 +4,23 @@ import { LoadSampleProxy } from "../bin/Sample";
 import { TimesCall } from "../communicate/utils";
 
 function init() {
-  // const AmpleProxy = {
-  //   Module: LoadAmpleProxy.module,
-  //   Conn: {
-  //     port: 24001,
-  //   },
-  //   ClientProxy: LoadAmpleProxy,
-  // };
+  const AmpleProxy = {
+    Module: LoadAmpleProxy.module,
+    Conn: {
+      port: 24001,
+    },
+    ClientProxy: LoadAmpleProxy,
+  };
 
   const SampleProxy = {
     Module: LoadSampleProxy.module,
     Conn: {
       port: 24511,
     },
-    language:"java",
     ClientProxy: LoadSampleProxy,
   };
 
-  const Servers = [SampleProxy];
+  const Servers = [SampleProxy,AmpleProxy];
 
   const GateWay = new T_GateWay(Servers);
   // GateWay.InvokeRpcMethod(LoadAmpleProxy.module, "getUserList", {

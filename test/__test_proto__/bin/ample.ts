@@ -271,6 +271,10 @@ getUserRes.Write =
 export const LoadAmpleProxy = function (client: ClinetProxy) {
   this.client = client;
   this.module = "Ample";
+  T_Utils.HideProperties(this); // HideProperties
+  this.getUserList = LoadAmpleProxy.prototype.getUserList.bind(this);
+  this.getUser = LoadAmpleProxy.prototype.getUser.bind(this);
+  this.setUser = LoadAmpleProxy.prototype.setUser.bind(this);
 };
 
 LoadAmpleProxy.module = "Ample";

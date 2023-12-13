@@ -12,7 +12,8 @@
       "test/*",
       "bin/*",
       "communicate/*",
-      "gateway/*"
+      "gateway/*",
+      "integration/*"
     ],
     "exclude": ["node_modules"]
 }

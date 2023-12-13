@@ -15,7 +15,7 @@ class Lemon2Node {
   public structs:struct = {};
   public rpcs:Array<{ rpcName:string, req:string,reqName:string,res:string,resName:string }> = [];
 
-  static Compile(target = '../test/ample.jce',type:"client"|"server" = "client") {
+  static Compile(target = '../test/Sample.jce',type:"client"|"server" = "client") {
     const lemon2node = new Lemon2Node();
     const tlvProtocol = fs.readFileSync(path.resolve(__dirname, target), "utf-8");
     let match;
@@ -284,12 +284,18 @@ ${structName}.Read = @DefineStruct(${structName}._t_className) class extends T_R
       }
       `
     }).join('\n')
-    console.log(clientProxy);
+    
+    const bindCode = this.rpcs.map(v=>{
+      const rpcMethodName = v.rpcName.replaceAll(' ','').substring(3);
+      return `this.${rpcMethodName} = ${ModuleProxy}.prototype.${rpcMethodName}.bind(this)`
+    })
     
     return `
 export const ${ModuleProxy} = function(client:ClinetProxy){
   this.client = client;
   this.module = '${this.module}';
+  T_Utils.HideProperties(this); // HideProperties
+  ${bindCode.join('\n')}
 };
 
 ${ModuleProxy}.module = '${this.module}';
@@ -329,102 +335,6 @@ ${clientProxy}
     ${ServerMethods}
     `
   }
-
-  static Test = `
-  function main(){
-    const write_basicInfo = new BasicInfo.Write();
-    const wbf = write_basicInfo.Serialize(
-        {
-            token:'1234',
-            detail:{'a':'1','b':'2'}
-        }
-    ).toBuf()!;
-    const read_basicInfo = new BasicInfo.Read(wbf).Deserialize().toObj()
-    console.log(read_basicInfo);
-
-    const write_pagination = new Pagination.Write();
-    const wpg =  write_pagination.Serialize({
-        offset:0,
-        size:10,
-        keyword:"hello world"
-    }).toBuf()!;
-    const read_pagination = new Pagination.Read(wpg).Deserialize().toObj()
-    console.log(read_pagination);
-
-    const write_user = new User.Write();
-    const wus =  write_user.Serialize({
-        id:0,
-        name:'leemulus',
-        age:12,
-        phone:'12321412321',
-        address:'wuhan'
-    }).toBuf()!;
-    const read_user = new User.Read(wus).Deserialize().toObj()
-    console.log(read_user);
-    
-
-    const write_getuserreq = new getUserListReq.Write();
-    const wgreq =  write_getuserreq.Serialize({
-        basicInfo:{
-            token:"qwe123asd123",
-            detail:{
-                a:"1",
-                b:"2"
-            }
-        },
-        page:{
-            offset:0,
-            size:10,
-            keyword:"hello world"
-        }
-    }).toBuf()!;
-    const rgreq = new getUserListReq.Read(wgreq).Deserialize().toObj()
-    console.log(rgreq);
-
-    const write_getuserres = new getUserListRes.Write();
-    debugger;
-    const wgres =  write_getuserres.Serialize({
-        code:0,
-        message:'ok',
-        data:[
-            {
-                id:0,
-                name:'leemulus',
-                age:13,
-                phone:'12321412321',
-                address:'wuhan'
-            },
-            {
-                id:1,
-                name:'leemulus',
-                age:14,
-                phone:'12321412321',
-                address:'wuhan'
-            },
-            {
-                id:2,
-                name:'leemulus',
-                age:15,
-                phone:'12321412321',
-                address:'wuhan'
-            }
-        ],
-        user: {
-            id:0,
-            name:'leemulus',
-            age:13,
-            phone:'12321412321',
-            address:'wuhan'
-        },
-        
-    }).toBuf()!;
-    debugger;
-    const rgres = new getUserListRes.Read(wgres).Deserialize().toObj()
-    console.log(rgres);
-}
-
-main();
-`
 
   public async CreateJavaProtocol(){
     for(let v in this.structs){
